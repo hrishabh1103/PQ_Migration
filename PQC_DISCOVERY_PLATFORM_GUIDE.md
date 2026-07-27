@@ -12,7 +12,7 @@ The **Enterprise Cryptographic Discovery Platform** is a modular, high-assurance
 ```
                                   +---------------------------------------+
                                   | React + TypeScript + Tailwind UI      |
-                                  | Dashboard, Targets, Scans, Reports    |
+                                  | Dashboard, API Hub, Scans, Reports    |
                                   +---------------------------------------+
                                                       |
                                                       v REST API (FastAPI)
@@ -61,11 +61,26 @@ The **Enterprise Cryptographic Discovery Platform** is a modular, high-assurance
 
 ---
 
-## 2. How to Test Real Work Environments
+## 2. Team API & Server Discovery Hub Guide
+
+The **API & Server Hub** tab in the UI allows engineering teams to register and test all company backend servers and endpoints:
+
+1. **Bulk API Server Registration**:
+   - Navigate to **API & Server Hub** in top navbar.
+   - Paste server URLs/endpoints (e.g. `https://api.company.com`, `https://auth.company.com/v1`, `10.0.0.12:443`).
+   - Click **Register Servers & Run Quantum Discovery** to automatically set up targets and run quantum audits.
+2. **OpenAPI / Swagger Spec Import**:
+   - Upload an OpenAPI 3.0 / Swagger 2.0 `.json` file to auto-extract all server host endpoints and initiate quantum status checks.
+3. **Team Migration Strategy**:
+   - Inspect the real-time **Team Quantum Status** table showing specific team action plans (e.g., *Enable Hybrid X25519+MLKEM768 for TLS 1.3 endpoints*, *Re-issue server certificates with ML-DSA-65*).
+
+---
+
+## 3. How to Test Real Work Environments
 
 The platform includes 5 production discovery scanners capable of operating against real enterprise systems:
 
-### 2.1 TLS & Network Service Scanning (`TLSScanner`)
+### 3.1 TLS & Network Service Scanning (`TLSScanner`)
 - **Target Type:** `HOSTNAME`, `URL`, `IP_RANGE`, or `CIDR` (e.g. `google.com`, `api.company.com`, `192.168.1.50`).
 - **How to Test:**
   1. Open the **Targets** page in the UI and click **Register Target**.
@@ -74,28 +89,28 @@ The platform includes 5 production discovery scanners capable of operating again
   4. Navigate to **Scans** → Select target → Choose **TLS & Network Scanner** → Click **Trigger Scan**.
 - **What is Discovered:** Performs a real TLS handshake to extract server certificates, public key algorithms (RSA-2048, ECDSA P-256), bit lengths, negotiated TLS protocol version (`TLSv1.3`), and cipher suites (`TLS_AES_256_GCM_SHA384`).
 
-### 2.2 SSH Host & Key Exchange Scanning (`SSHScanner`)
+### 3.2 SSH Host & Key Exchange Scanning (`SSHScanner`)
 - **Target Type:** `HOSTNAME`, `IP_RANGE`, `CIDR` (e.g. `ssh.company.com`, `10.0.0.12`).
 - **How to Test:**
   1. Register an SSH server target on port 22.
   2. Navigate to **Scans** → Select target → Choose **SSH Host & KEX Scanner** → Click **Trigger Scan**.
 - **What is Discovered:** Connects to TCP port 22 to inspect SSH server identification banners (`SSH-2.0-OpenSSH_8.9p1`), Host Key algorithms (`rsa-sha2-512`, `ssh-ed25519`), and KEX algorithms (`curve25519-sha256`).
 
-### 2.3 X.509 Certificate Store Scanning (`CertificateScanner`)
+### 3.3 X.509 Certificate Store Scanning (`CertificateScanner`)
 - **Target Type:** `CERT_STORE` (e.g., `/etc/ssl/certs`, `/etc/letsencrypt/live`, or `/path/to/my-certs`).
 - **How to Test:**
   1. Register a `CERT_STORE` target with an absolute local directory or file path containing certificates.
   2. Select **X.509 Certificate Scanner** and trigger the scan.
 - **What is Discovered:** Scans and parses `.crt`, `.pem`, `.cer`, and `.der` files on disk, extracting Subject/Issuer names, signature algorithms (`sha256WithRSAEncryption`), validity dates, serial numbers, and X.509 extensions.
 
-### 2.4 Source Code Cryptographic Scanning (`SourceCodeScanner`)
+### 3.4 Source Code Cryptographic Scanning (`SourceCodeScanner`)
 - **Target Type:** `REPOSITORY` (e.g., `/Users/hrishabh/Projects/my-app`).
 - **How to Test:**
   1. Register a `REPOSITORY` target pointing to an absolute directory path of a git repository or project folder.
   2. Select **Source Code Crypto Scanner** and trigger the scan.
 - **What is Discovered:** Scans `.py`, `.js`, `.ts`, `.go`, `.java`, `.cpp`, `.rs` files for cryptographic primitives (RSA generation, AES-GCM ciphers, ECDSA, SHA-384, Kyber768, Dilithium3), capturing line-number location provenance.
 
-### 2.5 Package Dependency Scanning (`DependencyScanner`)
+### 3.5 Package Dependency Scanning (`DependencyScanner`)
 - **Target Type:** `REPOSITORY` (e.g., `/Users/hrishabh/Projects/my-app`).
 - **How to Test:**
   1. Register a target pointing to a folder containing package manifests (`package.json`, `requirements.txt`, `go.mod`, `pom.xml`, `Cargo.toml`).
@@ -104,7 +119,7 @@ The platform includes 5 production discovery scanners capable of operating again
 
 ---
 
-## 3. Cryptographic Flaws & PQC Mitigation Strategies
+## 4. Cryptographic Flaws & PQC Mitigation Strategies
 
 The platform's **Risk & Mitigation Engine** evaluates all discovered findings against **NIST PQC Standards (FIPS 203, FIPS 204, FIPS 205)** and **CNSA 2.0 Migration Timelines**:
 
@@ -119,7 +134,7 @@ The platform's **Risk & Mitigation Engine** evaluates all discovered findings ag
 
 ---
 
-## 4. Reports & Document Generation
+## 5. Reports & Document Generation
 
 The platform provides automated report generation:
 
@@ -134,7 +149,7 @@ The platform provides automated report generation:
 
 ---
 
-## 5. Developer & Deployment Guide
+## 6. Developer & Deployment Guide
 
 ### Option A: Local Development Server
 Run the single-command startup script:
@@ -155,4 +170,4 @@ cd backend
 source venv/bin/activate
 PYTHONPATH=. pytest -v
 ```
-All 21 backend unit/integration tests verify ScopeGuard, Sanitizer, NormalizationEngine, ScannerRegistry, MockScanner, Real Scanners, DiscoveryOrchestrator, and Report Generation.
+All 23 backend unit/integration tests verify ScopeGuard, Sanitizer, NormalizationEngine, ScannerRegistry, MockScanner, Real Scanners, DiscoveryOrchestrator, API Hub, and Report Generation.
