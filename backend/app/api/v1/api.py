@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import health, targets, scans, assets, findings, stats, reports, cbom
+from app.api.v1 import health, targets, scans, assets, findings, stats, reports, cbom, api_hub
 
 api_router = APIRouter()
 
@@ -11,3 +11,4 @@ api_router.include_router(findings.router, tags=["Findings"])
 api_router.include_router(stats.router, tags=["Stats"])
 api_router.include_router(reports.router, tags=["Reports"])
 api_router.include_router(cbom.router, tags=["CBOM Export"])
+api_router.include_router(api_hub.router, tags=["API & Server Hub"])

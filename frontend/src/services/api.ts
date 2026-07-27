@@ -36,6 +36,32 @@ export async function createTarget(input: TargetCreateInput): Promise<Authorized
   return res.json();
 }
 
+export async function bulkRegisterApiServers(name: string, endpoints: string[], environment: string = 'PRODUCTION') {
+  const res = await fetch(`${API_BASE}/api-hub/bulk-register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name,
+      endpoints,
+      environment,
+      run_immediate_scan: true
+    }),
+  });
+  if (!res.ok) throw new Error('Failed to register API servers');
+  return res.json();
+}
+
+export async function uploadOpenApiSpec(file: File, environment: string = 'PRODUCTION') {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(`${API_BASE}/api-hub/import-openapi?environment=${environment}`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!res.ok) throw new Error('Failed to upload OpenAPI spec');
+  return res.json();
+}
+
 export async function fetchScans(): Promise<ScanJob[]> {
   const res = await fetch(`${API_BASE}/scans`);
   if (!res.ok) throw new Error('Failed to fetch scan jobs');

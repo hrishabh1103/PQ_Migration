@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { DashboardPage } from './pages/DashboardPage';
+import { ApiServerHubPage } from './pages/ApiServerHubPage';
 import { TargetsPage } from './pages/TargetsPage';
 import { ScansPage } from './pages/ScansPage';
 import { AssetsPage } from './pages/AssetsPage';
@@ -15,6 +16,7 @@ export const App: React.FC = () => {
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && <DashboardPage onNavigate={(tab) => setActiveTab(tab)} />}
+        {activeTab === 'api-hub' && <ApiServerHubPage onNavigateScans={() => setActiveTab('scans')} />}
         {activeTab === 'targets' && <TargetsPage onNavigateScans={() => setActiveTab('scans')} />}
         {activeTab === 'scans' && <ScansPage />}
         {activeTab === 'assets' && <AssetsPage />}
@@ -22,7 +24,7 @@ export const App: React.FC = () => {
         {activeTab === 'reports' && <ReportsPage />}
       </main>
       <footer className="border-t border-slate-800 bg-slate-950 py-6 text-center text-xs font-mono text-slate-500">
-        Enterprise Cryptographic Discovery Platform • Post-Quantum Migration Readiness Report Engine
+        Enterprise Cryptographic Discovery Platform • Post-Quantum Migration Readiness Hub
       </footer>
     </div>
   );

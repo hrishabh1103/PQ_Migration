@@ -5,7 +5,7 @@ An enterprise-grade cryptographic discovery, inventory, normalization, risk asse
 ```
                                   +---------------------------------------+
                                   | React + TypeScript + Tailwind UI      |
-                                  | Dashboard, Targets, Scans, Reports    |
+                                  | Dashboard, API Hub, Scans, Reports    |
                                   +---------------------------------------+
                                                       |
                                                       v REST API (FastAPI)
@@ -56,6 +56,7 @@ An enterprise-grade cryptographic discovery, inventory, normalization, risk asse
 
 ## Key Features
 
+- **Team API & Server Discovery Hub (`API & Server Hub`)**: Dedicated UI section for engineering teams to paste bulk API server endpoints, URLs, or upload OpenAPI/Swagger JSON specifications to test quantum safety status and receive team migration strategies.
 - **Hierarchy-Aware Entity Modeling**: `AuthorizedTarget` → `ScanJob` → `Asset` → `Service` → `CryptoFinding` → `NormalizedAlgorithm`
 - **5 Production Discovery Scanners**:
   - TLS & Network Scanner (`TLSScanner`)
@@ -88,15 +89,26 @@ docker compose up --build
 
 ---
 
+## API & Server Discovery Hub Guide
+
+The **API & Server Hub** tab in the UI allows engineering teams to register and test all company backend servers and endpoints:
+
+1. **Bulk API Server Registration**:
+   - Navigate to **API & Server Hub** in top navbar.
+   - Paste server URLs/endpoints (e.g. `https://api.company.com`, `https://auth.company.com/v1`, `10.0.0.12:443`).
+   - Click **Register Servers & Run Quantum Discovery** to automatically set up targets and run quantum audits.
+2. **OpenAPI / Swagger Spec Import**:
+   - Upload an OpenAPI 3.0 / Swagger 2.0 `.json` file to auto-extract all server host endpoints and initiate quantum status checks.
+3. **Team Migration Strategy**:
+   - Inspect the real-time **Team Quantum Status** table showing specific team action plans (e.g., *Enable Hybrid X25519+MLKEM768 for TLS 1.3 endpoints*, *Re-issue server certificates with ML-DSA-65*).
+
+---
+
 ## Testing Real Work Environments Guide
 
 ### 1. Network & TLS Services (`TLSScanner`)
 - **Target Types:** `HOSTNAME`, `URL`, `IP_RANGE`, `CIDR` (e.g. `api.company.com`, `google.com`, `192.168.1.50`).
-- **Instructions:**
-  1. Open the **Targets** tab in the UI and click **Register Target**.
-  2. Enter Target Name (e.g. `Corporate API Gateway`), Target Type (`HOSTNAME`), and Value (`api.company.com`).
-  3. Ensure **Is Authorized** is checked and click **Save Target**.
-  4. Navigate to **Scans** → Select target → Choose **TLS & Network Scanner** → Click **Trigger Scan**.
+- **Instructions:** Register target on port 443 and trigger **TLS & Network Scanner**.
 - **Discovered Output:** Performs a real TLS handshake over TCP port 443 to extract server certificates, public key algorithms (RSA-2048, ECDSA P-256), bit lengths, negotiated TLS protocol version (`TLSv1.3`), and cipher suites (`TLS_AES_256_GCM_SHA384`).
 
 ### 2. SSH Host Services (`SSHScanner`)
@@ -149,4 +161,4 @@ cd backend
 source venv/bin/activate
 PYTHONPATH=. pytest -v
 ```
-All 21 backend unit/integration tests verify ScopeGuard, Sanitizer, NormalizationEngine, ScannerRegistry, MockScanner, Real Scanners, DiscoveryOrchestrator, and Report Generation.
+All 23 backend unit/integration tests verify ScopeGuard, Sanitizer, NormalizationEngine, ScannerRegistry, MockScanner, Real Scanners, DiscoveryOrchestrator, API Hub, and Report Generation.
