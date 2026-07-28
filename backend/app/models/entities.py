@@ -19,6 +19,10 @@ class TargetType(str, enum.Enum):
     URL = "URL"
     REPOSITORY = "REPOSITORY"
     CERT_STORE = "CERT_STORE"
+    CLOUD_PROVIDER = "CLOUD_PROVIDER"
+    CLOUD_SERVER = "CLOUD_SERVER"
+    CLOUD_KMS = "CLOUD_KMS"
+    CONTAINER_REGISTRY = "CONTAINER_REGISTRY"
 
 class ScanStatus(str, enum.Enum):
     PENDING = "PENDING"
@@ -33,6 +37,10 @@ class AssetType(str, enum.Enum):
     APPLICATION = "APPLICATION"
     SOURCE_REPOSITORY = "SOURCE_REPOSITORY"
     CONTAINER = "CONTAINER"
+    CLOUD_VM = "CLOUD_VM"
+    CLOUD_INSTANCE = "CLOUD_INSTANCE"
+    KMS_KEY = "KMS_KEY"
+    CLOUD_BUCKET = "CLOUD_BUCKET"
 
 class TransportProtocol(str, enum.Enum):
     TCP = "TCP"

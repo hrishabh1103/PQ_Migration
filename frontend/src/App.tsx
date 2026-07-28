@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { DashboardPage } from './pages/DashboardPage';
+import { CloudServersPage } from './pages/CloudServersPage';
 import { ApiServerHubPage } from './pages/ApiServerHubPage';
 import { TargetsPage } from './pages/TargetsPage';
 import { ScansPage } from './pages/ScansPage';
@@ -16,6 +17,7 @@ export const App: React.FC = () => {
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && <DashboardPage onNavigate={(tab) => setActiveTab(tab)} />}
+        {activeTab === 'cloud-servers' && <CloudServersPage />}
         {activeTab === 'api-hub' && <ApiServerHubPage onNavigateScans={() => setActiveTab('scans')} />}
         {activeTab === 'targets' && <TargetsPage onNavigateScans={() => setActiveTab('scans')} />}
         {activeTab === 'scans' && <ScansPage />}

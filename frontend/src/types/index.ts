@@ -1,8 +1,8 @@
-export type TargetType = 'HOSTNAME' | 'IP_RANGE' | 'CIDR' | 'URL' | 'REPOSITORY' | 'CERT_STORE';
+export type TargetType = 'HOSTNAME' | 'IP_RANGE' | 'CIDR' | 'URL' | 'REPOSITORY' | 'CERT_STORE' | 'CLOUD_PROVIDER' | 'CLOUD_SERVER' | 'CLOUD_KMS' | 'CONTAINER_REGISTRY';
 
 export type ScanStatus = 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
 
-export type AssetType = 'HOST' | 'SERVER' | 'APPLICATION' | 'SOURCE_REPOSITORY' | 'CONTAINER';
+export type AssetType = 'HOST' | 'SERVER' | 'APPLICATION' | 'SOURCE_REPOSITORY' | 'CONTAINER' | 'CLOUD_VM' | 'CLOUD_INSTANCE' | 'KMS_KEY' | 'CLOUD_BUCKET';
 
 export type TransportProtocol = 'TCP' | 'UDP' | 'NONE';
 

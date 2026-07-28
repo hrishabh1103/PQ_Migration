@@ -5,6 +5,7 @@ from app.scanners import certificate_scanner
 from app.scanners import ssh_scanner
 from app.scanners import source_code_scanner
 from app.scanners import dependency_scanner
+from app.scanners import cloud_scanner
 
 __all__ = [
     "Scanner",
@@ -17,4 +18,5 @@ __all__ = [
     "ssh_scanner",
     "source_code_scanner",
     "dependency_scanner",
+    "cloud_scanner",
 ]

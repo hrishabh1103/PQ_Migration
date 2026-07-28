@@ -82,10 +82,28 @@ An enterprise-grade cryptographic discovery, inventory, normalization, risk asse
 - **React Frontend**: http://localhost:5173
 - **FastAPI REST API Docs**: http://localhost:8000/docs
 
-### Option B: Docker Compose
+### Option B: Production Docker Compose
 ```bash
-docker compose up --build
+docker compose -f docker-compose.prod.yml up -d --build
 ```
+
+### Option C: Cloud Server Deployment (AWS, GCP, Kubernetes)
+- **AWS (Terraform / EC2 / ECS)**: `cd deploy/aws && terraform init && terraform apply`
+- **GCP (Cloud Run / Artifact Registry)**: `bash deploy/gcp/deploy_gcp.sh`
+- **Kubernetes (EKS / GKE / AKS)**: `kubectl apply -f deploy/k8s/deployment.yaml`
+
+---
+
+## Cloud Servers & Infrastructure Hub
+
+The **Cloud Servers** tab in the top navigation bar provides specialized cryptographic auditing and cloud deployment management:
+
+1. **Cloud Target Registration**:
+   - Register AWS EC2 instances, GCP Compute Engine VMs, Azure Virtual Machines, Cloud KMS Key ARNs/URIs, and Container Load Balancers.
+2. **Cloud Server Cryptographic Discovery (`CloudServerScanner`)**:
+   - Automatically audits Cloud Host SSH host keys, Cloud Load Balancer TLS policies, Cloud KMS customer master keys (RSA/ECC vs Post-Quantum ML-KEM candidates), and S3/GCS server-side storage encryption (`AES-256-GCM`).
+3. **Cloud PQC Risk Scorecard & Remediation Roadmap**:
+   - Generates real-time PQC readiness scores, flags vulnerable KMS keys, and presents actionable NIST FIPS 203/204 mitigation steps tailored for enterprise cloud environments.
 
 ---
 

@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: qdiscovery
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qdiscovery-config
+  namespace: qdiscovery
+data:
+  DATABASE_URL: "postgresql+psycopg2://postgres:postgres_password@qdiscovery-postgres:5432/qdiscovery"
+  ENV: "production"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qdiscovery-backend
+  namespace: qdiscovery
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: qdiscovery-backend
+  template:
+    metadata:
+      labels:
+        app: qdiscovery-backend
+    spec:
+      containers:
+      - name: backend
+        image: qdiscovery-backend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: qdiscovery-config
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qdiscovery-backend
+  namespace: qdiscovery
+spec:
+  selector:
+    app: qdiscovery-backend
+  ports:
+  - port: 8000
+    targetPort: 8000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qdiscovery-frontend
+  namespace: qdiscovery
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: qdiscovery-frontend
+  template:
+    metadata:
+      labels:
+        app: qdiscovery-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: qdiscovery-frontend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qdiscovery-frontend
+  namespace: qdiscovery
+spec:
+  type: LoadBalancer
+  selector:
+    app: qdiscovery-frontend
+  ports:
+  - port: 80
+    targetPort: 80
