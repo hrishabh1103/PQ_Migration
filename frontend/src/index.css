@@ -2,10 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --sidebar-expanded-width: 240px;
+  --sidebar-collapsed-width: 68px;
+  --header-height: 64px;
+}
+
 @layer base {
   body {
     background-color: #020617;
     color: #f8fafc;
+    overflow-x: hidden;
   }
 }
 

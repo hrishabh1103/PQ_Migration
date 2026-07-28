@@ -3,6 +3,8 @@ import { CryptoFinding } from '../types';
 import { fetchFindings } from '../services/api';
 import { FileText, KeyRound, Hash, RefreshCw, AlertCircle, Eye } from 'lucide-react';
 
+import { PageHeader } from '../components/common/PageHeader';
+
 export const FindingsPage: React.FC = () => {
   const [findings, setFindings] = useState<CryptoFinding[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -27,25 +29,21 @@ export const FindingsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center space-x-3">
-            <FileText className="w-6 h-6 text-cyan-400" />
-            <span>Cryptographic Findings & Provenance</span>
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Factual observation records with evidence snippets, scanner source, location, and SHA-256 evidence hashes.
-          </p>
-        </div>
-
-        <button
-          onClick={loadFindings}
-          className="p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition"
-        >
-          <RefreshCw className="w-4 h-4" />
-        </button>
-      </div>
+      {/* Reusable Page Header */}
+      <PageHeader
+        title="Cryptographic Findings & Provenance"
+        description="Factual observation records with evidence snippets, scanner source, location, and SHA-256 evidence hashes."
+        icon={FileText}
+        breadcrumbs={[{ label: 'Inventory' }, { label: 'Crypto Findings' }]}
+        actions={
+          <button
+            onClick={loadFindings}
+            className="p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        }
+      />
 
       {error && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center space-x-3 text-sm">

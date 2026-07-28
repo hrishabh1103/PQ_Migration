@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ScanJob, AuthorizedTarget } from '../types';
 import { fetchScans, fetchTargets, createScan } from '../services/api';
 import { Play, RefreshCw, CheckCircle, Clock, XCircle, AlertCircle, Cpu } from 'lucide-react';
+import { PageHeader } from '../components/common/PageHeader';
 
 const AVAILABLE_SCANNERS = [
   { id: 'all', name: 'All Scanners (Complete Discovery)' },
@@ -58,57 +59,53 @@ export const ScansPage: React.FC = () => {
 
   const getTargetName = (targetId: string) => {
     const t = targets.find((item) => item.id === targetId);
-    return t ? `${t.name} (${t.target_value})` : targetId;
+    return t ? t.name : targetId;
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center space-x-3">
-            <Play className="w-6 h-6 text-cyan-400" />
-            <span>Scan Jobs & Executions</span>
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Real-time execution status and history of discovery orchestrations.
-          </p>
-        </div>
+      <PageHeader
+        title="Scan Jobs & Executions"
+        description="Real-time execution status and history of discovery orchestrations."
+        icon={Play}
+        breadcrumbs={[{ label: 'Discovery' }, { label: 'Scans' }]}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={selectedTargetId}
+              onChange={(e) => setSelectedTargetId(e.target.value)}
+              className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-mono focus:outline-none focus:border-cyan-500"
+            >
+              {targets.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name} ({t.target_value})
+                </option>
+              ))}
+            </select>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={selectedTargetId}
-            onChange={(e) => setSelectedTargetId(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs font-mono focus:outline-none focus:border-cyan-500"
-          >
-            {targets.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name} ({t.target_value})
-              </option>
-            ))}
-          </select>
+            <select
+              value={selectedScannerId}
+              onChange={(e) => setSelectedScannerId(e.target.value)}
+              className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-cyan-400 text-xs font-mono focus:outline-none focus:border-cyan-500"
+            >
+              {AVAILABLE_SCANNERS.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
 
-          <select
-            value={selectedScannerId}
-            onChange={(e) => setSelectedScannerId(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 text-xs font-mono focus:outline-none focus:border-cyan-500"
-          >
-            {AVAILABLE_SCANNERS.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-
-          <button
-            onClick={handleLaunchScan}
-            disabled={!selectedTargetId}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium text-xs transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
-          >
-            <Play className="w-3.5 h-3.5 fill-white" />
-            <span>Trigger Scan</span>
-          </button>
-        </div>
-      </div>
+            <button
+              onClick={handleLaunchScan}
+              disabled={!selectedTargetId}
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium text-xs transition shadow-lg shadow-cyan-500/20 disabled:opacity-50"
+            >
+              <Play className="w-3.5 h-3.5 fill-white" />
+              <span>Trigger Scan</span>
+            </button>
+          </div>
+        }
+      />
 
       {error && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center space-x-3 text-sm">

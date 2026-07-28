@@ -130,6 +130,7 @@ export interface DashboardStats {
   services_count: number;
   findings_count: number;
   scan_jobs_count: number;
+  authorized_targets_count?: number;
   algorithm_distribution: Record<string, number>;
   scan_status_distribution: Record<string, number>;
 }

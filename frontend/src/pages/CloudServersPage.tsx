@@ -4,6 +4,7 @@ import {
   Lock, Activity, Plus, Terminal
 } from 'lucide-react';
 import { TargetType } from '../types';
+import { PageHeader } from '../components/common/PageHeader';
 
 interface CloudInstance {
   name: string;
@@ -59,7 +60,7 @@ export const CloudServersPage: React.FC = () => {
   ]);
 
   const [scorecard, setScorecard] = useState<ScorecardData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [auditStatus, setAuditStatus] = useState<string | null>(null);
 
   // New instance form
@@ -127,38 +128,33 @@ export const CloudServersPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-8 border border-indigo-500/20 text-white shadow-xl">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3">
-              <Cloud className="w-3.5 h-3.5" /> Cloud Server Cryptographic Hub
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">
-              Cloud Infrastructure & Server Discovery
-            </h1>
-            <p className="text-slate-300 mt-2 max-w-2xl text-sm leading-relaxed">
-              Audit enterprise cloud servers, virtual machines (EC2, GCP Compute, Azure VMs), Cloud KMS key rings, and container load balancers for post-quantum cryptographic readiness.
-            </p>
-          </div>
-          <button
-            onClick={handleRunCloudAudit}
-            disabled={loading}
-            className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-all shadow-lg shadow-indigo-600/30 disabled:opacity-50 shrink-0 cursor-pointer"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            {loading ? 'Auditing Cloud Infrastructure...' : 'Run Cloud Quantum Audit'}
-          </button>
-        </div>
-
-        {auditStatus && (
-          <div className="mt-4 p-3 rounded-lg bg-indigo-900/50 border border-indigo-500/40 text-xs text-indigo-200 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-indigo-400 animate-pulse" />
-            {auditStatus}
-          </div>
-        )}
-      </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <PageHeader
+        title="Cloud Infrastructure & Server Discovery"
+        description="Audit enterprise cloud servers, virtual machines, Cloud KMS key specs, and container load balancers for post-quantum cryptographic readiness."
+        icon={Cloud}
+        badge="Cloud Server Hub"
+        breadcrumbs={[{ label: 'Discovery' }, { label: 'Cloud Servers' }]}
+        actions={
+          <>
+            <button
+              onClick={handleRunCloudAudit}
+              disabled={loading}
+              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-all shadow-lg shadow-indigo-600/30 disabled:opacity-50 cursor-pointer"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <span>{loading ? 'Auditing...' : 'Run Cloud Discovery Audit'}</span>
+            </button>
+            {auditStatus && (
+              <div className="mt-2 p-2 rounded-lg bg-indigo-900/50 border border-indigo-500/40 text-xs text-indigo-200 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-indigo-400 animate-pulse" />
+                <span>{auditStatus}</span>
+              </div>
+            )}
+          </>
+        }
+      />
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

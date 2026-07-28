@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Asset, CryptoFinding } from '../types';
 import { fetchAssets, fetchFindings } from '../services/api';
 import { Database, Network, KeyRound, ShieldAlert, ChevronRight, RefreshCw, AlertCircle } from 'lucide-react';
+import { PageHeader } from '../components/common/PageHeader';
 
 export const AssetsPage: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [findings, setFindings] = useState<CryptoFinding[]>([]);
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
   const loadData = async () => {
     try {
@@ -20,7 +21,7 @@ export const AssetsPage: React.FC = () => {
         setSelectedAssetId(assetsData[0].id);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load assets inventory');
+      setError(err.message || 'Failed to load asset data');
     } finally {
       setLoading(false);
     }
@@ -35,25 +36,21 @@ export const AssetsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center space-x-3">
-            <Database className="w-6 h-6 text-indigo-400" />
-            <span>Discovered Asset Hierarchy</span>
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            System assets, active services, protocols, and associated cryptographic primitives.
-          </p>
-        </div>
-
-        <button
-          onClick={loadData}
-          className="p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition self-start sm:self-auto"
-        >
-          <RefreshCw className="w-4 h-4" />
-        </button>
-      </div>
+      {/* Reusable Page Header */}
+      <PageHeader
+        title="Discovered Asset Hierarchy"
+        description="System assets, active services, protocols, and associated cryptographic primitives."
+        icon={Database}
+        breadcrumbs={[{ label: 'Inventory' }, { label: 'Assets' }]}
+        actions={
+          <button
+            onClick={loadData}
+            className="p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        }
+      />
 
       {error && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center space-x-3 text-sm">

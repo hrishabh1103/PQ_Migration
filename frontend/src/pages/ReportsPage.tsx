@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { fetchRemediationReport, downloadRemediationMarkdown, downloadCycloneDXCBOM } from '../services/api';
 import { FileDown, ShieldAlert, AlertTriangle, CheckCircle2, RefreshCw, Cpu, BookOpen, Layers } from 'lucide-react';
 
+import { PageHeader } from '../components/common/PageHeader';
+
 export const ReportsPage: React.FC = () => {
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,36 +39,32 @@ export const ReportsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center space-x-3">
-            <ShieldAlert className="w-6 h-6 text-cyan-400" />
-            <span>PQC Migration Risk & Remediation Report</span>
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Automated analysis of cryptographic flaws, NIST FIPS 203/204/205 compliance, and mitigation strategies.
-          </p>
-        </div>
+      {/* Reusable Page Header */}
+      <PageHeader
+        title="PQC Migration Risk & Remediation Report"
+        description="Automated analysis of cryptographic flaws, NIST FIPS 203/204/205 compliance, and mitigation strategies."
+        icon={ShieldAlert}
+        breadcrumbs={[{ label: 'Migration' }, { label: 'Reports & Readiness' }]}
+        actions={
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={downloadCycloneDXCBOM}
+              className="flex items-center space-x-2 px-3.5 py-2 rounded-xl border border-slate-700 bg-slate-900 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-mono transition"
+            >
+              <Layers className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Export CycloneDX 1.6 CBOM (.json)</span>
+            </button>
 
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={downloadCycloneDXCBOM}
-            className="flex items-center space-x-2 px-3.5 py-2 rounded-xl border border-slate-700 bg-slate-900 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-mono transition"
-          >
-            <Layers className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Export CycloneDX 1.6 CBOM (.json)</span>
-          </button>
-
-          <button
-            onClick={downloadRemediationMarkdown}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium text-xs transition shadow-lg shadow-cyan-500/20"
-          >
-            <FileDown className="w-4 h-4 fill-white" />
-            <span>Download Audit Report (.md)</span>
-          </button>
-        </div>
-      </div>
+            <button
+              onClick={downloadRemediationMarkdown}
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition shadow-lg shadow-cyan-500/20"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              <span>Download Markdown Report</span>
+            </button>
+          </div>
+        }
+      />
 
       {error && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm">

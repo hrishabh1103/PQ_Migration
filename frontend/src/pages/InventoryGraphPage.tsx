@@ -3,6 +3,7 @@ import {
   Network, Server, Shield, Database, Activity, RefreshCw, 
   Info, ChevronRight, Search, Layers, AlertCircle
 } from 'lucide-react';
+import { PageHeader } from '../components/common/PageHeader';
 
 interface NodeItem {
   id: string;
@@ -58,7 +59,7 @@ export const InventoryGraphPage: React.FC = () => {
           }
         }
       } catch (err) {
-        console.error('Failed to load assets list:', err);
+        console.error('Failed to load assets for graph selector:', err);
       }
     };
     loadAssets();
@@ -66,26 +67,19 @@ export const InventoryGraphPage: React.FC = () => {
 
   // Fetch graph data whenever root entity or depth changes
   const fetchGraphData = async () => {
-    const targetId = selectedEntityId || customEntityIdInput.trim();
-    if (!targetId) {
-      setNodes([]);
-      setEdges([]);
-      setSelectedNode(null);
-      return;
-    }
+    const targetId = customEntityIdInput.trim() || selectedEntityId;
+    if (!targetId) return;
 
     setLoading(true);
     setError(null);
     try {
-      let url = `/api/v1/graph/entity/${selectedEntityType}/${targetId}?depth=${depth}`;
-      if (filterRelType !== 'ALL') {
-        url += `&relationship_type=${encodeURIComponent(filterRelType)}`;
-      }
-      if (filterNodeType !== 'ALL') {
-        url += `&node_type=${encodeURIComponent(filterNodeType)}`;
-      }
+      const queryParams = new URLSearchParams({
+        depth: depth.toString(),
+        node_type: filterNodeType,
+        relationship_type: filterRelType
+      });
 
-      const res = await fetch(url);
+      const res = await fetch(`/api/v1/graph/entity/${selectedEntityType}/${targetId}?${queryParams.toString()}`);
       if (!res.ok) {
         if (res.status === 404) {
           setError(`Entity ${selectedEntityType}:${targetId} not found in inventory.`);
@@ -160,33 +154,28 @@ export const InventoryGraphPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Controls Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              <Network className="w-7 h-7 text-indigo-400" />
-              Enterprise Inventory Topology Graph
-            </h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Explore interconnected discovery relationships across Assets, Services, CryptoObjects, and Data Assets.
-            </p>
-          </div>
+      {/* Reusable Page Header */}
+      <PageHeader
+        title="Enterprise Inventory Topology Graph"
+        description="Query and visualize multi-hop relationship topologies and dependencies across Assets, Services, CryptoObjects, and Data Assets."
+        icon={Network}
+        badge="Knowledge Graph"
+        breadcrumbs={[{ label: 'Inventory' }, { label: 'Inventory Graph' }]}
+        actions={
+          <button
+            onClick={fetchGraphData}
+            disabled={loading}
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh Topology</span>
+          </button>
+        }
+      />
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={fetchGraphData}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              Refresh Graph
-            </button>
-          </div>
-        </div>
-
-        {/* Root Entity Selector Bar */}
-        <div className="mt-6 pt-6 border-t border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Root Entity Selector Bar */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
               Root Entity Type

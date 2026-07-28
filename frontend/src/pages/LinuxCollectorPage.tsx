@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Server, Terminal, Shield, RefreshCw, Play, CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-react';
+import { PageHeader } from '../components/common/PageHeader';
 
 interface CoverageItem {
   capability: string;
@@ -148,27 +149,14 @@ export const LinuxCollectorPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-              <Server className="w-6 h-6 text-emerald-400" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-100">Linux Host Collector</h1>
-              <p className="text-sm text-slate-400">
-                Production-oriented read-only metadata discovery for Linux servers & cryptographic posture
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-md text-xs font-mono text-emerald-400">
-              Transport: LocalTransport (Bounded)
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* Reusable Page Header with Breadcrumbs */}
+      <PageHeader
+        title="Linux Host Collector"
+        description="Production-oriented read-only metadata discovery for Linux servers & cryptographic posture."
+        icon={Server}
+        badge="LocalTransport Bounded"
+        breadcrumbs={[{ label: 'Discovery' }, { label: 'Linux Collector' }]}
+      />
 
       {/* Target Registration & Action Bar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

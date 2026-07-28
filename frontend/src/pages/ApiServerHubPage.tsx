@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { AuthorizedTarget, CryptoFinding } from '../types';
 import { fetchTargets, fetchFindings, bulkRegisterApiServers, uploadOpenApiSpec } from '../services/api';
-import { Server, Plus, Upload, Play, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { Server, Plus, Upload, Play, CheckCircle2, AlertCircle, Sparkles, Cpu } from 'lucide-react';
+import { PageHeader } from '../components/common/PageHeader';
 
 interface ApiServerHubPageProps {
   onNavigateScans: () => void;
@@ -86,24 +87,14 @@ export const ApiServerHubPage: React.FC<ApiServerHubPageProps> = ({ onNavigateSc
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="flex items-center space-x-2 text-cyan-400 font-mono text-xs mb-2">
-              <Server className="w-4 h-4" />
-              <span>TEAM API & SERVER DISCOVERY HUB</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Enterprise Server & API Quantum Testing Center
-            </h1>
-            <p className="text-slate-400 text-sm mt-1 max-w-2xl">
-              Register all company API servers, backend endpoints, and infrastructure IPs. Automatically execute quantum status verification and generate team PQC migration action plans.
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Enterprise Server & API Quantum Testing Center"
+        description="Register company API servers, backend endpoints, and OpenAPI specs to test quantum readiness."
+        icon={Cpu}
+        badge="API Hub"
+        breadcrumbs={[{ label: 'Discovery' }, { label: 'API & Server Hub' }]}
+      />
 
       {successMsg && (
         <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center space-x-3 text-sm font-mono">
