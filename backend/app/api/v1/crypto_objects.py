@@ -2,6 +2,7 @@ import logging
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel, Field
 
 from app.core.database import get_db
@@ -81,8 +82,14 @@ def get_crypto_object_by_id(id: str, db: Session = Depends(get_db)):
 def get_or_create_crypto_object(input_data: CryptoObjectCreate, db: Session = Depends(get_db)):
     """
     Deterministic identity resolution & deduplication for CryptoObject based on identity_key.
+    Uses database uniqueness guarantees and handles IntegrityError for concurrent requests.
     """
-    existing = db.query(CryptoObject).filter(CryptoObject.identity_key == input_data.identity_key).first()
+    effective_key = input_data.identity_key
+    if input_data.object_type.upper() == "CERTIFICATE" and input_data.fingerprint:
+        clean_fp = input_data.fingerprint.lower().replace(":", "").replace(" ", "")
+        effective_key = f"cert:sha256:{clean_fp}"
+
+    existing = db.query(CryptoObject).filter(CryptoObject.identity_key == effective_key).first()
     if existing:
         return {
             "message": "CryptoObject resolved (existing found)",
@@ -91,23 +98,35 @@ def get_or_create_crypto_object(input_data: CryptoObjectCreate, db: Session = De
             "identity_key": existing.identity_key
         }
 
-    cobj = CryptoObject(
-        object_type=input_data.object_type,
-        canonical_name=input_data.canonical_name,
-        provider=input_data.provider,
-        version=input_data.version,
-        identity_key=input_data.identity_key,
-        fingerprint=input_data.fingerprint,
-        external_id=input_data.external_id,
-        provider_resource_id=input_data.provider_resource_id,
-        metadata_json=input_data.metadata_json
-    )
-    db.add(cobj)
-    db.commit()
-    db.refresh(cobj)
-    return {
-        "message": "CryptoObject created",
-        "id": cobj.id,
-        "is_new": True,
-        "identity_key": cobj.identity_key
-    }
+    try:
+        cobj = CryptoObject(
+            object_type=input_data.object_type,
+            canonical_name=input_data.canonical_name,
+            provider=input_data.provider,
+            version=input_data.version,
+            identity_key=effective_key,
+            fingerprint=input_data.fingerprint,
+            external_id=input_data.external_id,
+            provider_resource_id=input_data.provider_resource_id,
+            metadata_json=input_data.metadata_json
+        )
+        db.add(cobj)
+        db.commit()
+        db.refresh(cobj)
+        return {
+            "message": "CryptoObject created",
+            "id": cobj.id,
+            "is_new": True,
+            "identity_key": cobj.identity_key
+        }
+    except IntegrityError:
+        db.rollback()
+        existing = db.query(CryptoObject).filter(CryptoObject.identity_key == effective_key).first()
+        if existing:
+            return {
+                "message": "CryptoObject resolved (concurrency conflict handled)",
+                "id": existing.id,
+                "is_new": False,
+                "identity_key": existing.identity_key
+            }
+        raise HTTPException(status_code=500, detail="Failed to resolve CryptoObject concurrently")

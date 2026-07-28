@@ -54,15 +54,15 @@ An enterprise-grade cryptographic discovery, inventory, normalization, risk asse
 
 ---
 
-- **Enterprise Inventory Foundation V2**:
-  - **Interactive Inventory Graph (`Inventory Graph`)**: Multi-depth visual graph rendering connected Assets, Services, CryptoObjects, Data Assets, and 16+ relationship types (`RUNS_ON`, `TERMINATES_TLS_AT`, `USES`, etc.).
-  - **Bounded Graph Traversal API (`GET /api/v1/graph/entity/{type}/{id}`)**: Bounded depth-limit graph API (`depth=1..3`) returning nodes, edges, and truncation status.
-  - **DiscoveryPlugin Architecture & Capability Registry**: Generalized `DiscoveryPlugin` base class with `Scanner`, `Connector`, and `Collector` inheritance models and `CapabilityRegistry` tracking 18+ capabilities (`TLS`, `SSH`, `KMS`, `PKI`, `DATABASE`, `DATA_FLOW`, etc.).
-  - **First-Class CryptoObject Identity & Deduplication**: Normalized `CryptoObject` entity (`ALGORITHM`, `KEY`, `CERTIFICATE`, `PROTOCOL`, `LIBRARY`) with deterministic identity resolution.
-  - **DataAsset & DataFlow Models**: Tracks sensitive data flows across cryptographic channels to prioritize Harvest Now Decrypt Later (HNDL) migration risks.
-  - **Contextual Risk Engine**: Evaluates findings using `RiskContext` (purpose, network exposure, confidentiality lifetime) with explicit factor rationales and signature vs key establishment separation.
-  - **Version-Independent CBOM Mapper**: Decouples internal inventory representation from output formats (`InternalInventoryMapper` → `CycloneDX16Serializer`).
-  - **Capability Coverage Tracking**: Clearly distinguishes *Not Scanned*, *Scan Failed*, *Partially Scanned*, *Scanned With Findings*, and *Scanned Without Findings*.
+- **Enterprise Inventory Foundation V2.1 Hardened**:
+  - **Alembic Migration Chain**: Two-stage migration (`001_initial_v1` → `002_foundation_v2_1`) verified against fresh empty databases and existing V1 databases without data loss.
+  - **Provenance Model & DiscoveryRun Integration**: Auditable `Provenance` entity (`collection_method`, `evidence_hash`, `discovery_run_id`, secret redaction) linked to findings, relationships, and discovery runs (`SCAN`, `SYNC`, `COLLECTION`, `IMPORT`, `PASSIVE_INGESTION`).
+  - **Strict `(entity_type, entity_id)` Graph API**: Bounded depth-limit graph API (`depth=1..3`) with strict pair matching preventing ID collisions across entity types, edge deduplication, and truncation safety.
+  - **Real Inventory Topology Graph UI**: Production graph canvas with real asset selection, dynamic API fetching, depth controls, node/edge filters, and clean empty states (zero demo data).
+  - **Deterministic Asset Identity Resolution**: Enforces resolution precedence (`provider_resource_id` > `external_id` > `identity_key` / `(hostname, target_id)`) without incorrectly merging assets by IP.
+  - **Concurrent CryptoObject Deduplication**: Database uniqueness guarantees with `IntegrityError` rollback handling and normalized certificate fingerprints.
+  - **Neutral RiskContext & Confidence Scoring**: Default `UNKNOWN` context handling, explicit factor rationales (`known_factors` vs `unknown_factors`), and contextual confidence evaluation (`HIGH`/`MEDIUM`/`LOW`).
+  - **DiscoveryCoverage Lifecycle**: Auto-updates coverage state (`NOT_SCANNED` → `IN_PROGRESS` → `SCANNED` / `FAILED` / `PARTIALLY_SCANNED`).
 - **Team API & Server Discovery Hub (`API & Server Hub`)**: Dedicated UI section for engineering teams to paste bulk API server endpoints, URLs, or upload OpenAPI/Swagger JSON specifications to test quantum safety status and receive team migration strategies.
 - **6 Production Discovery Scanners**:
   - TLS & Network Scanner (`TLSScanner`)

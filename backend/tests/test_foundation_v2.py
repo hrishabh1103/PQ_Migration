@@ -125,6 +125,43 @@ def test_relationship_and_graph_traversal(db_session):
     assert graph_data["depth"] == 1
     assert graph_data["truncated"] is False
 
+def test_graph_identical_uuids_across_entity_types(db_session):
+    """Test graph traversal matching (entity_type, entity_id) strictly when UUIDs collision occurs."""
+    shared_uuid = "shared-uuid-9999"
+    target = AuthorizedTarget(name="UUID Collision Target", target_type=TargetType.HOSTNAME, target_value="collision.com")
+    db_session.add(target)
+    db_session.commit()
+
+    asset = Asset(id=shared_uuid, target_id=target.id, hostname="collision.com", ip_address="10.0.0.99")
+    db_session.add(asset)
+
+    cobj = CryptoObject(id="cobj-8888", object_type="ALGORITHM", canonical_name="ECDSA-P256", identity_key="algo:ecdsa-p256")
+    db_session.add(cobj)
+    db_session.commit()
+
+    # Create relationship for Asset shared_uuid
+    rel = Relationship(
+        source_entity_type="Asset",
+        source_entity_id=shared_uuid,
+        target_entity_type="CryptoObject",
+        target_entity_id="cobj-8888",
+        relationship_type="USES",
+        scanner_or_connector_id="test"
+    )
+    db_session.add(rel)
+    db_session.commit()
+
+    # Query graph as Asset
+    asset_graph = client.get(f"/api/v1/graph/entity/Asset/{shared_uuid}?depth=1")
+    assert asset_graph.status_code == 200
+    data = asset_graph.json()
+    assert len(data["nodes"]) == 2
+    assert data["nodes"][0]["entity_type"] == "Asset"
+
+    # Query graph as Service with same UUID should return 404 because Service shared_uuid does not exist
+    svc_graph = client.get(f"/api/v1/graph/entity/Service/{shared_uuid}?depth=1")
+    assert svc_graph.status_code == 404
+
 def test_data_asset_and_data_flow_api(db_session):
     da_res = client.post("/api/v1/data/assets", json={
         "name": "Customer PI Data",
@@ -160,7 +197,7 @@ def test_contextual_risk_engine():
     eval_sig = ContextualRiskEngine.evaluate(ctx_sig)
     assert eval_sig.severity == "CRITICAL"
     assert "ML-DSA-65" in eval_sig.recommended_pqc_replacement
-    assert any("SIGNATURE" in f for f in eval_sig.contributing_factors)
+    assert any("SIGNATURE" in f for f in eval_sig.known_factors)
 
     ctx_kex = RiskContext(
         algorithm="RSA-2048",
@@ -169,7 +206,15 @@ def test_contextual_risk_engine():
     )
     eval_kex = ContextualRiskEngine.evaluate(ctx_kex)
     assert "ML-KEM-768" in eval_kex.recommended_pqc_replacement
-    assert any("KEY_ESTABLISHMENT" in f for f in eval_kex.contributing_factors)
+    assert any("KEY_ESTABLISHMENT" in f for f in eval_kex.known_factors)
+
+def test_neutral_risk_context_defaults():
+    # Missing optional parameters must not default to HIGH/INTERNET, but remain UNKNOWN & reduce confidence
+    ctx = RiskContext(algorithm="RSA-2048")
+    eval_res = ContextualRiskEngine.evaluate(ctx)
+    assert eval_res.confidence in ["LOW", "MEDIUM"]
+    assert any("UNKNOWN" in f for f in eval_res.unknown_factors)
+    assert "rationale" in eval_res.model_dump()
 
 def test_coverage_summary_api(db_session):
     res = client.get("/api/v1/coverage/summary")

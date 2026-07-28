@@ -1,14 +1,14 @@
-# Architecture Specification: Enterprise Cryptographic Discovery Platform (Enterprise Foundation V2)
+# Architecture Specification: Enterprise Cryptographic Discovery Platform (Foundation V2.1 Hardened)
 
 ## 1. Executive Overview & System Goals
 
-The Enterprise Cryptographic Discovery Platform is a modular, high-assurance system designed to discover, catalog, normalize, and evaluate cryptographic assets across enterprise digital real estate (network infrastructure, cloud environments, virtual machines, containers, source code repositories, databases, PKI, KMS, and data flows).
+The Enterprise Cryptographic Discovery Platform is a modular, high-assurance system designed to discover, catalog, normalize, and evaluate cryptographic assets across enterprise digital real estate (network endpoints, TLS/SSH services, X.509 certificates, source code repositories, and dependency lockfiles).
 
 The platform serves as the foundational data collector, normalization engine, and contextual risk assessment platform for Post-Quantum Cryptography (PQC) migration readiness.
 
 ---
 
-## 2. Enterprise Inventory Foundation V2 Target Architecture
+## 2. Hardened V2.1 Architecture Hierarchy
 
 ```
 +-----------------------------------------------------------------------------------+
@@ -32,32 +32,34 @@ The platform serves as the foundational data collector, normalization engine, an
 |       - Collector (Installed Agents, Telemetry, Passive Monitoring)               |
 +-----------------------------------------------------------------------------------+
                                          |
-                                         v RawFinding & Observation Stream
+                                         v DiscoveryRun & RawFinding Stream
 +-----------------------------------------------------------------------------------+
 |                           Sanitizer & Provenance Pipeline                         |
 |   - Strips PEM private key headers & secret tokens (Zero Private Key Collection)  |
-|   - Attaches standardized Provenance (collection_method, evidence_hash, run_id)  |
+|   - Creates Provenance record (collection_method, evidence_hash, discovery_run_id)|
 +-----------------------------------------------------------------------------------+
                                          |
-                                         v Clean RawFinding
+                                         v Clean RawFinding & Provenance
 +-----------------------------------------------------------------------------------+
-|                     Normalization Engine & Entity Resolution                       |
+|                     Normalization Engine & Identity Resolution                    |
 |   - Maps raw_algorithm_name -> canonical_family, canonical_variant, status        |
-|   - Deterministic deduplication of CryptoObjects via identity_key / fingerprint   |
+|   - Deterministic Asset Resolution (provider_resource_id > external_id > key)     |
+|   - Deterministic CryptoObject deduplication & Cert fingerprint normalization     |
 +-----------------------------------------------------------------------------------+
                                          |
                                          v Entity Persistence Pipeline
 +-----------------------------------------------------------------------------------+
 |                           Enterprise PostgreSQL Database                          |
 |  Asset <--> Service <--> CryptoObject <--> Relationship <--> DataAsset/DataFlow   |
+|                       Linked to Provenance & DiscoveryRun                         |
 +-----------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 3. Connector & Plugin Domain Status Matrix
+## 3. Capability & Plugin Domain Status Matrix
 
-| Plugin Domain / Connector | Type | Status | Description |
+| Plugin Domain / Module | Type | Status | Description |
 | :--- | :--- | :--- | :--- |
 | **TLS & Network Scanner (`TLSScanner`)** | `Scanner` | `IMPLEMENTED` | Performs active TLS handshakes over TCP port 443; extracts server certificates, public key algorithms, and negotiated cipher suites. |
 | **SSH Host Scanner (`SSHScanner`)** | `Scanner` | `IMPLEMENTED` | Connects to TCP port 22 to inspect SSH server banners, Host Key algorithms (`rsa-sha2-512`, `ssh-ed25519`), and KEX algorithms. |
@@ -66,17 +68,17 @@ The platform serves as the foundational data collector, normalization engine, an
 | **Package Dependency Scanner (`DependencyScanner`)** | `Scanner` | `IMPLEMENTED` | Identifies package dependencies in manifest lockfiles (`package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`). |
 | **Cloud Server Scanner (`CloudServerScanner`)** | `Scanner` | `IMPLEMENTED` | Audits Cloud VMs, SSH host keys, Cloud Load Balancer TLS policies, Cloud KMS keys, and S3/GCS bucket storage encryption. |
 | **Plugin Architecture Core** | Core | `FOUNDATION READY` | `DiscoveryPlugin` base class, `Scanner`/`Connector`/`Collector` hierarchy, `PluginRegistry`, and `CapabilityRegistry`. |
-| **Generic Relationship Model** | Core | `FOUNDATION READY` | `Relationship` entity with 16+ relationship types (`RUNS_ON`, `TERMINATES_TLS_AT`, `USES`, etc.) and graph traversal API. |
-| **CryptoObject Identity & Deduplication** | Core | `FOUNDATION READY` | `CryptoObject` model supporting `ALGORITHM`, `KEY`, `CERTIFICATE`, `PROTOCOL`, `LIBRARY`, `KEYSTORE` with identity deduplication. |
-| **DataAsset & DataFlow Models** | Core | `FOUNDATION READY` | `DataAsset` & `DataFlow` models for tracking sensitive data flows across cryptographic channels for future HNDL prioritization. |
-| **DiscoveryCoverage Tracking** | Core | `FOUNDATION READY` | Tracks asset capability evaluation states (`NOT_SCANNED`, `SCANNED`, `FAILED`, `PARTIALLY_SCANNED`, `NOT_APPLICABLE`). |
-| **Contextual Risk Engine** | Core | `FOUNDATION READY` | `ContextualRiskEngine` with `RiskContext` computing contextual scores, providing factor rationales, and separating signature vs KEX. |
-| **Version-Independent CBOM Mapper** | Core | `FOUNDATION READY` | `InternalInventoryMapper` and `CycloneDX16Serializer` separating internal inventory representation from output formats. |
-| **AWS Connector (`AWSConnector`)** | `Connector` | `PLANNED` | Automated AWS EC2, KMS, ALB, ECR inventory API ingestion. |
+| **Generic Relationship Model & Bounded Graph API** | Core | `FOUNDATION READY` | `Relationship` entity with 16+ relationship types, `(entity_type, entity_id)` strict matching, depth limits (`depth=1..3`), and edge deduplication. |
+| **Provenance & DiscoveryRun Pipeline** | Core | `FOUNDATION READY` | `Provenance` model (`collection_method`, `evidence_hash`, `discovery_run_id`, secret redaction) linked to findings and discovery runs. |
+| **CryptoObject Identity & Deduplication** | Core | `FOUNDATION READY` | `CryptoObject` model with deterministic `identity_key` deduplication, `IntegrityError` rollback handling, and normalized cert fingerprints. |
+| **DataAsset & DataFlow Models** | Core | `FOUNDATION READY` | `DataAsset` & `DataFlow` models for tracking sensitive data flows across cryptographic channels. |
+| **DiscoveryCoverage Lifecycle** | Core | `FOUNDATION READY` | Auto-updates coverage state (`NOT_SCANNED` → `IN_PROGRESS` → `SCANNED` / `FAILED` / `PARTIALLY_SCANNED`). |
+| **Contextual Risk Engine** | Core | `FOUNDATION READY` | `ContextualRiskEngine` with neutral defaults (`UNKNOWN`), contextual confidence score (`HIGH`/`MEDIUM`/`LOW`), and explicit factor rationales. |
+| **AWS Connector (`AWSConnector`)** | `Connector` | `PLANNED` | Direct AWS API connector for EC2, KMS, ALB, and ECR discovery. |
 | **Azure Connector (`AzureConnector`)** | `Connector` | `PLANNED` | Azure Key Vault, App Service, and Virtual Machine API connector. |
 | **GCP Connector (`GCPConnector`)** | `Connector` | `PLANNED` | Google Cloud Compute Engine, Cloud KMS, and GKE API connector. |
 | **Kubernetes Connector (`KubernetesConnector`)** | `Connector` | `PLANNED` | Kubernetes API reader for Ingress TLS secrets, Service Accounts, and Cert-Manager objects. |
-| **Linux Agent Collector (`LinuxCollector`)** | `Collector` | `PLANNED` | Endpoint inventory collector for Linux OpenSSL / GnuTLS / system crypto policy configurations. |
+| **Linux Agent Collector (`LinuxCollector`)** | `Collector` | `PLANNED` | Endpoint inventory collector for Linux OpenSSL / GnuTLS system crypto policies. |
 | **Windows Endpoint Collector (`WindowsCollector`)** | `Collector` | `PLANNED` | Endpoint inventory collector for Windows Schannel, CAPI, and CNG crypto providers. |
 | **Network Device Connector (`NetworkDeviceConnector`)** | `Connector` | `PLANNED` | SSH/NETCONF connector for routers, switches, firewalls, and VPN gateways. |
 | **IPsec & IKE Scanner (`IPsecScanner`)** | `Scanner` | `PLANNED` | Scanner for IPsec IKEv1/IKEv2 proposal negotiation and SA parameters. |
@@ -91,9 +93,9 @@ The platform serves as the foundational data collector, normalization engine, an
 
 ---
 
-## 4. Key Data Models (V2 Spec)
+## 4. Key Data Models (V2.1 Spec)
 
-### 1. Asset (Extensible Taxonomy)
+### 1. Asset (Extensible Taxonomy & Identity Resolution)
 - `id`: String(36) UUID
 - `target_id`: String(36) FK
 - `hostname`, `ip_address`: Optional String
@@ -105,32 +107,20 @@ The platform serves as the foundational data collector, normalization engine, an
 - `status`: String (`ACTIVE`, `STALE`, `REMOVED`, `UNKNOWN`)
 - `first_seen_at`, `last_seen_at`: DateTime
 
-### 2. Relationship (First-Class Graph Edge)
+### 2. Provenance (Auditable Evidence Trail)
 - `id`: String(36) UUID
-- `source_entity_type`, `source_entity_id`: String
-- `target_entity_type`, `target_entity_id`: String
+- `discovery_run_id`: String(36) FK to `discovery_runs.id`
+- `target_id`: String(36) FK to `authorized_targets.id`
+- `plugin_id`, `plugin_version`: String
+- `collection_method`: String (`ACTIVE`, `PASSIVE`, `API`, `AGENT`, `IMPORT`, `STATIC_ANALYSIS`)
+- `observed_at`: DateTime
+- `evidence_type`, `evidence_hash`, `confidence`: String
+- `metadata_json`: JSON (Zero Secrets Policy)
+
+### 3. Relationship (Strict Pair Graph Edge)
+- `id`: String(36) UUID
+- `source_entity_type`, `source_entity_id`: String (Strict matching pair)
+- `target_entity_type`, `target_entity_id`: String (Strict matching pair)
 - `relationship_type`: String (`RUNS_ON`, `DEPLOYED_IN`, `CONNECTS_TO`, `DEPENDS_ON`, `USES`, `PROTECTS`, `AUTHENTICATES_WITH`, `SIGNED_BY`, `ISSUED_BY`, `STORES_KEY_IN`, `TERMINATES_TLS_AT`, `EXPOSED_BY`, `ENCRYPTED_BY`, `MANAGED_BY`, `CONTAINS`, `COMMUNICATES_WITH`)
-- `scanner_or_connector_id`: String
-- `evidence_snippet`, `evidence_hash`, `confidence`, `status`, `first_seen_at`, `last_seen_at`
-
-### 3. CryptoObject (First-Class Cryptographic Inventory Entity)
-- `id`: String(36) UUID
-- `object_type`: String (`ALGORITHM`, `KEY`, `CERTIFICATE`, `PROTOCOL`, `LIBRARY`, `CRYPTO_MODULE`, `KEYSTORE`)
-- `canonical_name`: String
-- `provider`, `version`: Optional String
-- `identity_key`: String (indexed for deterministic deduplication)
-- `fingerprint`, `external_id`, `provider_resource_id`: Optional String
-- `metadata_json`: JSON (Non-secret metadata only; no private keys)
-- `status`, `first_seen_at`, `last_seen_at`
-
-### 4. DataAsset & DataFlow
-- `DataAsset`: `id`, `name`, `classification` (`RESTRICTED`, `CONFIDENTIAL`, `PUBLIC`), `retention_period`, `business_criticality`.
-- `DataFlow`: `id`, `source_entity`, `destination_entity`, `data_asset_id`, `protocol`, `crypto_object_id`, `protection_purpose`, `direction`.
-
-### 5. DiscoveryCoverage
-- `id`: String(36) UUID
-- `asset_id`: String(36) FK
-- `capability`: String (`TLS`, `SSH`, `X509`, `SOURCE_CODE`, `DEPENDENCIES`, `KMS`, `HSM`, `PKI`, etc.)
-- `status`: String (`UNKNOWN`, `NOT_SCANNED`, `IN_PROGRESS`, `SCANNED`, `PARTIALLY_SCANNED`, `FAILED`, `NOT_APPLICABLE`)
-- `findings_count`: Integer
-- `last_evaluated_at`: DateTime
+- `provenance_id`, `discovery_run_id`: Foreign Keys
+- `scanner_or_connector_id`, `evidence_snippet`, `evidence_hash`, `confidence`, `status`

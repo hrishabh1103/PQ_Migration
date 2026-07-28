@@ -123,6 +123,34 @@ class ScanJob(Base):
     target: Mapped["AuthorizedTarget"] = relationship("AuthorizedTarget", back_populates="scans")
     findings: Mapped[List["CryptoFinding"]] = relationship("CryptoFinding", back_populates="scan_job", cascade="all, delete-orphan")
 
+class DiscoveryRun(Base):
+    __tablename__ = "discovery_runs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    run_type: Mapped[str] = mapped_column(String(32), default="SCAN", nullable=False) # SCAN, SYNC, COLLECTION, IMPORT, PASSIVE_INGESTION
+    plugin_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    plugin_version: Mapped[str] = mapped_column(String(32), default="1.0.0", nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="PENDING", nullable=False)
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    stats_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+class Provenance(Base):
+    __tablename__ = "provenance"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    discovery_run_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("discovery_runs.id"), nullable=True)
+    target_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("authorized_targets.id"), nullable=True)
+    plugin_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    plugin_version: Mapped[str] = mapped_column(String(32), default="1.0.0", nullable=False)
+    collection_method: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False) # ACTIVE, PASSIVE, API, AGENT, IMPORT, STATIC_ANALYSIS
+    observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    evidence_type: Mapped[str] = mapped_column(String(64), default="OBSERVATION", nullable=False)
+    evidence_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    confidence: Mapped[str] = mapped_column(String(16), default="HIGH", nullable=False)
+    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+
 class Asset(Base):
     __tablename__ = "assets"
 
@@ -205,6 +233,9 @@ class CryptoObject(Base):
     external_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     provider_resource_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
+    provenance_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("provenance.id"), nullable=True)
+    discovery_run_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("discovery_runs.id"), nullable=True)
+
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False) # ACTIVE, STALE, REMOVED, UNKNOWN
     first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -217,6 +248,9 @@ class CryptoFinding(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     scan_job_id: Mapped[str] = mapped_column(String(36), ForeignKey("scan_jobs.id"), nullable=False)
+    discovery_run_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("discovery_runs.id"), nullable=True)
+    provenance_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("provenance.id"), nullable=True)
+
     asset_id: Mapped[str] = mapped_column(String(36), ForeignKey("assets.id"), nullable=False)
     service_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("services.id"), nullable=True)
     crypto_object_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("crypto_objects.id"), nullable=True)
@@ -240,6 +274,7 @@ class CryptoFinding(Base):
     service: Mapped[Optional["Service"]] = relationship("Service", back_populates="findings")
     normalized_algorithm: Mapped["NormalizedAlgorithm"] = relationship("NormalizedAlgorithm", back_populates="findings")
     crypto_object: Mapped[Optional["CryptoObject"]] = relationship("CryptoObject", back_populates="findings")
+    provenance: Mapped[Optional["Provenance"]] = relationship("Provenance")
 
 class Relationship(Base):
     __tablename__ = "relationships"
@@ -252,6 +287,9 @@ class Relationship(Base):
     
     relationship_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     scanner_or_connector_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    provenance_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("provenance.id"), nullable=True)
+    discovery_run_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("discovery_runs.id"), nullable=True)
+
     evidence_snippet: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     evidence_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     confidence: Mapped[str] = mapped_column(String(16), default="HIGH", nullable=False)
@@ -286,6 +324,8 @@ class DataFlow(Base):
     data_asset_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("data_assets.id"), nullable=True)
     protocol: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     crypto_object_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("crypto_objects.id"), nullable=True)
+    provenance_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("provenance.id"), nullable=True)
+
     protection_purpose: Mapped[str] = mapped_column(String(64), default="ENCRYPTION", nullable=False)
     direction: Mapped[str] = mapped_column(String(32), default="INBOUND", nullable=False)
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
@@ -299,22 +339,12 @@ class DiscoveryCoverage(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     asset_id: Mapped[str] = mapped_column(String(36), ForeignKey("assets.id"), nullable=False, index=True)
     capability: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    plugin_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    discovery_run_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("discovery_runs.id"), nullable=True)
+    
     status: Mapped[str] = mapped_column(String(32), default="NOT_SCANNED", nullable=False) # UNKNOWN, NOT_SCANNED, IN_PROGRESS, SCANNED, PARTIALLY_SCANNED, FAILED, NOT_APPLICABLE
     findings_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     last_evaluated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
 
     asset: Mapped["Asset"] = relationship("Asset", back_populates="coverage_records")
-
-class DiscoveryRun(Base):
-    __tablename__ = "discovery_runs"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    run_type: Mapped[str] = mapped_column(String(32), default="SCAN", nullable=False) # SCAN, SYNC, COLLECTION, IMPORT, PASSIVE_INGESTION
-    plugin_id: Mapped[str] = mapped_column(String(64), nullable=False)
-    plugin_version: Mapped[str] = mapped_column(String(32), default="1.0.0", nullable=False)
-    status: Mapped[str] = mapped_column(String(32), default="PENDING", nullable=False)
-    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    stats_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

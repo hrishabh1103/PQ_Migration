@@ -1,9 +1,11 @@
 import logging
 import asyncio
 from datetime import datetime, timezone
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.models.entities import (
-    ScanJob, AuthorizedTarget, ScanStatus, Asset, Service, CryptoFinding, AssetType, utc_now
+    ScanJob, AuthorizedTarget, ScanStatus, Asset, Service, CryptoFinding, AssetType,
+    DiscoveryRun, DiscoveryCoverage, utc_now
 )
 from app.scanners.base import ScannerRegistry, ScanContext
 import app.scanners  # Ensure all scanner plugins are registered
@@ -11,14 +13,81 @@ import app.scanners  # Ensure all scanner plugins are registered
 from app.core.scope_guard import ScopeGuard, ScopeGuardError
 from app.core.sanitizer import Sanitizer
 from app.normalization.engine import NormalizationEngine
+from app.risk.provenance import create_provenance_record
 
 logger = logging.getLogger(__name__)
 
 class DiscoveryOrchestrator:
     """
     Coordinates scan job execution:
-    ScopeGuard authorization -> Scanner discovery -> Sanitizer -> NormalizationEngine -> Database Persistence
+    ScopeGuard authorization -> DiscoveryRun creation -> Scanner discovery -> Sanitizer -> 
+    NormalizationEngine -> Provenance & Asset Resolution -> DiscoveryCoverage Lifecycle -> Database Persistence
     """
+
+    @classmethod
+    def resolve_or_create_asset(
+        cls,
+        db: Session,
+        target_id: str,
+        hostname: Optional[str],
+        ip_address: Optional[str],
+        asset_type: str,
+        environment: str,
+        operating_system: Optional[str] = None,
+        provider_resource_id: Optional[str] = None,
+        external_id: Optional[str] = None,
+        identity_key: Optional[str] = None
+    ) -> Asset:
+        """
+        Deterministic Asset Identity Resolution.
+        Precedence:
+        1. provider_resource_id
+        2. external_id
+        3. identity_key
+        4. (hostname, target_id)
+        Note: Never merge two assets solely because they share an IP address.
+        """
+        asset = None
+
+        # 1. provider_resource_id
+        if provider_resource_id:
+            asset = db.query(Asset).filter(Asset.provider_resource_id == provider_resource_id).first()
+
+        # 2. external_id
+        if not asset and external_id:
+            asset = db.query(Asset).filter(Asset.external_id == external_id).first()
+
+        # 3. identity_key
+        if not asset and identity_key:
+            asset = db.query(Asset).filter(Asset.identity_key == identity_key).first()
+
+        # 4. (hostname, target_id)
+        if not asset and hostname:
+            asset = db.query(Asset).filter(
+                Asset.target_id == target_id,
+                Asset.hostname == hostname
+            ).first()
+
+        if not asset:
+            computed_key = identity_key or (f"host:{hostname}" if hostname else f"ip:{ip_address}:{target_id}")
+            asset = Asset(
+                target_id=target_id,
+                hostname=hostname,
+                ip_address=ip_address,
+                asset_type=asset_type if hasattr(asset_type, 'value') else str(asset_type),
+                asset_category="INFRASTRUCTURE",
+                identity_key=computed_key,
+                provider_resource_id=provider_resource_id,
+                external_id=external_id,
+                environment=environment,
+                operating_system=operating_system,
+                status="ACTIVE",
+                metadata_json={}
+            )
+            db.add(asset)
+            db.flush()
+
+        return asset
 
     @classmethod
     async def run_scan_job(cls, db: Session, scan_job_id: str) -> ScanJob:
@@ -42,6 +111,18 @@ class DiscoveryOrchestrator:
             scan_job.completed_at = utc_now()
             db.commit()
             return scan_job
+
+        # Create generic parent DiscoveryRun record
+        discovery_run = DiscoveryRun(
+            run_type="SCAN",
+            plugin_id="orchestrator",
+            plugin_version="1.0.0",
+            status="RUNNING",
+            started_at=utc_now(),
+            stats_json={}
+        )
+        db.add(discovery_run)
+        db.flush()
 
         # Set job state to RUNNING
         scan_job.status = ScanStatus.RUNNING
@@ -69,38 +150,56 @@ class DiscoveryOrchestrator:
                     logger.warning(f"Scanner '{scanner_id}' not registered, skipping.")
                     continue
 
+                scanner_findings_count = 0
+
                 async for raw_finding in scanner.discover(target.target_value, target.target_type, context):
+                    scanner_findings_count += 1
                     # 1. Sanitizer pipeline
                     clean_finding = Sanitizer.sanitize(raw_finding)
 
                     # 2. Normalization Engine
                     norm_algo = NormalizationEngine.normalize_and_get_or_create(db, clean_finding.raw_algorithm_name)
 
-                    # 3. Asset creation/lookup
+                    # 3. Deterministic Asset Resolution
                     asset_key = f"{clean_finding.asset_hostname}:{clean_finding.asset_ip}"
                     if asset_key not in asset_cache:
-                        existing_asset = db.query(Asset).filter(
-                            Asset.target_id == target.id,
-                            Asset.hostname == clean_finding.asset_hostname,
-                            Asset.ip_address == clean_finding.asset_ip
-                        ).first()
-
-                        if not existing_asset:
-                            existing_asset = Asset(
-                                target_id=target.id,
-                                hostname=clean_finding.asset_hostname,
-                                ip_address=clean_finding.asset_ip,
-                                asset_type=clean_finding.asset_type,
-                                environment=clean_finding.environment,
-                                operating_system=clean_finding.operating_system,
-                                metadata_json={}
-                            )
-                            db.add(existing_asset)
-                            db.flush()
-                            assets_count += 1
-                        asset_cache[asset_key] = existing_asset
+                        asset = cls.resolve_or_create_asset(
+                            db=db,
+                            target_id=target.id,
+                            hostname=clean_finding.asset_hostname,
+                            ip_address=clean_finding.asset_ip,
+                            asset_type=clean_finding.asset_type,
+                            environment=clean_finding.environment,
+                            operating_system=clean_finding.operating_system
+                        )
+                        asset_cache[asset_key] = asset
+                        assets_count += 1
 
                     asset = asset_cache[asset_key]
+
+                    # Update DiscoveryCoverage state: NOT_SCANNED -> IN_PROGRESS -> SCANNED
+                    coverage = db.query(DiscoveryCoverage).filter(
+                        DiscoveryCoverage.asset_id == asset.id,
+                        DiscoveryCoverage.capability == scanner_id
+                    ).first()
+
+                    if not coverage:
+                        coverage = DiscoveryCoverage(
+                            asset_id=asset.id,
+                            capability=scanner_id,
+                            plugin_id=scanner.scanner_id,
+                            discovery_run_id=discovery_run.id,
+                            status="IN_PROGRESS",
+                            findings_count=0,
+                            last_evaluated_at=utc_now(),
+                            metadata_json={}
+                        )
+                        db.add(coverage)
+                        db.flush()
+                    else:
+                        coverage.status = "IN_PROGRESS"
+                        coverage.discovery_run_id = discovery_run.id
+                        coverage.plugin_id = scanner.scanner_id
 
                     # 4. Service creation/lookup
                     service = None
@@ -128,10 +227,26 @@ class DiscoveryOrchestrator:
                             service_cache[service_key] = existing_service
                         service = service_cache[service_key]
 
-                    # 5. CryptoFinding creation
+                    # 5. Create Provenance Record
                     evidence_hash = clean_finding.metadata.get("_evidence_hash", "none")
+                    prov = create_provenance_record(
+                        db=db,
+                        plugin_id=scanner.scanner_id,
+                        evidence_hash=evidence_hash,
+                        plugin_version=scanner.version,
+                        discovery_run_id=discovery_run.id,
+                        target_id=target.id,
+                        collection_method="ACTIVE",
+                        evidence_type="OBSERVATION",
+                        confidence=clean_finding.confidence.value if hasattr(clean_finding.confidence, 'value') else str(clean_finding.confidence),
+                        metadata_json=clean_finding.metadata
+                    )
+
+                    # 6. CryptoFinding creation
                     crypto_finding = CryptoFinding(
                         scan_job_id=scan_job.id,
+                        discovery_run_id=discovery_run.id,
+                        provenance_id=prov.id,
                         asset_id=asset.id,
                         service_id=service.id if service else None,
                         scanner_id=scanner.scanner_id,
@@ -149,7 +264,20 @@ class DiscoveryOrchestrator:
                     db.add(crypto_finding)
                     findings_count += 1
 
-            # Job finished successfully
+                    # Complete coverage state: SCANNED
+                    coverage.status = "SCANNED"
+                    coverage.findings_count += 1
+                    coverage.last_evaluated_at = utc_now()
+
+            # Job & DiscoveryRun finished successfully
+            discovery_run.status = "COMPLETED"
+            discovery_run.completed_at = utc_now()
+            discovery_run.stats_json = {
+                "assets_found": assets_count,
+                "services_found": services_count,
+                "findings_found": findings_count
+            }
+
             scan_job.status = ScanStatus.COMPLETED
             scan_job.completed_at = utc_now()
             scan_job.stats_json = {
@@ -161,6 +289,10 @@ class DiscoveryOrchestrator:
 
         except Exception as e:
             logger.exception("Scan job execution failed.")
+            discovery_run.status = "FAILED"
+            discovery_run.error_message = str(e)
+            discovery_run.completed_at = utc_now()
+
             scan_job.status = ScanStatus.FAILED
             scan_job.error_message = str(e)
             scan_job.completed_at = utc_now()
