@@ -10,6 +10,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'inventory-graph', label: 'Inventory Graph', icon: Network },
+    { id: 'linux-collector', label: 'Linux Collector', icon: Server },
     { id: 'cloud-servers', label: 'Cloud Servers', icon: Cloud },
     { id: 'api-hub', label: 'API & Server Hub', icon: Server },
     { id: 'targets', label: 'Targets', icon: Target },

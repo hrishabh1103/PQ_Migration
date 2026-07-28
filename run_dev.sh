@@ -14,8 +14,8 @@ else
     source venv/bin/activate
 fi
 
-# Ensure tables exist and port 8000 is free before starting
-DATABASE_URL="sqlite:///./dev_qdiscovery.db" python3 -c "from app.core.database import engine, Base; Base.metadata.create_all(bind=engine)"
+# Ensure database schema is migrated via Alembic and port 8000 is free before starting
+DATABASE_URL="sqlite:///./dev_qdiscovery.db" PYTHONPATH=. ./venv/bin/alembic upgrade head
 lsof -ti:8000 | xargs kill -9 2>/dev/null || true
 
 DATABASE_URL="sqlite:///./dev_qdiscovery.db" uvicorn app.main:app --reload --port 8000 &

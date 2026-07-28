@@ -78,7 +78,7 @@ The platform serves as the foundational data collector, normalization engine, an
 | **Azure Connector (`AzureConnector`)** | `Connector` | `PLANNED` | Azure Key Vault, App Service, and Virtual Machine API connector. |
 | **GCP Connector (`GCPConnector`)** | `Connector` | `PLANNED` | Google Cloud Compute Engine, Cloud KMS, and GKE API connector. |
 | **Kubernetes Connector (`KubernetesConnector`)** | `Connector` | `PLANNED` | Kubernetes API reader for Ingress TLS secrets, Service Accounts, and Cert-Manager objects. |
-| **Linux Agent Collector (`LinuxCollector`)** | `Collector` | `PLANNED` | Endpoint inventory collector for Linux OpenSSL / GnuTLS system crypto policies. |
+| **Linux Host Collector (`LinuxCollector`)** | `Collector` | `IMPLEMENTED` | Host discovery collector for Linux OpenSSL, OpenSSH, TLS, Java, Keystores, and System Crypto Policies via LocalTransport (`SSH_REMOTE` is `FOUNDATION READY`). |
 | **Windows Endpoint Collector (`WindowsCollector`)** | `Collector` | `PLANNED` | Endpoint inventory collector for Windows Schannel, CAPI, and CNG crypto providers. |
 | **Network Device Connector (`NetworkDeviceConnector`)** | `Connector` | `PLANNED` | SSH/NETCONF connector for routers, switches, firewalls, and VPN gateways. |
 | **IPsec & IKE Scanner (`IPsecScanner`)** | `Scanner` | `PLANNED` | Scanner for IPsec IKEv1/IKEv2 proposal negotiation and SA parameters. |

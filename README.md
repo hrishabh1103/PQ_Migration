@@ -64,13 +64,14 @@ An enterprise-grade cryptographic discovery, inventory, normalization, risk asse
   - **Neutral RiskContext & Confidence Scoring**: Default `UNKNOWN` context handling, explicit factor rationales (`known_factors` vs `unknown_factors`), and contextual confidence evaluation (`HIGH`/`MEDIUM`/`LOW`).
   - **DiscoveryCoverage Lifecycle**: Auto-updates coverage state (`NOT_SCANNED` → `IN_PROGRESS` → `SCANNED` / `FAILED` / `PARTIALLY_SCANNED`).
 - **Team API & Server Discovery Hub (`API & Server Hub`)**: Dedicated UI section for engineering teams to paste bulk API server endpoints, URLs, or upload OpenAPI/Swagger JSON specifications to test quantum safety status and receive team migration strategies.
-- **6 Production Discovery Scanners**:
+- **Production Discovery Plugins**:
   - TLS & Network Scanner (`TLSScanner`)
   - SSH Host & KEX Scanner (`SSHScanner`)
   - X.509 Certificate Store Scanner (`CertificateScanner`)
   - Source Code Crypto AST Scanner (`SourceCodeScanner`)
   - Package Manifest Dependency Scanner (`DependencyScanner`)
   - Cloud Server Scanner (`CloudServerScanner`)
+  - Linux Host Collector (`LinuxCollector` via `LocalTransport`)
 - **Zero Private Key Collection**: Automated sanitization & PEM redaction pipeline.
 - **Scope Guard**: Target authorization and post-DNS resolution scope re-validation.
 - **Algorithm Normalization Engine**: Maps observed algorithms to standardized canonical taxonomies.

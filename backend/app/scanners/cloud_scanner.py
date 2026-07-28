@@ -3,6 +3,7 @@ import asyncio
 import re
 from typing import AsyncIterator
 from app.scanners.base import Scanner, RawFinding, ScanContext, ScannerRegistry
+from app.scanners.plugins import PluginCapability
 from app.models.entities import (
     TargetType, AssetType, TransportProtocol, ApplicationProtocol,
     FindingType, FindingPurpose, FindingConfidence
@@ -11,8 +12,14 @@ from app.models.entities import (
 logger = logging.getLogger(__name__)
 
 class CloudServerScanner(Scanner):
+    """
+    Synthetic Cloud Host & Endpoint Security Scanner.
+    Audits cloud VM host SSH keys, ALB TLS certificates, KMS key specifications, and bucket encryption policies.
+    Note: Live provider API ingestion (e.g. AWSConnector, GCPConnector) remains PLANNED.
+    """
     scanner_id = "cloud-server-scanner"
     version = "1.0.0"
+    plugin_id = "cloud-server-scanner"
     supported_target_types = {
         TargetType.CLOUD_PROVIDER,
         TargetType.CLOUD_SERVER,
@@ -20,6 +27,11 @@ class CloudServerScanner(Scanner):
         TargetType.CONTAINER_REGISTRY,
         TargetType.HOSTNAME,
         TargetType.URL
+    }
+    capabilities = {
+        PluginCapability.TLS,
+        PluginCapability.SSH,
+        PluginCapability.HOST_INVENTORY
     }
 
     async def discover(

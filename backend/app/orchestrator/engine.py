@@ -1,11 +1,12 @@
 import logging
 import asyncio
+import hashlib
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from app.models.entities import (
-    ScanJob, AuthorizedTarget, ScanStatus, Asset, Service, CryptoFinding, AssetType,
-    DiscoveryRun, DiscoveryCoverage, utc_now
+    ScanJob, AuthorizedTarget, ScanStatus, Asset, Service, CryptoFinding, CryptoObject, Relationship,
+    DataAsset, DataFlow, DiscoveryRun, DiscoveryCoverage, utc_now
 )
 from app.scanners.base import ScannerRegistry, ScanContext
 import app.scanners  # Ensure all scanner plugins are registered
@@ -15,13 +16,20 @@ from app.core.sanitizer import Sanitizer
 from app.normalization.engine import NormalizationEngine
 from app.risk.provenance import create_provenance_record
 
+from app.collectors.linux_collector import LinuxCollector
+from app.collectors.observations import (
+    AssetObservation, ServiceObservation, ProcessObservation,
+    CryptoObservation, CertificateObservation, RelationshipObservation, CapabilityObservation
+)
+from app.collectors.modules.base_module import ModuleResultStatus
+
 logger = logging.getLogger(__name__)
 
 class DiscoveryOrchestrator:
     """
-    Coordinates scan job execution:
-    ScopeGuard authorization -> DiscoveryRun creation -> Scanner discovery -> Sanitizer -> 
-    NormalizationEngine -> Provenance & Asset Resolution -> DiscoveryCoverage Lifecycle -> Database Persistence
+    Coordinates scan job execution & collection runs:
+    ScopeGuard authorization -> DiscoveryRun creation -> Scanner/Collector execution -> 
+    Sanitizer -> NormalizationEngine -> Provenance & Asset Resolution -> DiscoveryCoverage Lifecycle -> Database Persistence
     """
 
     @classmethod
@@ -36,7 +44,8 @@ class DiscoveryOrchestrator:
         operating_system: Optional[str] = None,
         provider_resource_id: Optional[str] = None,
         external_id: Optional[str] = None,
-        identity_key: Optional[str] = None
+        identity_key: Optional[str] = None,
+        asset_category: str = "INFRASTRUCTURE"
     ) -> Asset:
         """
         Deterministic Asset Identity Resolution.
@@ -75,7 +84,7 @@ class DiscoveryOrchestrator:
                 hostname=hostname,
                 ip_address=ip_address,
                 asset_type=asset_type if hasattr(asset_type, 'value') else str(asset_type),
-                asset_category="INFRASTRUCTURE",
+                asset_category=asset_category,
                 identity_key=computed_key,
                 provider_resource_id=provider_resource_id,
                 external_id=external_id,
@@ -299,3 +308,201 @@ class DiscoveryOrchestrator:
             db.commit()
 
         return scan_job
+
+    @classmethod
+    async def run_collection_job(cls, db: Session, target_id: str, collector_plugin_id: str = "linux-host") -> DiscoveryRun:
+        """
+        Executes a Collector run (e.g. LinuxCollector), converts structured DiscoveryObservations into 
+        Asset, Service, CryptoObject, Relationship, Provenance, and DiscoveryCoverage entities.
+        """
+        target = db.query(AuthorizedTarget).filter(AuthorizedTarget.id == target_id).first()
+        if not target:
+            raise ValueError(f"Target {target_id} not found.")
+
+        # Create DiscoveryRun(type=COLLECTION)
+        discovery_run = DiscoveryRun(
+            run_type="COLLECTION",
+            plugin_id=collector_plugin_id,
+            plugin_version="1.0.0",
+            status="RUNNING",
+            started_at=utc_now(),
+            stats_json={}
+        )
+        db.add(discovery_run)
+        db.flush()
+
+        # Primary Host Asset
+        host_asset = cls.resolve_or_create_asset(
+            db=db,
+            target_id=target.id,
+            hostname=target.target_value,
+            ip_address=None,
+            asset_type="HOST",
+            environment=target.environment,
+            operating_system="Linux"
+        )
+
+        collector = LinuxCollector()
+        module_results = await collector.run_collection()
+
+        obj_map: Dict[str, str] = {"host": host_asset.id}
+        obs_count = 0
+
+        for res in module_results:
+            # Map module status to coverage state
+            cov_status = "SCANNED"
+            if res.status == ModuleResultStatus.PARTIAL:
+                cov_status = "PARTIALLY_SCANNED"
+            elif res.status == ModuleResultStatus.FAILED:
+                cov_status = "FAILED"
+            elif res.status == ModuleResultStatus.NOT_APPLICABLE:
+                cov_status = "NOT_APPLICABLE"
+
+            coverage = db.query(DiscoveryCoverage).filter(
+                DiscoveryCoverage.asset_id == host_asset.id,
+                DiscoveryCoverage.capability == res.capability
+            ).first()
+
+            if not coverage:
+                coverage = DiscoveryCoverage(
+                    asset_id=host_asset.id,
+                    capability=res.capability,
+                    plugin_id=collector.plugin_id,
+                    discovery_run_id=discovery_run.id,
+                    status=cov_status,
+                    findings_count=len(res.observations),
+                    last_evaluated_at=utc_now(),
+                    metadata_json={}
+                )
+                db.add(coverage)
+                db.flush()
+            else:
+                coverage.status = cov_status
+                coverage.discovery_run_id = discovery_run.id
+                coverage.findings_count += len(res.observations)
+                coverage.last_evaluated_at = utc_now()
+
+            for obs in res.observations:
+                obs_count += 1
+                ev_hash = hashlib.sha256(f"{obs.observation_type}:{obs.module_id}:{obs.metadata}".encode()).hexdigest()
+                prov = create_provenance_record(
+                    db=db,
+                    plugin_id=collector.plugin_id,
+                    evidence_hash=ev_hash,
+                    discovery_run_id=discovery_run.id,
+                    target_id=target.id,
+                    collection_method="AGENT" if obs.module_id == "host_info" else "ACTIVE",
+                    metadata_json=obs.metadata
+                )
+
+                if isinstance(obs, AssetObservation):
+                    ast = cls.resolve_or_create_asset(
+                        db=db,
+                        target_id=target.id,
+                        hostname=obs.hostname,
+                        ip_address=obs.ip_address,
+                        asset_type=obs.asset_type,
+                        environment=target.environment,
+                        operating_system=obs.os_distribution,
+                        identity_key=obs.identity_key,
+                        asset_category=obs.asset_category
+                    )
+                    if obs.identity_key:
+                        obj_map[obs.identity_key] = ast.id
+
+                elif isinstance(obs, ProcessObservation):
+                    proc_key = f"process:{obs.process_name}:{obs.pid}"
+                    proc_ast = cls.resolve_or_create_asset(
+                        db=db,
+                        target_id=target.id,
+                        hostname=None,
+                        ip_address=None,
+                        asset_type="process",
+                        environment=target.environment,
+                        identity_key=proc_key,
+                        asset_category="runtime"
+                    )
+                    obj_map[proc_key] = proc_ast.id
+
+                elif isinstance(obs, ServiceObservation):
+                    svc = db.query(Service).filter(
+                        Service.asset_id == host_asset.id,
+                        Service.port == obs.port
+                    ).first()
+                    if not svc:
+                        svc = Service(
+                            asset_id=host_asset.id,
+                            port=obs.port,
+                            transport_protocol=obs.transport_protocol,
+                            application_protocol=obs.application_protocol,
+                            service_name=obs.service_name,
+                            metadata_json=obs.metadata
+                        )
+                        db.add(svc)
+                        db.flush()
+                    obj_map[f"service:{obs.port}"] = svc.id
+
+                elif isinstance(obs, CryptoObservation):
+                    existing = db.query(CryptoObject).filter(CryptoObject.identity_key == obs.identity_key).first()
+                    if not existing:
+                        cobj = CryptoObject(
+                            object_type=obs.object_type,
+                            canonical_name=obs.canonical_name,
+                            provider=obs.provider,
+                            version=obs.version,
+                            identity_key=obs.identity_key,
+                            fingerprint=obs.fingerprint,
+                            provenance_id=prov.id,
+                            discovery_run_id=discovery_run.id,
+                            metadata_json=obs.metadata
+                        )
+                        db.add(cobj)
+                        db.flush()
+                        obj_map[obs.identity_key] = cobj.id
+                    else:
+                        obj_map[obs.identity_key] = existing.id
+
+                elif isinstance(obs, CertificateObservation):
+                    cert_key = f"cert:sha256:{obs.fingerprint}"
+                    existing = db.query(CryptoObject).filter(CryptoObject.identity_key == cert_key).first()
+                    if not existing:
+                        cobj = CryptoObject(
+                            object_type="CERTIFICATE",
+                            canonical_name=f"Certificate ({obs.subject[:30]})",
+                            provider=obs.issuer[:30],
+                            identity_key=cert_key,
+                            fingerprint=obs.fingerprint,
+                            provenance_id=prov.id,
+                            discovery_run_id=discovery_run.id,
+                            metadata_json={"subject": obs.subject, "issuer": obs.issuer, "valid_to": obs.valid_to}
+                        )
+                        db.add(cobj)
+                        db.flush()
+                        obj_map[cert_key] = cobj.id
+                    else:
+                        obj_map[cert_key] = existing.id
+
+                elif isinstance(obs, RelationshipObservation):
+                    src_id = obj_map.get(obs.source_id_hint, host_asset.id)
+                    tgt_id = obj_map.get(obs.target_id_hint)
+                    if src_id and tgt_id:
+                        rel = Relationship(
+                            source_entity_type=obs.source_type,
+                            source_entity_id=src_id,
+                            target_entity_type=obs.target_type,
+                            target_entity_id=tgt_id,
+                            relationship_type=obs.relationship_type,
+                            scanner_or_connector_id=collector.plugin_id,
+                            provenance_id=prov.id,
+                            discovery_run_id=discovery_run.id,
+                            confidence=obs.confidence,
+                            metadata_json=obs.metadata
+                        )
+                        db.add(rel)
+
+        discovery_run.status = "COMPLETED"
+        discovery_run.completed_at = utc_now()
+        discovery_run.stats_json = {"observations_processed": obs_count, "modules_executed": len(module_results)}
+        db.commit()
+
+        return discovery_run

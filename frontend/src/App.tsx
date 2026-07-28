@@ -9,6 +9,7 @@ import { ScansPage } from './pages/ScansPage';
 import { AssetsPage } from './pages/AssetsPage';
 import { FindingsPage } from './pages/FindingsPage';
 import { ReportsPage } from './pages/ReportsPage';
+import { LinuxCollectorPage } from './pages/LinuxCollectorPage';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -19,6 +20,7 @@ export const App: React.FC = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && <DashboardPage onNavigate={(tab) => setActiveTab(tab)} />}
         {activeTab === 'inventory-graph' && <InventoryGraphPage />}
+        {activeTab === 'linux-collector' && <LinuxCollectorPage />}
         {activeTab === 'cloud-servers' && <CloudServersPage />}
         {activeTab === 'api-hub' && <ApiServerHubPage onNavigateScans={() => setActiveTab('scans')} />}
         {activeTab === 'targets' && <TargetsPage onNavigateScans={() => setActiveTab('scans')} />}

@@ -1,0 +1,28 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    openssl \
+    openssh-server \
+    nginx \
+    default-jre \
+    procps \
+    net-tools \
+    iproute2 \
+    curl \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create test certificate
+RUN mkdir -p /etc/ssl/certs /etc/nginx/sites-available /etc/nginx/sites-enabled
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/certs/test_privkey.key \
+    -out /etc/ssl/certs/test_pubcert.crt \
+    -subj "/C=US/ST=CA/L=SanFrancisco/O=TestOrg/OU=QA/CN=linux-integration-test.local"
+
+# Nginx test configuration
+RUN echo 'server { listen 443 ssl; server_name localhost; ssl_certificate /etc/ssl/certs/test_pubcert.crt; ssl_certificate_key /etc/ssl/certs/test_privkey.key; ssl_protocols TLSv1.2 TLSv1.3; ssl_ciphers HIGH:!aNULL:!MD5; }' > /etc/nginx/sites-available/default
+
+CMD ["nginx", "-g", "daemon off;"]
