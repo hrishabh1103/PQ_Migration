@@ -1,251 +1,136 @@
-# Architecture Specification: Enterprise Cryptographic Discovery Platform (PQC Readiness)
+# Architecture Specification: Enterprise Cryptographic Discovery Platform (Enterprise Foundation V2)
 
 ## 1. Executive Overview & System Goals
 
-The Enterprise Cryptographic Discovery Platform is a modular, high-assurance system designed to discover, catalog, normalize, and evaluate cryptographic assets across enterprise digital real estate (network endpoints, TLS/SSH services, X.509 certificates, source code repositories, and dependency manifests).
+The Enterprise Cryptographic Discovery Platform is a modular, high-assurance system designed to discover, catalog, normalize, and evaluate cryptographic assets across enterprise digital real estate (network infrastructure, cloud environments, virtual machines, containers, source code repositories, databases, PKI, KMS, and data flows).
 
-The platform serves as the foundational data collector and normalization engine for Post-Quantum Cryptography (PQC) migration readiness.
-
-### Key Design Principles
-
-1. **Hierarchy-Aware Entity Modeling**:
-   Distinct separation between Authorized Targets, Scan Jobs, Discovered Assets (Hosts/Servers/Apps), Discovered Services (Ports/Protocols), Cryptographic Findings (Observations & Provenance), and Normalized Algorithms.
-
-2. **Modular Scanner Plugin Architecture**:
-   Scanners implement a common asynchronous interface producing generic `RawFinding` streams. A centralized `ScannerRegistry` decouples scanner implementations from the orchestrator.
-
-3. **Preservation of Observed Algorithm Names**:
-   Raw algorithm identifiers (e.g. `Kyber768`, `RSA-2048`, `ECDSA_P256`) are preserved as observed. Canonical standardization (`ML-KEM-768`, `ML-DSA-65`) occurs via explicit normalization mapping without erasing historical or implementation details.
-
-4. **Factual Discovery vs. Risk Interpretation**:
-   Scanners output pure, verifiable observations (algorithm, key size, parameters, location, evidence snippet). Risk classification (e.g., migration priority, exposure risk, compliance deadline) occurs downstream in a separate Risk Assessment engine.
-
-5. **Non-Dogmatic Quantum Safety Taxonomy**:
-   Categorizes algorithm safety into `QUANTUM_VULNERABLE`, `PQC_STANDARDIZED`, `PQC_CANDIDATE`, `HYBRID`, `SYMMETRIC`, `HASH`, `LEGACY`, `DEPRECATED`, and `UNKNOWN`.
-
-6. **Strict Scope Security & Privacy Safeguards**:
-   Active scanners operate only against explicitly authorized targets. Network scanners validate scope before connecting and re-validate IP address range post-DNS resolution. Private key material (PEM blocks, secret keys, tokens) is stripped and redacted at the `Sanitizer` layer before persistence.
+The platform serves as the foundational data collector, normalization engine, and contextual risk assessment platform for Post-Quantum Cryptography (PQC) migration readiness.
 
 ---
 
-## 2. Platform Architecture Diagram
+## 2. Enterprise Inventory Foundation V2 Target Architecture
 
 ```
 +-----------------------------------------------------------------------------------+
 |                            React + TypeScript Frontend                            |
-|             Dashboard  |  Targets  |  Scans  |  Assets  |  Findings           |
+|    Dashboard | Inventory Graph | Cloud Servers | API Hub | Scans | Assets | Reports|
 +-----------------------------------------------------------------------------------+
                                          |
-                                         v HTTP / REST API
+                                         v REST API
 +-----------------------------------------------------------------------------------+
 |                                 FastAPI REST API                                  |
-|         /api/v1/targets | /api/v1/scans | /api/v1/assets | /api/v1/findings          |
+|   /api/v1/targets | /api/v1/scans | /api/v1/assets | /api/v1/relationships        |
+|   /api/v1/graph   | /api/v1/crypto-objects | /api/v1/data | /api/v1/coverage       |
 +-----------------------------------------------------------------------------------+
                                          |
                                          v
 +-----------------------------------------------------------------------------------+
-|                               Discovery Orchestrator                              |
-|       - ScopeGuard Authorization Check                                            |
-|       - Post-DNS IP Scope Re-validation                                           |
-|       - Scanner Selection via ScannerRegistry                                     |
+|                           Plugin & Capability Architecture                        |
+|                     PluginRegistry | CapabilityRegistry                           |
+|       - Scanner  (Active/Direct Scanners: TLS, SSH, X.509, Source, Dep)           |
+|       - Connector (External Inventory APIs: AWS, GCP, Azure, K8s, PKI)             |
+|       - Collector (Installed Agents, Telemetry, Passive Monitoring)               |
 +-----------------------------------------------------------------------------------+
                                          |
-                                         v
+                                         v RawFinding & Observation Stream
 +-----------------------------------------------------------------------------------+
-|                                 Scanner Plugins                                   |
-|   [MockScanner]  (Future: TLSScanner, SSHScanner, CertScanner, SourceCodeScanner)  |
-+-----------------------------------------------------------------------------------+
-                                         |
-                                         v AsyncIterator[RawFinding]
-+-----------------------------------------------------------------------------------+
-|                                   Sanitizer                                       |
-|   - Strips PEM private key headers & secret tokens                                |
-|   - Computes evidence SHA-256 hash                                                |
+|                           Sanitizer & Provenance Pipeline                         |
+|   - Strips PEM private key headers & secret tokens (Zero Private Key Collection)  |
+|   - Attaches standardized Provenance (collection_method, evidence_hash, run_id)  |
 +-----------------------------------------------------------------------------------+
                                          |
                                          v Clean RawFinding
 +-----------------------------------------------------------------------------------+
-|                              Normalization Engine                                 |
+|                     Normalization Engine & Entity Resolution                       |
 |   - Maps raw_algorithm_name -> canonical_family, canonical_variant, status        |
-|   - Links to NormalizedAlgorithm entity                                           |
+|   - Deterministic deduplication of CryptoObjects via identity_key / fingerprint   |
 +-----------------------------------------------------------------------------------+
                                          |
                                          v Entity Persistence Pipeline
 +-----------------------------------------------------------------------------------+
-|                               PostgreSQL Database                                 |
-|  AuthorizedTarget -> ScanJob -> Asset -> Service -> CryptoFinding -> AlgoTaxonomy |
+|                           Enterprise PostgreSQL Database                          |
+|  Asset <--> Service <--> CryptoObject <--> Relationship <--> DataAsset/DataFlow   |
 +-----------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 3. Data Model & Entity Hierarchy
+## 3. Connector & Plugin Domain Status Matrix
 
-```
-[AuthorizedTarget]
-        │
-        └──1:N──► [ScanJob]
-                    │
-                    └──1:N──► [Asset] (Host, IP, Server, Source Repo)
-                                │
-                                └──1:N──► [Service] (Port, Transport, App Protocol)
-                                            │
-                                            └──1:N──► [CryptoFinding] (Observation)
-                                                          │
-                                                          └──N:1──► [NormalizedAlgorithm]
-```
-
-### Entity Schemas
-
-#### 1. AuthorizedTarget
-- `id`: UUID (Primary Key)
-- `name`: String (Human identifier, e.g. "Internal API Gateway")
-- `target_type`: Enum (`HOSTNAME`, `IP_RANGE`, `CIDR`, `URL`, `REPOSITORY`, `CERT_STORE`)
-- `target_value`: String (e.g. `demo.internal`, `10.0.0.0/16`)
-- `is_authorized`: Boolean (Must be `True` for scanner execution)
-- `environment`: String (`PRODUCTION`, `STAGING`, `DEVELOPMENT`)
-- `created_at`, `updated_at`: DateTime
-
-#### 2. ScanJob
-- `id`: UUID (Primary Key)
-- `target_id`: UUID (Foreign Key -> AuthorizedTarget.id)
-- `status`: Enum (`PENDING`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`)
-- `requested_scanners`: JSON Array of Scanner IDs (e.g., `["mock-scanner"]`)
-- `started_at`, `completed_at`: DateTime (Nullable)
-- `error_message`: Text (Nullable)
-- `stats_json`: JSONB (`{assets_found: 1, services_found: 1, findings_found: 4}`)
-
-#### 3. Asset
-- `id`: UUID (Primary Key)
-- `target_id`: UUID (Foreign Key -> AuthorizedTarget.id)
-- `hostname`: String (Nullable, e.g., `demo.internal`)
-- `ip_address`: String (Nullable, e.g., `127.0.0.1`)
-- `asset_type`: Enum (`HOST`, `SERVER`, `APPLICATION`, `SOURCE_REPOSITORY`, `CONTAINER`)
-- `environment`: String
-- `operating_system`: String (Nullable)
-- `metadata_json`: JSONB
-- `first_seen_at`, `last_seen_at`: DateTime
-
-#### 4. Service
-- `id`: UUID (Primary Key)
-- `asset_id`: UUID (Foreign Key -> Asset.id)
-- `port`: Integer (Nullable, e.g., `443`)
-- `transport_protocol`: Enum (`TCP`, `UDP`, `NONE`)
-- `application_protocol`: Enum (`HTTPS`, `TLS`, `SSH`, `HTTP`, `UNKNOWN`)
-- `service_name`: String (e.g., `https`)
-- `metadata_json`: JSONB (e.g., `{tls_version: "1.3"}`)
-- `first_seen_at`, `last_seen_at`: DateTime
-
-#### 5. CryptoFinding
-- `id`: UUID (Primary Key)
-- `scan_job_id`: UUID (Foreign Key -> ScanJob.id)
-- `asset_id`: UUID (Foreign Key -> Asset.id)
-- `service_id`: UUID (Foreign Key -> Service.id, Nullable)
-- `scanner_id`: String (e.g., `mock-scanner`)
-- `scanner_version`: String
-- `finding_type`: Enum (`CERTIFICATE_PUBLIC_KEY`, `KEY_EXCHANGE`, `SYMMETRIC_CIPHER`, `HASH_FUNCTION`, `SIGNATURE_ALGORITHM`, `LIBRARY_DEPENDENCY`)
-- `raw_algorithm_name`: String (e.g., `RSA`, `X25519`, `AES-256-GCM`, `SHA-384`)
-- `normalized_algorithm_id`: String (Foreign Key -> NormalizedAlgorithm.canonical_id)
-- `purpose`: Enum (`AUTHENTICATION`, `KEY_EXCHANGE`, `ENCRYPTION`, `INTEGRITY`, `DIGITAL_SIGNATURE`, `UNKNOWN`)
-- `location_identifier`: String (e.g., `HTTPS :443 TLS 1.3 Handshake`)
-- `evidence_snippet`: Text (Sanitized evidence)
-- `evidence_hash`: String (SHA-256 hex digest)
-- `confidence`: Enum (`HIGH`, `MEDIUM`, `LOW`)
-- `metadata_json`: JSONB
-- `first_seen_at`, `last_seen_at`: DateTime
-
-#### 6. NormalizedAlgorithm
-- `canonical_id`: String (Primary Key, e.g., `RSA-2048`, `X25519`, `AES-256-GCM`, `SHA-384`, `ML-KEM-768`)
-- `name`: String
-- `observed_name`: String
-- `canonical_family`: String (e.g., `RSA`, `ECC`, `AES`, `SHA2`, `ML-KEM`)
-- `canonical_variant`: String (e.g., `RSA-2048`, `X25519`, `ML-KEM-768`)
-- `implementation_variant`: String (Nullable, e.g., `Kyber768`)
-- `primitive_type`: Enum (`ASYMMETRIC_ENCRYPTION`, `SIGNATURE`, `KEY_EXCHANGE`, `SYMMETRIC`, `HASH`)
-- `quantum_safety_status`: Enum (`QUANTUM_VULNERABLE`, `PQC_STANDARDIZED`, `PQC_CANDIDATE`, `HYBRID`, `SYMMETRIC`, `HASH`, `LEGACY`, `DEPRECATED`, `UNKNOWN`)
-- `estimated_security_bits`: Integer
-- `nist_standard_status`: String
+| Plugin Domain / Connector | Type | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **TLS & Network Scanner (`TLSScanner`)** | `Scanner` | `IMPLEMENTED` | Performs active TLS handshakes over TCP port 443; extracts server certificates, public key algorithms, and negotiated cipher suites. |
+| **SSH Host Scanner (`SSHScanner`)** | `Scanner` | `IMPLEMENTED` | Connects to TCP port 22 to inspect SSH server banners, Host Key algorithms (`rsa-sha2-512`, `ssh-ed25519`), and KEX algorithms. |
+| **X.509 Certificate Scanner (`CertificateScanner`)** | `Scanner` | `IMPLEMENTED` | Scans local certificate stores on disk (`.crt`, `.pem`, `.cer`), extracting Subject/Issuer names, validity, and key usage. |
+| **Source Code AST Scanner (`SourceCodeScanner`)** | `Scanner` | `IMPLEMENTED` | Scans source code files (`.py`, `.js`, `.ts`, `.go`, `.java`, `.cpp`, `.rs`) for AST cryptographic call sites. |
+| **Package Dependency Scanner (`DependencyScanner`)** | `Scanner` | `IMPLEMENTED` | Identifies package dependencies in manifest lockfiles (`package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`). |
+| **Cloud Server Scanner (`CloudServerScanner`)** | `Scanner` | `IMPLEMENTED` | Audits Cloud VMs, SSH host keys, Cloud Load Balancer TLS policies, Cloud KMS keys, and S3/GCS bucket storage encryption. |
+| **Plugin Architecture Core** | Core | `FOUNDATION READY` | `DiscoveryPlugin` base class, `Scanner`/`Connector`/`Collector` hierarchy, `PluginRegistry`, and `CapabilityRegistry`. |
+| **Generic Relationship Model** | Core | `FOUNDATION READY` | `Relationship` entity with 16+ relationship types (`RUNS_ON`, `TERMINATES_TLS_AT`, `USES`, etc.) and graph traversal API. |
+| **CryptoObject Identity & Deduplication** | Core | `FOUNDATION READY` | `CryptoObject` model supporting `ALGORITHM`, `KEY`, `CERTIFICATE`, `PROTOCOL`, `LIBRARY`, `KEYSTORE` with identity deduplication. |
+| **DataAsset & DataFlow Models** | Core | `FOUNDATION READY` | `DataAsset` & `DataFlow` models for tracking sensitive data flows across cryptographic channels for future HNDL prioritization. |
+| **DiscoveryCoverage Tracking** | Core | `FOUNDATION READY` | Tracks asset capability evaluation states (`NOT_SCANNED`, `SCANNED`, `FAILED`, `PARTIALLY_SCANNED`, `NOT_APPLICABLE`). |
+| **Contextual Risk Engine** | Core | `FOUNDATION READY` | `ContextualRiskEngine` with `RiskContext` computing contextual scores, providing factor rationales, and separating signature vs KEX. |
+| **Version-Independent CBOM Mapper** | Core | `FOUNDATION READY` | `InternalInventoryMapper` and `CycloneDX16Serializer` separating internal inventory representation from output formats. |
+| **AWS Connector (`AWSConnector`)** | `Connector` | `PLANNED` | Automated AWS EC2, KMS, ALB, ECR inventory API ingestion. |
+| **Azure Connector (`AzureConnector`)** | `Connector` | `PLANNED` | Azure Key Vault, App Service, and Virtual Machine API connector. |
+| **GCP Connector (`GCPConnector`)** | `Connector` | `PLANNED` | Google Cloud Compute Engine, Cloud KMS, and GKE API connector. |
+| **Kubernetes Connector (`KubernetesConnector`)** | `Connector` | `PLANNED` | Kubernetes API reader for Ingress TLS secrets, Service Accounts, and Cert-Manager objects. |
+| **Linux Agent Collector (`LinuxCollector`)** | `Collector` | `PLANNED` | Endpoint inventory collector for Linux OpenSSL / GnuTLS / system crypto policy configurations. |
+| **Windows Endpoint Collector (`WindowsCollector`)** | `Collector` | `PLANNED` | Endpoint inventory collector for Windows Schannel, CAPI, and CNG crypto providers. |
+| **Network Device Connector (`NetworkDeviceConnector`)** | `Connector` | `PLANNED` | SSH/NETCONF connector for routers, switches, firewalls, and VPN gateways. |
+| **IPsec & IKE Scanner (`IPsecScanner`)** | `Scanner` | `PLANNED` | Scanner for IPsec IKEv1/IKEv2 proposal negotiation and SA parameters. |
+| **PKI & CA Connector (`PKIConnector`)** | `Connector` | `PLANNED` | Connector for EJBCA, Microsoft AD CS, HashiCorp Vault PKI, and Let's Encrypt ACME. |
+| **KMS Connector (`KMSConnector`)** | `Connector` | `PLANNED` | Direct KMS connector for AWS KMS, GCP KMS, Vault Transit secrets engine. |
+| **HSM Connector (`HSMConnector`)** | `Connector` | `PLANNED` | PKCS#11 / KMIP connector for hardware security modules (nCipher, Thales, AWS CloudHSM). |
+| **Database Crypto Connector (`DatabaseConnector`)** | `Connector` | `PLANNED` | Audits TLS connections, Transparent Data Encryption (TDE), and column-level encryption in databases. |
+| **Identity System Connector (`IdentityConnector`)** | `Connector` | `PLANNED` | Inspects SAML, OAuth/OIDC, Kerberos, and LDAP signing/encryption certificate keys. |
+| **CI/CD Pipeline Connector (`CICDConnector`)** | `Connector` | `PLANNED` | Inspects GitHub Actions, GitLab CI, and Jenkins code signing certificates and secrets. |
+| **Passive Network Collector (`PassiveNetworkCollector`)** | `Collector` | `PLANNED` | SPAN/TAP passive packet capture for TLS Server Name Indication (SNI) and cipher suite negotiation. |
+| **IoT & OT Device Collector (`IoTCollector`/`OTCollector`)** | `Collector` | `PLANNED` | Discovers embedded device firmware crypto primitives and Modbus/DNP3 TLS profiles. |
 
 ---
 
-## 4. Scanner Plugin Interface & Architecture
+## 4. Key Data Models (V2 Spec)
 
-All discovery scanners inherit from `Scanner` abstract base class and register with `ScannerRegistry`.
+### 1. Asset (Extensible Taxonomy)
+- `id`: String(36) UUID
+- `target_id`: String(36) FK
+- `hostname`, `ip_address`: Optional String
+- `asset_type`: String (e.g. `HOST`, `VM`, `SERVER`, `APPLICATION`, `ROUTER`, `LOAD_BALANCER`, `KMS`)
+- `asset_category`: String (e.g. `INFRASTRUCTURE`, `CLOUD`, `DATA`)
+- `asset_subtype`, `taxonomy_namespace`: Optional String
+- `identity_key`: String (indexed identity resolution key)
+- `external_id`, `provider_resource_id`, `provider`, `region`, `account_or_tenant_id`: Cloud/Enterprise Metadata
+- `status`: String (`ACTIVE`, `STALE`, `REMOVED`, `UNKNOWN`)
+- `first_seen_at`, `last_seen_at`: DateTime
 
-```python
-from abc import ABC, abstractmethod
-from typing import AsyncIterator, Set
-from pydantic import BaseModel
+### 2. Relationship (First-Class Graph Edge)
+- `id`: String(36) UUID
+- `source_entity_type`, `source_entity_id`: String
+- `target_entity_type`, `target_entity_id`: String
+- `relationship_type`: String (`RUNS_ON`, `DEPLOYED_IN`, `CONNECTS_TO`, `DEPENDS_ON`, `USES`, `PROTECTS`, `AUTHENTICATES_WITH`, `SIGNED_BY`, `ISSUED_BY`, `STORES_KEY_IN`, `TERMINATES_TLS_AT`, `EXPOSED_BY`, `ENCRYPTED_BY`, `MANAGED_BY`, `CONTAINS`, `COMMUNICATES_WITH`)
+- `scanner_or_connector_id`: String
+- `evidence_snippet`, `evidence_hash`, `confidence`, `status`, `first_seen_at`, `last_seen_at`
 
-class RawFinding(BaseModel):
-    asset_hostname: str | None = None
-    asset_ip: str | None = None
-    asset_type: str = "HOST"
-    port: int | None = None
-    transport_protocol: str = "TCP"
-    application_protocol: str = "HTTPS"
-    service_name: str = "https"
-    finding_type: str
-    raw_algorithm_name: str
-    key_size: int | None = None
-    curve_or_parameter: str | None = None
-    purpose: str = "UNKNOWN"
-    location_identifier: str
-    evidence_snippet: str
-    confidence: str = "HIGH"
-    metadata: dict = {}
+### 3. CryptoObject (First-Class Cryptographic Inventory Entity)
+- `id`: String(36) UUID
+- `object_type`: String (`ALGORITHM`, `KEY`, `CERTIFICATE`, `PROTOCOL`, `LIBRARY`, `CRYPTO_MODULE`, `KEYSTORE`)
+- `canonical_name`: String
+- `provider`, `version`: Optional String
+- `identity_key`: String (indexed for deterministic deduplication)
+- `fingerprint`, `external_id`, `provider_resource_id`: Optional String
+- `metadata_json`: JSON (Non-secret metadata only; no private keys)
+- `status`, `first_seen_at`, `last_seen_at`
 
-class Scanner(ABC):
-    scanner_id: str
-    version: str
-    supported_target_types: Set[str]
+### 4. DataAsset & DataFlow
+- `DataAsset`: `id`, `name`, `classification` (`RESTRICTED`, `CONFIDENTIAL`, `PUBLIC`), `retention_period`, `business_criticality`.
+- `DataFlow`: `id`, `source_entity`, `destination_entity`, `data_asset_id`, `protocol`, `crypto_object_id`, `protection_purpose`, `direction`.
 
-    @abstractmethod
-    async def discover(
-        self,
-        target: AuthorizedTarget,
-        context: ScanContext
-    ) -> AsyncIterator[RawFinding]:
-        pass
-```
-
-### Sanitizer Pipeline Guardrails
-1. Receives `RawFinding`.
-2. Inspects `evidence_snippet` and `metadata` for string or byte patterns matching private key material (PEM headers `-----BEGIN *PRIVATE KEY-----`).
-3. Replaces matches with `[REDACTED PRIVATE KEY MATERIAL]`.
-4. Computes SHA-256 `evidence_hash` of sanitized evidence.
-
-### Scope Security Enforcement
-- Scanners will only execute if `target.is_authorized` is `True`.
-- Network/Host target scan context executes:
-  1. Scope validation of raw target string.
-  2. DNS resolution for hostname targets.
-  3. IP range validation of resolved addresses against target boundaries.
-  4. Connection initialization.
-
----
-
-## 5. API Contracts (FastAPI REST)
-
-- `GET /api/v1/health`: System status.
-- `POST /api/v1/targets`: Register authorized target.
-- `GET /api/v1/targets`: List targets.
-- `GET /api/v1/targets/{id}`: Target details.
-- `POST /api/v1/scans`: Trigger scan job.
-- `GET /api/v1/scans`: List scan jobs.
-- `GET /api/v1/scans/{id}`: Scan job details & statistics.
-- `GET /api/v1/assets`: List assets with filtering.
-- `GET /api/v1/assets/{id}`: Asset details with Service & Finding hierarchy.
-- `GET /api/v1/findings`: List cryptographic findings.
-- `GET /api/v1/findings/{id}`: Finding details & provenance.
-
----
-
-## 6. Frontend Dashboard (React + TypeScript + Tailwind)
-
-Components:
-- **Dashboard**: Asset count, service count, crypto finding count, scan job count, algorithm distribution breakdown, scan status distribution.
-- **Targets Page & Modal**: List targets, create new target.
-- **Scans Page & Detail**: List scan jobs, launch new scan, detailed scan status view.
-- **Assets Page & Detail**: Interactive asset tree showing Asset -> Service -> CryptoFinding.
-- **Findings Table**: Detailed tabular list of findings with search/filter.
+### 5. DiscoveryCoverage
+- `id`: String(36) UUID
+- `asset_id`: String(36) FK
+- `capability`: String (`TLS`, `SSH`, `X509`, `SOURCE_CODE`, `DEPENDENCIES`, `KMS`, `HSM`, `PKI`, etc.)
+- `status`: String (`UNKNOWN`, `NOT_SCANNED`, `IN_PROGRESS`, `SCANNED`, `PARTIALLY_SCANNED`, `FAILED`, `NOT_APPLICABLE`)
+- `findings_count`: Integer
+- `last_evaluated_at`: DateTime

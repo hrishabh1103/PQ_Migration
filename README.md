@@ -54,22 +54,28 @@ An enterprise-grade cryptographic discovery, inventory, normalization, risk asse
 
 ---
 
-## Key Features
-
+- **Enterprise Inventory Foundation V2**:
+  - **Interactive Inventory Graph (`Inventory Graph`)**: Multi-depth visual graph rendering connected Assets, Services, CryptoObjects, Data Assets, and 16+ relationship types (`RUNS_ON`, `TERMINATES_TLS_AT`, `USES`, etc.).
+  - **Bounded Graph Traversal API (`GET /api/v1/graph/entity/{type}/{id}`)**: Bounded depth-limit graph API (`depth=1..3`) returning nodes, edges, and truncation status.
+  - **DiscoveryPlugin Architecture & Capability Registry**: Generalized `DiscoveryPlugin` base class with `Scanner`, `Connector`, and `Collector` inheritance models and `CapabilityRegistry` tracking 18+ capabilities (`TLS`, `SSH`, `KMS`, `PKI`, `DATABASE`, `DATA_FLOW`, etc.).
+  - **First-Class CryptoObject Identity & Deduplication**: Normalized `CryptoObject` entity (`ALGORITHM`, `KEY`, `CERTIFICATE`, `PROTOCOL`, `LIBRARY`) with deterministic identity resolution.
+  - **DataAsset & DataFlow Models**: Tracks sensitive data flows across cryptographic channels to prioritize Harvest Now Decrypt Later (HNDL) migration risks.
+  - **Contextual Risk Engine**: Evaluates findings using `RiskContext` (purpose, network exposure, confidentiality lifetime) with explicit factor rationales and signature vs key establishment separation.
+  - **Version-Independent CBOM Mapper**: Decouples internal inventory representation from output formats (`InternalInventoryMapper` → `CycloneDX16Serializer`).
+  - **Capability Coverage Tracking**: Clearly distinguishes *Not Scanned*, *Scan Failed*, *Partially Scanned*, *Scanned With Findings*, and *Scanned Without Findings*.
 - **Team API & Server Discovery Hub (`API & Server Hub`)**: Dedicated UI section for engineering teams to paste bulk API server endpoints, URLs, or upload OpenAPI/Swagger JSON specifications to test quantum safety status and receive team migration strategies.
-- **Hierarchy-Aware Entity Modeling**: `AuthorizedTarget` → `ScanJob` → `Asset` → `Service` → `CryptoFinding` → `NormalizedAlgorithm`
-- **5 Production Discovery Scanners**:
+- **6 Production Discovery Scanners**:
   - TLS & Network Scanner (`TLSScanner`)
   - SSH Host & KEX Scanner (`SSHScanner`)
   - X.509 Certificate Store Scanner (`CertificateScanner`)
   - Source Code Crypto AST Scanner (`SourceCodeScanner`)
   - Package Manifest Dependency Scanner (`DependencyScanner`)
+  - Cloud Server Scanner (`CloudServerScanner`)
 - **Zero Private Key Collection**: Automated sanitization & PEM redaction pipeline.
 - **Scope Guard**: Target authorization and post-DNS resolution scope re-validation.
-- **Algorithm Normalization Engine**: Maps observed algorithms (`RSA-2048`, `X25519`, `AES-256-GCM`, `SHA-384`, `ML-KEM-768`, `ML-DSA-65`) to standardized canonical taxonomies while preserving raw observed names and distinguishing standards vs candidates.
-- **PQC Risk & Remediation Engine**: Evaluates findings against NIST FIPS 203/204/205 standards and CNSA 2.0 timelines; generates actionable technical mitigation strategies.
+- **Algorithm Normalization Engine**: Maps observed algorithms to standardized canonical taxonomies.
 - **CycloneDX 1.6 CBOM Generator**: Native export of Cryptographic Bill of Materials in CycloneDX 1.6 JSON format.
-- **Modern React Dashboard**: Real-time stats, interactive asset hierarchy tree, scan job status monitoring, findings provenance modal, and report exporter.
+- **Modern React Dashboard**: Real-time stats, interactive asset hierarchy tree, scan job status monitoring, and report exporter.
 
 ---
 

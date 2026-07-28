@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, LayoutDashboard, Server, Cloud, Target, Play, Database, FileText, FileDown } from 'lucide-react';
+import { ShieldAlert, LayoutDashboard, Server, Cloud, Network, Target, Play, Database, FileText, FileDown } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
@@ -9,6 +9,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'inventory-graph', label: 'Inventory Graph', icon: Network },
     { id: 'cloud-servers', label: 'Cloud Servers', icon: Cloud },
     { id: 'api-hub', label: 'API & Server Hub', icon: Server },
     { id: 'targets', label: 'Targets', icon: Target },

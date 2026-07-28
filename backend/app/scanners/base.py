@@ -38,6 +38,11 @@ class Scanner(ABC):
     scanner_id: str
     version: str
     supported_target_types: Set[TargetType]
+    capabilities: Set[Any] = set()
+
+    @property
+    def plugin_id(self) -> str:
+        return getattr(self, "scanner_id", self.__class__.__name__)
 
     @abstractmethod
     async def discover(
@@ -54,6 +59,8 @@ class ScannerRegistry:
     @classmethod
     def register(cls, scanner: Scanner) -> None:
         cls._registry[scanner.scanner_id] = scanner
+        from app.scanners.plugins import PluginRegistry
+        PluginRegistry.register(scanner)
 
     @classmethod
     def get(cls, scanner_id: str) -> Optional[Scanner]:
@@ -66,3 +73,5 @@ class ScannerRegistry:
     @classmethod
     def clear(cls):
         cls._registry.clear()
+        from app.scanners.plugins import PluginRegistry
+        PluginRegistry.clear()

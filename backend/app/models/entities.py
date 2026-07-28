@@ -130,9 +130,25 @@ class Asset(Base):
     target_id: Mapped[str] = mapped_column(String(36), ForeignKey("authorized_targets.id"), nullable=False)
     hostname: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
     ip_address: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
-    asset_type: Mapped[AssetType] = mapped_column(SQLEnum(AssetType), default=AssetType.HOST, nullable=False)
+    
+    # Extensible Asset Taxonomy
+    asset_type: Mapped[str] = mapped_column(String(64), default="HOST", nullable=False, index=True)
+    asset_category: Mapped[str] = mapped_column(String(64), default="INFRASTRUCTURE", nullable=False, index=True)
+    asset_subtype: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    taxonomy_namespace: Mapped[Optional[str]] = mapped_column(String(64), default="enterprise_v2", nullable=True)
+    
+    # Identity & Enterprise Metadata
+    identity_key: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    external_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    provider_resource_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    provider: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    region: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    account_or_tenant_id: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+
+    # Environment & Lifecycle
     environment: Mapped[str] = mapped_column(String(64), default="DEVELOPMENT", nullable=False)
     operating_system: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False, index=True) # ACTIVE, STALE, REMOVED, UNKNOWN
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
@@ -140,6 +156,7 @@ class Asset(Base):
     target: Mapped["AuthorizedTarget"] = relationship("AuthorizedTarget", back_populates="assets")
     services: Mapped[List["Service"]] = relationship("Service", back_populates="asset", cascade="all, delete-orphan")
     findings: Mapped[List["CryptoFinding"]] = relationship("CryptoFinding", back_populates="asset", cascade="all, delete-orphan")
+    coverage_records: Mapped[List["DiscoveryCoverage"]] = relationship("DiscoveryCoverage", back_populates="asset", cascade="all, delete-orphan")
 
 class Service(Base):
     __tablename__ = "services"
@@ -151,6 +168,7 @@ class Service(Base):
     application_protocol: Mapped[ApplicationProtocol] = mapped_column(SQLEnum(ApplicationProtocol), default=ApplicationProtocol.HTTPS, nullable=False)
     service_name: Mapped[str] = mapped_column(String(64), default="https", nullable=False)
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False)
     first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
 
@@ -160,18 +178,39 @@ class Service(Base):
 class NormalizedAlgorithm(Base):
     __tablename__ = "normalized_algorithms"
 
-    canonical_id: Mapped[str] = mapped_column(String(64), primary_key=True)  # e.g. "RSA-2048", "X25519"
+    canonical_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(128), nullable=False)
     observed_name: Mapped[str] = mapped_column(String(128), nullable=False)
-    canonical_family: Mapped[str] = mapped_column(String(64), nullable=False) # e.g. "RSA", "ML-KEM"
-    canonical_variant: Mapped[str] = mapped_column(String(64), nullable=False) # e.g. "RSA-2048", "ML-KEM-768"
-    implementation_variant: Mapped[Optional[str]] = mapped_column(String(64), nullable=True) # e.g. "Kyber768"
+    canonical_family: Mapped[str] = mapped_column(String(64), nullable=False)
+    canonical_variant: Mapped[str] = mapped_column(String(64), nullable=False)
+    implementation_variant: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     primitive_type: Mapped[PrimitiveType] = mapped_column(SQLEnum(PrimitiveType), nullable=False)
     quantum_safety_status: Mapped[QuantumSafetyStatus] = mapped_column(SQLEnum(QuantumSafetyStatus), nullable=False)
     estimated_security_bits: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     nist_standard_status: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
 
     findings: Mapped[List["CryptoFinding"]] = relationship("CryptoFinding", back_populates="normalized_algorithm")
+
+class CryptoObject(Base):
+    __tablename__ = "crypto_objects"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    object_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True) # ALGORITHM, KEY, CERTIFICATE, PROTOCOL, LIBRARY, CRYPTO_MODULE, KEYSTORE
+    canonical_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    provider: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    version: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    
+    identity_key: Mapped[str] = mapped_column(String(255), nullable=False, index=True, unique=True)
+    fingerprint: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    external_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    provider_resource_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False) # ACTIVE, STALE, REMOVED, UNKNOWN
+    first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+    findings: Mapped[List["CryptoFinding"]] = relationship("CryptoFinding", back_populates="crypto_object")
 
 class CryptoFinding(Base):
     __tablename__ = "crypto_findings"
@@ -180,6 +219,8 @@ class CryptoFinding(Base):
     scan_job_id: Mapped[str] = mapped_column(String(36), ForeignKey("scan_jobs.id"), nullable=False)
     asset_id: Mapped[str] = mapped_column(String(36), ForeignKey("assets.id"), nullable=False)
     service_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("services.id"), nullable=True)
+    crypto_object_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("crypto_objects.id"), nullable=True)
+    
     scanner_id: Mapped[str] = mapped_column(String(64), nullable=False)
     scanner_version: Mapped[str] = mapped_column(String(32), default="1.0.0", nullable=False)
     finding_type: Mapped[FindingType] = mapped_column(SQLEnum(FindingType), nullable=False)
@@ -198,3 +239,82 @@ class CryptoFinding(Base):
     asset: Mapped["Asset"] = relationship("Asset", back_populates="findings")
     service: Mapped[Optional["Service"]] = relationship("Service", back_populates="findings")
     normalized_algorithm: Mapped["NormalizedAlgorithm"] = relationship("NormalizedAlgorithm", back_populates="findings")
+    crypto_object: Mapped[Optional["CryptoObject"]] = relationship("CryptoObject", back_populates="findings")
+
+class Relationship(Base):
+    __tablename__ = "relationships"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    source_entity_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    source_entity_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    target_entity_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    target_entity_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    
+    relationship_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    scanner_or_connector_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    evidence_snippet: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    evidence_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    confidence: Mapped[str] = mapped_column(String(16), default="HIGH", nullable=False)
+    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False)
+    first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+class DataAsset(Base):
+    __tablename__ = "data_assets"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    classification: Mapped[str] = mapped_column(String(64), default="CONFIDENTIAL", nullable=False)
+    required_confidentiality_until: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    retention_period: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    business_criticality: Mapped[str] = mapped_column(String(32), default="MEDIUM", nullable=False)
+    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False)
+    first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+class DataFlow(Base):
+    __tablename__ = "data_flows"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    source_entity_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_entity_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    destination_entity_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    destination_entity_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    
+    data_asset_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("data_assets.id"), nullable=True)
+    protocol: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    crypto_object_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("crypto_objects.id"), nullable=True)
+    protection_purpose: Mapped[str] = mapped_column(String(64), default="ENCRYPTION", nullable=False)
+    direction: Mapped[str] = mapped_column(String(32), default="INBOUND", nullable=False)
+    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False)
+    first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+class DiscoveryCoverage(Base):
+    __tablename__ = "discovery_coverage"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    asset_id: Mapped[str] = mapped_column(String(36), ForeignKey("assets.id"), nullable=False, index=True)
+    capability: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(32), default="NOT_SCANNED", nullable=False) # UNKNOWN, NOT_SCANNED, IN_PROGRESS, SCANNED, PARTIALLY_SCANNED, FAILED, NOT_APPLICABLE
+    findings_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_evaluated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+
+    asset: Mapped["Asset"] = relationship("Asset", back_populates="coverage_records")
+
+class DiscoveryRun(Base):
+    __tablename__ = "discovery_runs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    run_type: Mapped[str] = mapped_column(String(32), default="SCAN", nullable=False) # SCAN, SYNC, COLLECTION, IMPORT, PASSIVE_INGESTION
+    plugin_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    plugin_version: Mapped[str] = mapped_column(String(32), default="1.0.0", nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="PENDING", nullable=False)
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    stats_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

@@ -1,5 +1,8 @@
 from fastapi import APIRouter
-from app.api.v1 import health, targets, scans, assets, findings, stats, reports, cbom, api_hub, cloud
+from app.api.v1 import (
+    health, targets, scans, assets, findings, stats, reports, cbom, api_hub, cloud,
+    relationships, graph, crypto_objects, data_assets, coverage
+)
 
 api_router = APIRouter()
 
@@ -13,3 +16,10 @@ api_router.include_router(reports.router, tags=["Reports"])
 api_router.include_router(cbom.router, tags=["CBOM Export"])
 api_router.include_router(api_hub.router, tags=["API & Server Hub"])
 api_router.include_router(cloud.router, prefix="/cloud", tags=["Cloud Servers"])
+
+# V2 Foundation Routers
+api_router.include_router(relationships.router, prefix="/relationships", tags=["Relationships"])
+api_router.include_router(graph.router, prefix="/graph", tags=["Graph Traversal"])
+api_router.include_router(crypto_objects.router, prefix="/crypto-objects", tags=["CryptoObjects"])
+api_router.include_router(data_assets.router, prefix="/data", tags=["Data Assets & Data Flows"])
+api_router.include_router(coverage.router, prefix="/coverage", tags=["Discovery Coverage"])

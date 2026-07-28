@@ -14,8 +14,9 @@ else
     source venv/bin/activate
 fi
 
-# Run DB Migrations / ensure tables
+# Ensure tables exist and port 8000 is free before starting
 DATABASE_URL="sqlite:///./dev_qdiscovery.db" python3 -c "from app.core.database import engine, Base; Base.metadata.create_all(bind=engine)"
+lsof -ti:8000 | xargs kill -9 2>/dev/null || true
 
 DATABASE_URL="sqlite:///./dev_qdiscovery.db" uvicorn app.main:app --reload --port 8000 &
 BACKEND_PID=$!
