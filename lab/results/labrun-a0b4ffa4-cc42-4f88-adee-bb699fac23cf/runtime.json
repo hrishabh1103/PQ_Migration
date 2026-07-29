@@ -1,0 +1,7 @@
+{
+  "lab_run_id": "labrun-a0b4ffa4-cc42-4f88-adee-bb699fac23cf",
+  "timestamp": "2026-07-29T11:29:04.360167Z",
+  "environment": "PQC Validation Lab V1.1 Hardened",
+  "host_os": "darwin",
+  "python_version": "3.11.6"
+}

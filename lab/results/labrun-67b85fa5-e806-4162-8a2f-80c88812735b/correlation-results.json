@@ -1,0 +1,33 @@
+{
+  "lab_run_id": "labrun-67b85fa5-e806-4162-8a2f-80c88812735b",
+  "correlations": [
+    {
+      "scenario": "Certificate Correlation",
+      "target": "SHA-256: 88915019dd67...",
+      "tls_version": "N/A",
+      "cert_pubkey": "RSA-2048",
+      "cert_signature": "sha256WithRSAEncryption",
+      "key_exchange": "N/A",
+      "cipher": "N/A",
+      "state": "OBSERVED_IN_USE",
+      "quantum_classification": "QUANTUM_VULNERABLE",
+      "asset_readiness": "IDENTICAL_CORRELATED",
+      "status": "PASS",
+      "evidence": "CorrelationEngine evaluated independent TLSScanner & CertificateScanner fingerprint match -> Decision: IDENTICAL (HIGH)"
+    },
+    {
+      "scenario": "Negative Weak Correlation",
+      "target": "IP: 192.168.1.100 (Reused Private IP)",
+      "tls_version": "N/A",
+      "cert_pubkey": "N/A",
+      "cert_signature": "N/A",
+      "key_exchange": "N/A",
+      "cipher": "N/A",
+      "state": "WEAK_MATCH",
+      "quantum_classification": "N/A",
+      "asset_readiness": "SEPARATE_ENTITIES",
+      "status": "PASS",
+      "evidence": "Shared IP address did NOT produce IDENTICAL decision. Result: CONFLICTING (Entities remained separate)"
+    }
+  ]
+}

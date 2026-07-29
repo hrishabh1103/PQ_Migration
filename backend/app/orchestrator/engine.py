@@ -25,6 +25,21 @@ from app.collectors.modules.base_module import ModuleResultStatus
 
 logger = logging.getLogger(__name__)
 
+def _clean_metadata_json(meta: Any) -> dict:
+    if not isinstance(meta, dict):
+        return {}
+    cleaned = {}
+    for k, v in meta.items():
+        if isinstance(v, (str, int, float, bool, type(None))):
+            cleaned[k] = v
+        elif isinstance(v, (list, tuple)):
+            cleaned[k] = [x if isinstance(x, (str, int, float, bool)) else str(x) for x in v]
+        elif isinstance(v, dict):
+            cleaned[k] = _clean_metadata_json(v)
+        else:
+            cleaned[k] = str(v)
+    return cleaned
+
 class DiscoveryOrchestrator:
     """
     Coordinates scan job execution & collection runs:
@@ -515,7 +530,8 @@ class DiscoveryOrchestrator:
         connector_plugin_id: str = "aws",
         allowed_regions: Optional[List[str]] = None,
         profile_name: Optional[str] = None,
-        role_arn: Optional[str] = None
+        role_arn: Optional[str] = None,
+        **kwargs
     ) -> DiscoveryRun:
         """
         Executes a Connector DiscoveryRun (type=SYNC) across authorized API targets.
@@ -532,13 +548,13 @@ class DiscoveryOrchestrator:
             raise ValueError(f"Target '{target_id}' not found")
 
         # 1. Authorize target scope
-        is_auth, reason = ScopeGuard.verify_target(target.target_value, target.target_type, target.is_authorized)
-        if not is_auth:
-            raise ScopeGuardError(f"Target '{target.target_value}' blocked by ScopeGuard: {reason}")
+        try:
+            ScopeGuard.validate_target(target)
+        except ScopeGuardError as e:
+            raise ScopeGuardError(f"Target '{target.target_value}' blocked by ScopeGuard: {e}")
 
         # 2. Create DiscoveryRun (type=SYNC)
         discovery_run = DiscoveryRun(
-            target_id=target.id,
             plugin_id=connector_plugin_id,
             run_type="SYNC",
             status="RUNNING",
@@ -552,19 +568,22 @@ class DiscoveryOrchestrator:
         obs_count = 0
         obj_map: Dict[str, str] = {}
 
-        context = ScanContext(target_id=target.id, run_id=discovery_run.id)
+        context = ScanContext(scan_job_id=discovery_run.id, target_id=target.id, run_id=discovery_run.id)
 
         try:
-            async for obs in connector.collect(
+            collect_iter = connector.collect(
                 target_value=target.target_value,
                 target_type=target.target_type,
                 context=context,
                 allowed_regions=allowed_regions,
                 profile_name=profile_name,
-                role_arn=role_arn
-            ):
+                role_arn=role_arn,
+                **kwargs
+            )
+
+            async for obs in collect_iter:
                 obs_count += 1
-                ev_hash = hashlib.sha256(f"{obs.__class__.__name__}:{getattr(obs, 'provider_resource_id', obs_count)}".encode()).hexdigest()
+                ev_hash = hashlib.sha256(f"{obs.__class__.__name__}:{getattr(obs, 'identity_key', getattr(obs, 'provider_resource_id', obs_count))}".encode()).hexdigest()
 
                 prov = create_provenance_record(
                     db=db,
@@ -573,7 +592,7 @@ class DiscoveryOrchestrator:
                     discovery_run_id=discovery_run.id,
                     target_id=target.id,
                     collection_method="API",
-                    metadata_json=getattr(obs, "metadata_json", {})
+                    metadata_json=_clean_metadata_json(getattr(obs, "metadata", getattr(obs, "metadata_json", {})))
                 )
 
                 if isinstance(obs, AssetObservation):
@@ -584,7 +603,7 @@ class DiscoveryOrchestrator:
                         ip_address=obs.ip_address,
                         asset_type=obs.asset_type,
                         environment=target.environment,
-                        operating_system=obs.operating_system,
+                        operating_system=getattr(obs, 'operating_system', getattr(obs, 'os_distribution', None)),
                         provider_resource_id=obs.provider_resource_id,
                         external_id=obs.external_id,
                         identity_key=obs.identity_key,
@@ -596,18 +615,19 @@ class DiscoveryOrchestrator:
                         obj_map[obs.identity_key] = ast.id
 
                 elif isinstance(obs, CryptoObservation):
-                    norm_id = NormalizationEngine.normalize(obs.raw_algorithm_name)
-                    c_key = f"crypto:{obs.raw_algorithm_name}"
+                    raw_algo = obs.canonical_name if hasattr(obs, 'canonical_name') and obs.canonical_name else obs.raw_algorithm_name
+                    norm_id = NormalizationEngine.normalize_and_get_or_create(db, raw_algo)
+                    c_key = obs.identity_key if hasattr(obs, 'identity_key') and obs.identity_key else f"crypto:{obs.raw_algorithm_name}"
                     existing = db.query(CryptoObject).filter(CryptoObject.identity_key == c_key).first()
                     if not existing:
                         cobj = CryptoObject(
-                            object_type=obs.finding_type,
-                            canonical_name=norm_id.name if norm_id else obs.raw_algorithm_name,
-                            provider="AWS",
+                            object_type=getattr(obs, 'object_type', 'ALGORITHM'),
+                            canonical_name=obs.canonical_name if hasattr(obs, 'canonical_name') else (norm_id.name if norm_id else obs.raw_algorithm_name),
+                            provider=getattr(obs, 'provider', connector_plugin_id.upper()),
                             identity_key=c_key,
                             provenance_id=prov.id,
                             discovery_run_id=discovery_run.id,
-                            metadata_json=obs.metadata_json
+                            metadata_json=getattr(obs, 'metadata', getattr(obs, 'metadata_json', {}))
                         )
                         db.add(cobj)
                         db.flush()
@@ -616,7 +636,8 @@ class DiscoveryOrchestrator:
                         obj_map[c_key] = existing.id
 
                 elif isinstance(obs, CertificateObservation):
-                    cert_key = f"cert:sha256:{obs.fingerprint_sha256}"
+                    fp = getattr(obs, 'fingerprint', getattr(obs, 'fingerprint_sha256', ''))
+                    cert_key = f"cert:sha256:{fp.replace(':', '').upper()}"
                     existing = db.query(CryptoObject).filter(CryptoObject.identity_key == cert_key).first()
                     if not existing:
                         cobj = CryptoObject(
@@ -624,29 +645,36 @@ class DiscoveryOrchestrator:
                             canonical_name=f"Certificate ({obs.subject})",
                             provider=obs.issuer,
                             identity_key=cert_key,
-                            fingerprint=obs.fingerprint_sha256,
+                            fingerprint=fp,
                             provenance_id=prov.id,
                             discovery_run_id=discovery_run.id,
                             metadata_json={
                                 "subject": obs.subject,
                                 "issuer": obs.issuer,
                                 "serial_number": obs.serial_number,
-                                "not_after": obs.not_after
+                                "valid_to": getattr(obs, 'valid_to', getattr(obs, 'not_after', None))
                             }
                         )
                         db.add(cobj)
                         db.flush()
                         obj_map[cert_key] = cobj.id
-                        if obs.location_identifier:
+                        if hasattr(obs, 'location_identifier') and obs.location_identifier:
                             obj_map[obs.location_identifier] = cobj.id
                     else:
                         obj_map[cert_key] = existing.id
-                        if obs.location_identifier:
-                            obj_map[obs.location_identifier] = existing.id
 
                 elif isinstance(obs, RelationshipObservation):
-                    src_id = obj_map.get(obs.source_provider_resource_id)
-                    tgt_id = obj_map.get(obs.target_provider_resource_id)
+                    src_hint = getattr(obs, 'source_id_hint', getattr(obs, 'source_provider_resource_id', None))
+                    tgt_hint = getattr(obs, 'target_id_hint', getattr(obs, 'target_provider_resource_id', None))
+                    src_id = obj_map.get(src_hint)
+                    tgt_id = obj_map.get(tgt_hint)
+
+                    # If hints are DB entity UUIDs or directly resolved
+                    if not src_id and src_hint in obj_map.values():
+                        src_id = src_hint
+                    if not tgt_id and tgt_hint in obj_map.values():
+                        tgt_id = tgt_hint
+
                     if src_id and tgt_id:
                         rel = db.query(Relationship).filter(
                             Relationship.source_entity_id == src_id,
@@ -657,16 +685,20 @@ class DiscoveryOrchestrator:
                             rel = Relationship(
                                 source_entity_type="ASSET",
                                 source_entity_id=src_id,
-                                target_entity_type="ASSET",
+                                target_entity_type="ASSET" if tgt_hint not in [k for k in obj_map if k.startswith("cert:")] else "CRYPTO_OBJECT",
                                 target_entity_id=tgt_id,
                                 relationship_type=obs.relationship_type,
                                 scanner_or_connector_id=connector_plugin_id,
                                 provenance_id=prov.id,
                                 discovery_run_id=discovery_run.id,
                                 confidence=obs.confidence,
-                                metadata_json=obs.metadata_json
+                                metadata_json=getattr(obs, 'metadata', {})
                             )
                             db.add(rel)
+                        else:
+                            rel.provenance_id = prov.id
+                            rel.discovery_run_id = discovery_run.id
+                            rel.metadata_json = getattr(obs, 'metadata', {})
 
             discovery_run.status = "COMPLETED"
             discovery_run.completed_at = utc_now()

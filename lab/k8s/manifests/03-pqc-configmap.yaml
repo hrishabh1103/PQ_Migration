@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lab-pqc-config
+  namespace: lab-crypto
+data:
+  nginx-pqc.conf: |
+    ssl_protocols TLSv1.3;
+    ssl_ecdh_curve mlkem768:X25519;
+    ssl_ciphers TLS_AES_256_GCM_SHA384;

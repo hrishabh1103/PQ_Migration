@@ -1,0 +1,106 @@
+{
+  "manifest_version": "1.0",
+  "generated_at": "2026-07-29T14:10:00Z",
+  "environment": "PQC Validation Lab V1.1",
+  "services": [
+    {
+      "service_name": "lab-classical-tls",
+      "container_name": "lab-classical-tls",
+      "image": "nginx",
+      "image_digest": "sha256:516475cc129da42866742567714ddc681e5eed7b9ee0b9e9c015e464b4221a00",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": 8443,
+      "protocol": "TLSv1.3",
+      "crypto_provider": "OpenSSL 1.1.1t / Default",
+      "expected_algorithm_capabilities": ["RSA-2048", "X25519", "AES-256-GCM"]
+    },
+    {
+      "service_name": "lab-ecdsa-tls",
+      "container_name": "lab-ecdsa-tls",
+      "image": "nginx",
+      "image_digest": "sha256:516475cc129da42866742567714ddc681e5eed7b9ee0b9e9c015e464b4221a00",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": 8444,
+      "protocol": "TLSv1.3",
+      "crypto_provider": "OpenSSL 1.1.1t / Default",
+      "expected_algorithm_capabilities": ["ECDSA-P256", "secp256r1", "AES-256-GCM"]
+    },
+    {
+      "service_name": "lab-legacy-tls",
+      "container_name": "lab-legacy-tls",
+      "image": "nginx",
+      "image_digest": "sha256:93baf2ec1bfefd04d29eb070900dd5d79b0f79863653453397e55a5b663a6cb1",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": 8445,
+      "protocol": "TLSv1.0",
+      "crypto_provider": "OpenSSL 1.1.1k / Default",
+      "expected_algorithm_capabilities": ["RSA-1024", "3DES-EDE-CBC-SHA"]
+    },
+    {
+      "service_name": "lab-pqc-tls",
+      "container_name": "lab-pqc-tls",
+      "image": "openquantumsafe/nginx",
+      "image_digest": "sha256:6c8bebd06da583071c06331a433c31128f271fa8d16a19b3e75dbb5d5e4e1994",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": 8446,
+      "protocol": "TLSv1.3",
+      "crypto_provider": "oqsprovider v0.9.0 / OpenSSL 3.4.0",
+      "expected_algorithm_capabilities": ["mlkem768", "mldsa65", "AES-256-GCM"]
+    },
+    {
+      "service_name": "lab-hybrid-tls",
+      "container_name": "lab-hybrid-tls",
+      "image": "openquantumsafe/nginx",
+      "image_digest": "sha256:6c8bebd06da583071c06331a433c31128f271fa8d16a19b3e75dbb5d5e4e1994",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": 8447,
+      "protocol": "TLSv1.3",
+      "crypto_provider": "oqsprovider v0.9.0 / OpenSSL 3.4.0",
+      "expected_algorithm_capabilities": ["X25519MLKEM768", "x25519_mlkem768", "mldsa65", "AES-256-GCM"]
+    },
+    {
+      "service_name": "lab-negative-hybrid-tls",
+      "container_name": "lab-negative-hybrid-tls",
+      "image": "openquantumsafe/nginx",
+      "image_digest": "sha256:6c8bebd06da583071c06331a433c31128f271fa8d16a19b3e75dbb5d5e4e1994",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": 8448,
+      "protocol": "TLSv1.3",
+      "crypto_provider": "oqsprovider v0.9.0 / OpenSSL 3.4.0",
+      "expected_algorithm_capabilities": ["X25519", "x25519_mlkem768", "RSA-2048"]
+    },
+    {
+      "service_name": "lab-ssh-server",
+      "container_name": "lab-ssh-server",
+      "image": "lscr.io/linuxserver/openssh-server",
+      "image_digest": "sha256:9c5e178975fcc3917853f5e37cbf135ad7deb11de504ab0f460cc81a2e1eb539",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": 2223,
+      "protocol": "SSHv2",
+      "crypto_provider": "OpenSSH_9.9p1 / OpenSSL 3.3.2",
+      "expected_algorithm_capabilities": ["rsa-sha2-512", "curve25519-sha256", "aes256-gcm@openssh.com"]
+    },
+    {
+      "service_name": "lab-linux-host",
+      "container_name": "lab-linux-host",
+      "image": "alpine",
+      "image_digest": "sha256:6baf43584bcb78f2e5847d1de515f23499913ac9f12bdf834811a3145eb11ca1",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": null,
+      "protocol": "N/A",
+      "crypto_provider": "OpenSSL 3.1.4",
+      "expected_algorithm_capabilities": ["X.509 Certificate Store"]
+    },
+    {
+      "service_name": "lab-source-app",
+      "container_name": "lab-source-app",
+      "image": "python",
+      "image_digest": "sha256:db3ff2e1800a8581e2c48a27c3995339d47bdf046da21c7627accd3d51053a93",
+      "architecture": "linux/arm64",
+      "expected_exposed_port": null,
+      "protocol": "N/A",
+      "crypto_provider": "Python cryptography 42.0.5 + oqs 0.8.0",
+      "expected_algorithm_capabilities": ["RSA-PSS", "RSA-OAEP", "ECDSA", "ECDH", "ML-KEM-768", "ML-DSA-65"]
+    }
+  ]
+}

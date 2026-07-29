@@ -1,0 +1,33 @@
+{
+  "lab_run_id": "labrun-820d53da-dca2-47ea-b8db-b346b662c78a",
+  "readiness": [
+    {
+      "scenario": "Mixed Readiness",
+      "target": "mixed-app.local",
+      "tls_version": "TLSv1.3",
+      "cert_pubkey": "ECDSA-P256 (Vulnerable Signature)",
+      "cert_signature": "ecdsa-with-SHA256",
+      "key_exchange": "ML-KEM-768 (Resistant KEX)",
+      "cipher": "AES-256-GCM",
+      "state": "OBSERVED_IN_USE",
+      "quantum_classification": "QUANTUM_VULNERABLE",
+      "asset_readiness": "NOT_READY",
+      "status": "PASS",
+      "evidence": "Asset with ML-KEM-768 KEX and ECDSA-P256 Signature evaluated to NOT_READY (NOT READY)"
+    },
+    {
+      "scenario": "Incomplete Coverage",
+      "target": "unscanned-app.local",
+      "tls_version": "N/A",
+      "cert_pubkey": "N/A",
+      "cert_signature": "N/A",
+      "key_exchange": "N/A",
+      "cipher": "N/A",
+      "state": "NOT_SCANNED",
+      "quantum_classification": "UNKNOWN",
+      "asset_readiness": "INCOMPLETE_COVERAGE",
+      "status": "PASS",
+      "evidence": "Asset with zero vulnerabilities found but NOT_SCANNED coverage evaluated to INCOMPLETE_COVERAGE (NOT READY)"
+    }
+  ]
+}

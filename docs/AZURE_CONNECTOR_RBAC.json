@@ -1,0 +1,40 @@
+{
+  "Name": "PQC Enterprise Azure Discovery ReadOnly Role",
+  "IsCustomRole": true,
+  "Description": "Production least-privilege read-only role for AzureConnector cryptographic discovery.",
+  "Actions": [
+    "Microsoft.Resources/subscriptions/read",
+    "Microsoft.Resources/subscriptions/resourceGroups/read",
+    "Microsoft.Compute/virtualMachines/read",
+    "Microsoft.Compute/disks/read",
+    "Microsoft.Storage/storageAccounts/read",
+    "Microsoft.KeyVault/vaults/read",
+    "Microsoft.KeyVault/vaults/keys/read",
+    "Microsoft.KeyVault/vaults/certificates/read",
+    "Microsoft.Network/applicationGateways/read",
+    "Microsoft.Network/virtualNetworks/read",
+    "Microsoft.Network/publicIPAddresses/read",
+    "Microsoft.Sql/servers/read",
+    "Microsoft.Sql/servers/databases/read",
+    "Microsoft.Cdn/profiles/read"
+  ],
+  "NotActions": [
+    "Microsoft.KeyVault/vaults/secrets/read",
+    "Microsoft.KeyVault/vaults/keys/decrypt/action",
+    "Microsoft.KeyVault/vaults/keys/encrypt/action",
+    "Microsoft.KeyVault/vaults/keys/sign/action",
+    "Microsoft.KeyVault/vaults/keys/unwrap/action"
+  ],
+  "DataActions": [
+    "Microsoft.KeyVault/vaults/keys/read",
+    "Microsoft.KeyVault/vaults/certificates/read"
+  ],
+  "NotDataActions": [
+    "Microsoft.KeyVault/vaults/secrets/*",
+    "Microsoft.KeyVault/vaults/keys/unwrap/action",
+    "Microsoft.KeyVault/vaults/keys/decrypt/action"
+  ],
+  "AssignableScopes": [
+    "/subscriptions/00000000-0000-0000-0000-000000000000"
+  ]
+}

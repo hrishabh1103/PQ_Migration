@@ -89,7 +89,8 @@ class AWSConnector(Connector):
         context: ScanContext,
         allowed_regions: Optional[List[str]] = None,
         profile_name: Optional[str] = None,
-        role_arn: Optional[str] = None
+        role_arn: Optional[str] = None,
+        **kwargs
     ) -> AsyncIterator[DiscoveryObservation]:
         """
         Primary entry point performing AWS read-only discovery sync across authorized regions & services.

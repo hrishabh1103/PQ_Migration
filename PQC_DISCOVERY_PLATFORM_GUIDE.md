@@ -117,6 +117,15 @@ The platform includes 5 production discovery scanners capable of operating again
   2. Select **Package Dependency Scanner** and trigger the scan.
 - **What is Discovered:** Identifies cryptographic dependencies (`cryptography`, `pycryptodome`, `bouncycastle`, `libsodium`, `liboqs-python` PQC library) and library versions.
 
+### 3.6 Cloud Connector Sync (`AWSConnector`)
+- **Target Type:** `CLOUD_PROVIDER`
+- **What is Discovered:** Performs read-only cloud discovery sync across AWS KMS key specs, ACM X.509 certificates, ELBv2 SSL policies, S3 encryption settings, RDS storage encryption, and CloudFront CDN TLS configurations.
+
+### 3.7 Kubernetes Cluster Discovery (`KubernetesConnector`) — `IMPLEMENTED`
+- **Target Type:** `KUBERNETES_CLUSTER`
+- **What is Discovered:** Performs read-only Kubernetes cluster discovery across 15 capabilities (cluster identity, nodes, namespaces, workloads, pods, services, ingresses, certificates, secret metadata, ConfigMaps, RBAC, cert-manager, service mesh, encryption at rest).
+- **Security Guarantee:** Operates under strict zero-secret data exposure. `Secret.data` is not generally read (allowlisted public `tls.crt` certificates only). `tls.key` private keys, service-account tokens, passwords, and API keys are strictly excluded.
+
 ---
 
 ## 4. Cryptographic Flaws & PQC Mitigation Strategies

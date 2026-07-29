@@ -1,0 +1,5 @@
+CONNECTED(00000003)
+Server Config: x25519_mlkem768
+Client Request: X25519
+Negotiated Group: X25519
+Peer signature: RSA-PSS

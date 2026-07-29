@@ -1,0 +1,8 @@
+{
+  "scenario": "Negative Weak Identifier Correlation",
+  "source_entity": "Asset A (ip: 192.168.1.100)",
+  "target_entity": "Asset B (ip: 192.168.1.100)",
+  "weak_evidence": "IP_ADDRESS",
+  "forbidden_decision": "IDENTICAL",
+  "expected_decision": "CONFLICTING"
+}

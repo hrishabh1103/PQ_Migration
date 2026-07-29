@@ -1,0 +1,6 @@
+{
+  "scenario": "Linux Host Collector",
+  "target_name": "lab-linux-host.local",
+  "expected_openssl_capability": "INSTALLED",
+  "expected_certificate_fingerprint_file": "lab/certificates/lab_cert_fingerprint.txt"
+}

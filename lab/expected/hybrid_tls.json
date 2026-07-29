@@ -1,0 +1,10 @@
+{
+  "scenario": "Hybrid TLS",
+  "target_name": "lab-hybrid-tls.local",
+  "protocol": "TLSv1.3",
+  "key_exchange_raw": "x25519_mlkem768",
+  "key_exchange_normalized": "X25519_MLKEM768",
+  "purpose": "KEY_ESTABLISHMENT",
+  "usage_state": "OBSERVED_IN_USE",
+  "expected_primitive_status": "HYBRID"
+}

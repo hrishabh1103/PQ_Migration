@@ -1,0 +1,69 @@
+{
+  "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797",
+  "artifacts": [
+    {
+      "filename": "runtime.json",
+      "sha256": "9ade662293b0814eb2424fd15fd0ce4fe24973f5e1884b43adafb01402dcdb4f",
+      "timestamp": "2026-07-29T08:44:40.319745Z",
+      "scenario": "System Baseline",
+      "scanner_plugin_version": "1.0.0",
+      "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797"
+    },
+    {
+      "filename": "tls-classical.txt",
+      "sha256": "13cdc6e7fff88f974ed5700ab79b540eb2caebb4f7eb93d19168c39c385f9ea0",
+      "timestamp": "2026-07-29T08:44:40.324488Z",
+      "scenario": "Classical TLS",
+      "scanner_plugin_version": "1.0.0",
+      "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797"
+    },
+    {
+      "filename": "tls-ecdsa.txt",
+      "sha256": "d69b69a52d98ad1bb88f475d85d84a6ea5bb49189069490032a509f6dec647d3",
+      "timestamp": "2026-07-29T08:44:40.410174Z",
+      "scenario": "ECDSA TLS",
+      "scanner_plugin_version": "1.0.0",
+      "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797"
+    },
+    {
+      "filename": "tls-legacy.txt",
+      "sha256": "6a304cc8189c269e6e148e35d254ff9934b1e8df668438aca65f0d9e08f4dbc8",
+      "timestamp": "2026-07-29T08:44:40.426498Z",
+      "scenario": "Legacy TLS",
+      "scanner_plugin_version": "1.0.0",
+      "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797"
+    },
+    {
+      "filename": "tls-pqc.txt",
+      "sha256": "de9544cce4b07eed476051fa694d27317e46ba58dfa26c9e59e93f665fdd1cd6",
+      "timestamp": "2026-07-29T08:44:40.446302Z",
+      "scenario": "PQC TLS",
+      "scanner_plugin_version": "1.0.0",
+      "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797"
+    },
+    {
+      "filename": "tls-hybrid.txt",
+      "sha256": "f8acad6c3263297698a38c58becce28384c9363084a2327b36e773991f23ce7d",
+      "timestamp": "2026-07-29T08:44:40.452799Z",
+      "scenario": "Hybrid TLS",
+      "scanner_plugin_version": "1.0.0",
+      "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797"
+    },
+    {
+      "filename": "tls-negative-hybrid.txt",
+      "sha256": "a93a89dbfb9bcc75d9ad34675262d9d0d1ae1be2f01c274ccff186d26ae8a580",
+      "timestamp": "2026-07-29T08:44:40.461136Z",
+      "scenario": "Negative Hybrid Negotiation",
+      "scanner_plugin_version": "1.0.0",
+      "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797"
+    },
+    {
+      "filename": "ssh.txt",
+      "sha256": "559bd0ffc33550dec65ccdcd1431d8bfd81cb28893743028b5d5ac504a4628db",
+      "timestamp": "2026-07-29T08:44:40.461639Z",
+      "scenario": "SSH Server",
+      "scanner_plugin_version": "1.0.0",
+      "lab_run_id": "labrun-66aa979b-0be4-4e36-b904-437495679797"
+    }
+  ]
+}

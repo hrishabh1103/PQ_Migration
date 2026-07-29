@@ -1,0 +1,11 @@
+{
+  "lab_run_id": "labrun-68302132-56fd-4b29-a80f-f1ec9acc16e4",
+  "assessment_run_id": "ee6e0e82-5653-4689-867b-d4e82f51177d",
+  "timestamp": "2026-07-29T11:28:31.696548Z",
+  "total_scenarios": 13,
+  "passed_scenarios": 13,
+  "failed_scenarios": 0,
+  "real_runtime_scenarios": 10,
+  "config_only_scenarios": 2,
+  "simulated_scenarios": 0
+}

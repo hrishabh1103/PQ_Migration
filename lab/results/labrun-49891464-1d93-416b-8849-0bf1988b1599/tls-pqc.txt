@@ -1,0 +1,5 @@
+CONNECTED(00000003)
+Protocol: TLSv1.3
+Cipher: TLS_AES_256_GCM_SHA384
+Group: mlkem768
+Peer signature type: mldsa65

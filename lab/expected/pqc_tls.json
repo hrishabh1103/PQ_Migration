@@ -1,0 +1,10 @@
+{
+  "scenario": "PQC TLS",
+  "target_name": "lab-pqc-tls.local",
+  "protocol": "TLSv1.3",
+  "key_exchange_raw": "mlkem768",
+  "key_exchange_normalized": "ML-KEM-768",
+  "purpose": "KEY_ESTABLISHMENT",
+  "usage_state": "OBSERVED_IN_USE",
+  "expected_primitive_status": "QUANTUM_RESISTANT"
+}

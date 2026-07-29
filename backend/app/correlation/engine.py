@@ -11,7 +11,15 @@ RULE_ID = "rule-correlation-v1"
 RULE_VERSION = "v1.0"
 
 COMPATIBLE_ENTITY_GROUPS = [
-    {"ASSET", "CLOUD_VM", "HOST", "SERVER", "CLOUD_STORAGE", "KMS_KEY", "CLOUD_ACCOUNT", "CLOUD_REGION", "CLOUD_LOAD_BALANCER", "CLOUD_DATABASE", "CLOUD_CDN"},
+    {
+        "ASSET", "CLOUD_VM", "HOST", "SERVER", "CLOUD_STORAGE", "KMS_KEY", "CLOUD_ACCOUNT",
+        "CLOUD_REGION", "CLOUD_LOAD_BALANCER", "CLOUD_DATABASE", "CLOUD_CDN",
+        "CLOUD_ORGANIZATION", "CLOUD_TENANT", "CLOUD_SUBSCRIPTION", "CLOUD_PROJECT",
+        "CLOUD_RESOURCE_GROUP", "CLOUD_FOLDER", "CLOUD_ZONE", "COMPUTE_INSTANCE",
+        "BLOCK_STORAGE", "OBJECT_STORAGE", "MANAGED_DATABASE", "LOAD_BALANCER",
+        "TLS_TERMINATOR", "CDN", "NETWORK", "SUBNET", "PUBLIC_ENDPOINT",
+        "MANAGED_KEY", "HSM", "CERTIFICATE_STORE", "SECRET_STORE", "IDENTITY", "SERVICE_IDENTITY"
+    },
     {"CRYPTO_OBJECT", "CERTIFICATE"},
     {"DATA_ASSET"},
     {"SERVICE"}
@@ -80,27 +88,29 @@ class CorrelationEngine:
             weak_matches = 0
             conflicts = 0
 
-            # A. Strong Deterministic Evidence (Provider Resource ID / ARN)
-            src_arn = getattr(source_entity, "provider_resource_id", None) or getattr(source_entity, "external_id", None)
-            tgt_arn = getattr(target_entity, "provider_resource_id", None) or getattr(target_entity, "external_id", None)
+            # A. Strong Deterministic Evidence (Provider Resource ID / ARN / Resource URI)
+            src_provider_id = getattr(source_entity, "provider_resource_id", None) or getattr(source_entity, "external_id", None)
+            tgt_provider_id = getattr(target_entity, "provider_resource_id", None) or getattr(target_entity, "external_id", None)
 
-            if src_arn and tgt_arn:
-                if src_arn == tgt_arn:
+            src_provider = getattr(source_entity, "provider", None)
+            tgt_provider = getattr(target_entity, "provider", None)
+            if src_provider_id and tgt_provider_id and (src_provider == tgt_provider or not src_provider or not tgt_provider):
+                if src_provider_id == tgt_provider_id:
                     strong_matches += 1
                     matching_evidence.append(CorrelationEvidence(
                         evidence_type="PROVIDER_RESOURCE_ID",
-                        source_value=src_arn,
-                        target_value=tgt_arn,
+                        source_value=src_provider_id,
+                        target_value=tgt_provider_id,
                         strength=EvidenceStrength.STRONG,
                         matched=True,
-                        description="Exact match on provider resource ID / ARN"
+                        description="Exact match on canonical provider resource ID"
                     ).model_dump())
                 else:
                     conflicts += 1
                     conflicting_evidence.append(CorrelationEvidence(
                         evidence_type="PROVIDER_RESOURCE_ID",
-                        source_value=src_arn,
-                        target_value=tgt_arn,
+                        source_value=src_provider_id,
+                        target_value=tgt_provider_id,
                         strength=EvidenceStrength.STRONG,
                         matched=False,
                         description="Conflicting provider resource IDs"
@@ -149,24 +159,38 @@ class CorrelationEngine:
                         description="Exact match on deterministic identity key"
                     ).model_dump())
 
-            # D. Medium Contextual Evidence (EC2 Instance ID matching Linux Host Metadata)
+            # D. Medium Contextual Evidence (Compute Instance ID matching Linux Host Metadata)
             src_meta = getattr(source_entity, "metadata_json", {}) or {}
             tgt_meta = getattr(target_entity, "metadata_json", {}) or {}
-            src_inst = src_meta.get("instance_id") or src_meta.get("ec2_instance_id")
-            tgt_inst = tgt_meta.get("instance_id") or tgt_meta.get("ec2_instance_id")
+            src_inst = (
+                src_meta.get("compute_instance_id") or
+                src_meta.get("instance_id") or
+                src_meta.get("ec2_instance_id") or
+                src_meta.get("vm_id") or
+                src_meta.get("gcp_instance_id") or
+                getattr(source_entity, "provider_resource_id", None)
+            )
+            tgt_inst = (
+                tgt_meta.get("compute_instance_id") or
+                tgt_meta.get("instance_id") or
+                tgt_meta.get("ec2_instance_id") or
+                tgt_meta.get("vm_id") or
+                tgt_meta.get("gcp_instance_id") or
+                getattr(target_entity, "provider_resource_id", None)
+            )
 
             if src_inst and tgt_inst and src_inst == tgt_inst:
                 medium_matches += 1
                 matching_evidence.append(CorrelationEvidence(
-                    evidence_type="EC2_INSTANCE_ID",
-                    source_value=src_inst,
-                    target_value=tgt_inst,
+                    evidence_type="COMPUTE_INSTANCE_ID",
+                    source_value=str(src_inst),
+                    target_value=str(tgt_inst),
                     strength=EvidenceStrength.MEDIUM,
                     matched=True,
-                    description="Match on EC2 instance ID across cloud & host collector"
+                    description="Match on compute instance ID across cloud & host collector"
                 ).model_dump())
 
-            # E. Weak Evidence (IP Address, Hostname, Display Name, AWS Tags)
+            # E. Weak Evidence (IP Address, Hostname, Display Name, Cloud Tags)
             src_ip = getattr(source_entity, "ip_address", None)
             tgt_ip = getattr(target_entity, "ip_address", None)
             if src_ip and tgt_ip and src_ip == tgt_ip:

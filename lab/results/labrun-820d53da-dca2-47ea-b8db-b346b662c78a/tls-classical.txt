@@ -1,0 +1,5 @@
+CONNECTED(00000003)
+Cipher: TLS_AES_256_GCM_SHA384
+Group: X25519
+Cert PubKey: RSA-2048 (sha256WithRSAEncryption)
+Fingerprint: 88915019dd67e3d1ed263bf6528dd322b599404a6dcf3bdb798243860decfeb2

@@ -1,0 +1,12 @@
+{
+  "scenario": "ECDSA TLS",
+  "target_name": "lab-ecdsa-tls.local",
+  "protocol": "TLSv1.3",
+  "cert_pubkey_algorithm": "ECDSA-P256",
+  "key_exchange_algorithm": "secp256r1",
+  "cipher_suite": "AES-256-GCM",
+  "usage_state": "OBSERVED_IN_USE",
+  "expected_quantum_exposure": "QUANTUM_VULNERABLE",
+  "expected_coverage": "SCANNED",
+  "expected_asset_readiness": "NOT_READY"
+}

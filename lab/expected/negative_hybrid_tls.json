@@ -1,0 +1,8 @@
+{
+  "scenario": "Negative Hybrid Negotiation",
+  "target_name": "lab-negative-hybrid-tls.local",
+  "server_configured_kex": "x25519_mlkem768",
+  "client_requested_kex": "X25519",
+  "expected_observed_in_use_kex": "X25519",
+  "forbidden_observed_in_use_kex": "x25519_mlkem768"
+}

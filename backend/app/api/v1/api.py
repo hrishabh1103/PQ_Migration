@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from app.api.v1 import (
     health, targets, scans, assets, findings, stats, reports, cbom, api_hub, cloud,
     relationships, graph, crypto_objects, data_assets, coverage, collectors, connectors,
-    correlations, readiness
+    correlations, readiness, kubernetes
 )
 
 api_router = APIRouter()
@@ -19,6 +19,8 @@ api_router.include_router(api_hub.router, tags=["API & Server Hub"])
 api_router.include_router(cloud.router, prefix="/cloud", tags=["Cloud Servers"])
 api_router.include_router(collectors.router, tags=["Linux Collector & Telemetry"])
 api_router.include_router(connectors.router, tags=["AWS Connector & Cloud Sync"])
+api_router.include_router(connectors.generic_router, tags=["Multi-Cloud Connectors"])
+api_router.include_router(kubernetes.router, tags=["Kubernetes Connector & Discovery"])
 
 # V2 Foundation Routers
 api_router.include_router(relationships.router, prefix="/relationships", tags=["Relationships"])

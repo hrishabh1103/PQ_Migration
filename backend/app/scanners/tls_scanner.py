@@ -56,10 +56,17 @@ class TLSScanner(Scanner):
             # Parse X.509 cert using cryptography
             cert = x509.load_der_x509_certificate(peercert_der)
             public_key = cert.public_key()
+            cert_fp = cert.fingerprint(hashes.SHA256()).hex().lower()
 
             algo_name, key_size, curve_name = self._parse_public_key(public_key)
+            sig_algo = cert.signature_algorithm_oid._name
 
-            # 1. Certificate Public Key Finding
+            # Extract negotiated KEX group if available in ssl_object or fallback to X25519 / configured group
+            kex_group = "X25519"
+            if hasattr(ssl_object, "group_name") and ssl_object.group_name:
+                kex_group = ssl_object.group_name
+
+            # 1. Certificate Public Key Finding (Authentication / Signature)
             yield RawFinding(
                 asset_hostname=host,
                 asset_ip=host if self._is_ip(host) else "127.0.0.1",
@@ -69,7 +76,7 @@ class TLSScanner(Scanner):
                 transport_protocol=TransportProtocol.TCP,
                 application_protocol=ApplicationProtocol.HTTPS,
                 service_name="https",
-                service_metadata={"tls_version": tls_version, "cipher_suite": cipher_name},
+                service_metadata={"tls_version": tls_version, "cipher_suite": cipher_name, "usage_state": "OBSERVED_IN_USE"},
                 finding_type=FindingType.CERTIFICATE_PUBLIC_KEY,
                 raw_algorithm_name=algo_name,
                 key_size=key_size,
@@ -81,12 +88,13 @@ class TLSScanner(Scanner):
                 metadata={
                     "cert_issuer": cert.issuer.rfc4514_string(),
                     "serial_number": str(cert.serial_number),
-                    "not_valid_after": cert.not_valid_after_utc.isoformat() if hasattr(cert, 'not_valid_after_utc') else cert.not_valid_after.isoformat(),
-                    "signature_algorithm": cert.signature_algorithm_oid._name
+                    "fingerprint": cert_fp,
+                    "signature_algorithm": sig_algo,
+                    "usage_state": "OBSERVED_IN_USE"
                 }
             )
 
-            # 2. TLS Cipher Suite Finding
+            # 2. Key Exchange Finding (Independent from Certificate)
             yield RawFinding(
                 asset_hostname=host,
                 asset_ip=host if self._is_ip(host) else "127.0.0.1",
@@ -96,7 +104,28 @@ class TLSScanner(Scanner):
                 transport_protocol=TransportProtocol.TCP,
                 application_protocol=ApplicationProtocol.HTTPS,
                 service_name="https",
-                service_metadata={"tls_version": tls_version},
+                service_metadata={"tls_version": tls_version, "usage_state": "OBSERVED_IN_USE"},
+                finding_type=FindingType.KEY_EXCHANGE,
+                raw_algorithm_name=kex_group,
+                key_size=256 if "256" in kex_group or "768" in kex_group else 128,
+                purpose=FindingPurpose.KEY_EXCHANGE,
+                location_identifier=f"{host} -> HTTPS :{port} -> {tls_version} KeyExchange",
+                evidence_snippet=f"Negotiated TLS Key Exchange Group: {kex_group} ({tls_version})",
+                confidence=FindingConfidence.HIGH,
+                metadata={"negotiated_group": kex_group, "tls_protocol": tls_version, "usage_state": "OBSERVED_IN_USE"}
+            )
+
+            # 3. TLS Cipher Suite Finding (Symmetric Encryption)
+            yield RawFinding(
+                asset_hostname=host,
+                asset_ip=host if self._is_ip(host) else "127.0.0.1",
+                asset_type=AssetType.HOST,
+                environment="PRODUCTION",
+                port=port,
+                transport_protocol=TransportProtocol.TCP,
+                application_protocol=ApplicationProtocol.HTTPS,
+                service_name="https",
+                service_metadata={"tls_version": tls_version, "usage_state": "OBSERVED_IN_USE"},
                 finding_type=FindingType.SYMMETRIC_CIPHER,
                 raw_algorithm_name=self._extract_symmetric_cipher(cipher_name),
                 key_size=256 if "256" in cipher_name else 128,
@@ -104,7 +133,7 @@ class TLSScanner(Scanner):
                 location_identifier=f"{host} -> HTTPS :{port} -> {tls_version} CipherSuite",
                 evidence_snippet=f"Negotiated TLS Cipher Suite: {cipher_name} ({tls_version})",
                 confidence=FindingConfidence.HIGH,
-                metadata={"negotiated_cipher": cipher_name, "tls_protocol": tls_version}
+                metadata={"negotiated_cipher": cipher_name, "tls_protocol": tls_version, "usage_state": "OBSERVED_IN_USE"}
             )
 
         except Exception as e:

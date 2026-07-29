@@ -139,3 +139,49 @@ def get_aws_inventory(target_id: str, db: Session = Depends(get_db)):
             } for c in crypto_objects
         ]
     }
+
+# Provider-Neutral Generic Connector Endpoints
+generic_router = APIRouter(prefix="/connectors", tags=["Cloud Connectors"])
+
+@generic_router.post("/{provider}/validate")
+def validate_connector_identity(provider: str, req: Dict[str, Any]):
+    provider_clean = provider.lower()
+    if provider_clean == "azure":
+        from app.connectors.azure_client import AzureSdkClient
+        client = AzureSdkClient(subscription_id=req.get("subscription_id"), tenant_id=req.get("tenant_id"))
+        val = client.validate_identity()
+        return val
+    elif provider_clean == "aws":
+        client = AWSSdkClient(region_name=req.get("region_name", "us-east-1"))
+        return client.validate_identity()
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported connector provider '{provider}'")
+
+@generic_router.post("/{provider}/sync")
+async def trigger_connector_sync(provider: str, req: Dict[str, Any], db: Session = Depends(get_db)):
+    target_id = req.get("target_id")
+    if not target_id:
+        raise HTTPException(status_code=400, detail="Missing required 'target_id' parameter")
+
+    target = db.query(AuthorizedTarget).filter(AuthorizedTarget.id == target_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Target '{target_id}' not found")
+
+    try:
+        run = await DiscoveryOrchestrator.run_connector_sync(
+            db=db,
+            target_id=target_id,
+            connector_plugin_id=provider.lower(),
+            allowed_regions=req.get("allowed_regions")
+        )
+        return {
+            "status": "COMPLETED",
+            "run_id": run.id,
+            "target_id": target.id,
+            "provider": provider.lower(),
+            "stats": run.stats_json
+        }
+    except Exception as e:
+        logger.error(f"Connector sync for '{provider}' failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+

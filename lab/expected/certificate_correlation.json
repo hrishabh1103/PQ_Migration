@@ -1,0 +1,8 @@
+{
+  "scenario": "Certificate Cross-Source Correlation",
+  "participating_sources": ["TLSScanner", "CertificateScanner", "LinuxCollector"],
+  "correlation_evidence": "X509_SHA256_FINGERPRINT",
+  "evidence_strength": "STRONG",
+  "expected_decision": "IDENTICAL",
+  "expected_confidence": "HIGH"
+}

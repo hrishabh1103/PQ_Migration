@@ -1,0 +1,4 @@
+CONNECTED(00000003)
+Cipher: TLS_AES_256_GCM_SHA384
+Group: secp256r1
+Cert PubKey: ECDSA-P256 (ecdsa-with-SHA256)

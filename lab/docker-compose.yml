@@ -1,0 +1,108 @@
+networks:
+  lab_net:
+    driver: bridge
+
+services:
+  lab-classical-tls:
+    image: nginx@sha256:516475cc129da42866742567714ddc681e5eed7b9ee0b9e9c015e464b4221a00
+    container_name: lab-classical-tls
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./configs/nginx_classical.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certificates/lab_cert.pem:/etc/nginx/certs/lab_cert.pem:ro
+      - ./certificates/lab_cert.key:/etc/nginx/certs/lab_cert.key:ro
+    networks:
+      - lab_net
+
+  lab-ecdsa-tls:
+    image: nginx@sha256:516475cc129da42866742567714ddc681e5eed7b9ee0b9e9c015e464b4221a00
+    container_name: lab-ecdsa-tls
+    ports:
+      - "8444:8444"
+    volumes:
+      - ./configs/nginx_ecdsa.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certificates/lab_ecdsa_cert.pem:/etc/nginx/certs/lab_ecdsa_cert.pem:ro
+      - ./certificates/lab_ecdsa_cert.key:/etc/nginx/certs/lab_ecdsa_cert.key:ro
+    networks:
+      - lab_net
+
+  lab-legacy-tls:
+    image: nginx@sha256:93baf2ec1bfefd04d29eb070900dd5d79b0f79863653453397e55a5b663a6cb1
+    container_name: lab-legacy-tls
+    ports:
+      - "8445:8445"
+    volumes:
+      - ./configs/nginx_legacy.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certificates/lab_cert.pem:/etc/nginx/certs/lab_cert.pem:ro
+      - ./certificates/lab_cert.key:/etc/nginx/certs/lab_cert.key:ro
+    networks:
+      - lab_net
+
+  lab-pqc-tls:
+    image: openquantumsafe/nginx@sha256:6c8bebd06da583071c06331a433c31128f271fa8d16a19b3e75dbb5d5e4e1994
+    container_name: lab-pqc-tls
+    ports:
+      - "8446:4433"
+    volumes:
+      - ./configs/nginx_pqc.conf:/opt/nginx/conf/nginx.conf:ro
+      - ./certificates/lab_cert.pem:/opt/nginx/certs/lab_cert.pem:ro
+      - ./certificates/lab_cert.key:/opt/nginx/certs/lab_cert.key:ro
+    networks:
+      - lab_net
+
+  lab-hybrid-tls:
+    image: openquantumsafe/nginx@sha256:6c8bebd06da583071c06331a433c31128f271fa8d16a19b3e75dbb5d5e4e1994
+    container_name: lab-hybrid-tls
+    ports:
+      - "8447:4433"
+    volumes:
+      - ./configs/nginx_hybrid.conf:/opt/nginx/conf/nginx.conf:ro
+      - ./certificates/lab_cert.pem:/opt/nginx/certs/lab_cert.pem:ro
+      - ./certificates/lab_cert.key:/opt/nginx/certs/lab_cert.key:ro
+    networks:
+      - lab_net
+
+  lab-negative-hybrid-tls:
+    image: openquantumsafe/nginx@sha256:6c8bebd06da583071c06331a433c31128f271fa8d16a19b3e75dbb5d5e4e1994
+    container_name: lab-negative-hybrid-tls
+    ports:
+      - "8448:4433"
+    volumes:
+      - ./configs/nginx_negative_hybrid.conf:/opt/nginx/conf/nginx.conf:ro
+      - ./certificates/lab_cert.pem:/opt/nginx/certs/lab_cert.pem:ro
+      - ./certificates/lab_cert.key:/opt/nginx/certs/lab_cert.key:ro
+    networks:
+      - lab_net
+
+  lab-ssh-server:
+    image: lscr.io/linuxserver/openssh-server@sha256:9c5e178975fcc3917853f5e37cbf135ad7deb11de504ab0f460cc81a2e1eb539
+    container_name: lab-ssh-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - PASSWORD_ACCESS=true
+      - USER_PASSWORD=labpassword
+      - USER_NAME=labuser
+    ports:
+      - "2223:22"
+    networks:
+      - lab_net
+
+  lab-linux-host:
+    image: alpine@sha256:6baf43584bcb78f2e5847d1de515f23499913ac9f12bdf834811a3145eb11ca1
+    container_name: lab-linux-host
+    command: tail -f /dev/null
+    volumes:
+      - ./certificates/lab_cert.pem:/etc/ssl/certs/lab_cert.pem:ro
+    networks:
+      - lab_net
+
+  lab-source-app:
+    image: python@sha256:db3ff2e1800a8581e2c48a27c3995339d47bdf046da21c7627accd3d51053a93
+    container_name: lab-source-app
+    command: tail -f /dev/null
+    volumes:
+      - ./services/source-app:/app:ro
+    networks:
+      - lab_net

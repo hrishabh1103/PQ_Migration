@@ -52,6 +52,20 @@ export const NAVIGATION_CONFIG: NavItem[] = [
     description: 'Read-only AWS Cloud Cryptographic Discovery Connector'
   },
   {
+    id: 'kubernetes-connector',
+    label: 'Kubernetes Connector',
+    icon: Server,
+    section: 'DISCOVERY',
+    description: 'Read-only Kubernetes Cluster Cryptographic Discovery'
+  },
+  {
+    id: 'azure-connector',
+    label: 'Azure Connector',
+    icon: Cloud,
+    section: 'DISCOVERY',
+    description: 'Read-only Azure Cloud Cryptographic Discovery Connector'
+  },
+  {
     id: 'cloud-servers',
     label: 'Cloud Servers',
     icon: Cloud,

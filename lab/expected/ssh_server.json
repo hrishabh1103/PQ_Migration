@@ -1,0 +1,10 @@
+{
+  "scenario": "SSH Server",
+  "target_name": "lab-ssh-server.local",
+  "host_key_algorithm": "rsa-sha2-512",
+  "host_key_purpose": "IDENTITY_AUTHENTICATION",
+  "key_exchange_algorithm": "curve25519-sha256",
+  "key_exchange_purpose": "KEY_ESTABLISHMENT",
+  "cipher_algorithm": "aes256-gcm@openssh.com",
+  "mac_algorithm": "hmac-sha2-512"
+}

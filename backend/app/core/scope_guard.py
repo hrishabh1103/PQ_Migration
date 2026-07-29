@@ -58,8 +58,24 @@ class ScopeGuard:
         from urllib.parse import urlparse
         parsed = urlparse(redirect_url)
         redirect_host = parsed.netloc.split(":")[0].lower()
-        if redirect_host and redirect_host != original_host.split(":")[0].lower():
-            raise ScopeGuardError(
-                f"Unauthorized redirect attempted from '{original_host}' to unauthorized host '{redirect_host}'."
-            )
+        original_clean = original_host.split(":")[0].lower()
+        if redirect_host != original_clean:
+            raise ScopeGuardError(f"Cross-domain redirect from '{original_clean}' to '{redirect_host}' blocked by ScopeGuard.")
+        return True
+
+    @staticmethod
+    def validate_azure_scope(
+        tenant_id: str,
+        subscription_id: str,
+        allowed_tenant_ids: List[str] = None,
+        allowed_subscription_ids: List[str] = None
+    ) -> bool:
+        """
+        Validates Azure Tenant and Subscription IDs against authorized scope lists.
+        Fails closed with ScopeGuardError if identity falls outside authorized scope.
+        """
+        if allowed_tenant_ids and tenant_id not in allowed_tenant_ids:
+            raise ScopeGuardError(f"Azure Tenant ID '{tenant_id}' is outside authorized scope {allowed_tenant_ids}.")
+        if allowed_subscription_ids and subscription_id not in allowed_subscription_ids:
+            raise ScopeGuardError(f"Azure Subscription ID '{subscription_id}' is outside authorized scope {allowed_subscription_ids}.")
         return True

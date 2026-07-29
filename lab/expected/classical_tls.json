@@ -1,0 +1,14 @@
+{
+  "scenario": "Classical TLS",
+  "target_name": "lab-classical-tls.local",
+  "protocol": "TLSv1.3",
+  "cert_pubkey_algorithm": "RSA-2048",
+  "cert_signature_algorithm": "sha256WithRSAEncryption",
+  "key_exchange_algorithm": "X25519",
+  "cipher_suite": "AES-256-GCM",
+  "usage_state": "OBSERVED_IN_USE",
+  "expected_quantum_exposure": "QUANTUM_VULNERABLE",
+  "expected_coverage": "SCANNED",
+  "expected_asset_readiness": "NOT_READY",
+  "expected_migration_priority_category": "CRITICAL"
+}

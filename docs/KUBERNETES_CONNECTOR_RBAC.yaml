@@ -1,0 +1,103 @@
+# Production Least-Privilege Read-Only RBAC Manifest for KubernetesConnector
+# This ClusterRole and ClusterRoleBinding provide the minimum read-only permissions
+# required for Enterprise Post-Quantum Cryptographic Discovery.
+#
+# SECURITY GUARANTEES:
+# 1. Read-only permissions: get, list, watch ONLY. Zero create, update, patch, delete, or impersonate rights.
+# 2. Secret access rationale: 'secrets' read access is required ONLY for inspecting public X.509
+#    certificate material ('tls.crt') in TLS Secrets and cert-manager Secrets.
+#    KubernetesConnector NEVER reads, logs, or persists 'tls.key', service-account tokens, passwords,
+#    or generic secret data values.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: q-discovery-kubernetes-connector-readonly
+  labels:
+    app.kubernetes.io/name: q-discovery-platform
+    app.kubernetes.io/component: kubernetes-connector
+rules:
+  # 1. Core API Group (Nodes, Namespaces, Pods, Services, ServiceAccounts, ConfigMaps, Secrets metadata)
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - namespaces
+      - pods
+      - services
+      - serviceaccounts
+      - configmaps
+      - secrets
+    verbs: ["get", "list", "watch"]
+
+  # 2. Apps API Group (Deployments, StatefulSets, DaemonSets)
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - statefulsets
+      - daemonsets
+    verbs: ["get", "list", "watch"]
+
+  # 3. Batch API Group (Jobs, CronJobs)
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["get", "list", "watch"]
+
+  # 4. Networking API Group (Ingresses, IngressClasses, NetworkPolicies)
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - ingresses
+      - ingressclasses
+      - networkpolicies
+    verbs: ["get", "list", "watch"]
+
+  # 5. Gateway API Group (Gateways, HTTPRoutes - Optional / if installed)
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources:
+      - gateways
+      - httproutes
+    verbs: ["get", "list", "watch"]
+
+  # 6. Cert-Manager API Group (Certificates, Issuers, ClusterIssuers - Optional / if installed)
+  - apiGroups: ["cert-manager.io"]
+    resources:
+      - certificates
+      - issuers
+      - clusterissuers
+    verbs: ["get", "list", "watch"]
+
+  # 7. Service Mesh API Groups (Istio / Linkerd - Optional / if installed)
+  - apiGroups: ["networking.istio.io", "security.istio.io"]
+    resources:
+      - virtualservices
+      - destinationrules
+      - peerauthentications
+      - gateways
+    verbs: ["get", "list", "watch"]
+
+  # 8. RBAC API Group (Roles, ClusterRoles, RoleBindings, ClusterRoleBindings)
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources:
+      - roles
+      - clusterroles
+      - rolebindings
+      - clusterrolebindings
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: q-discovery-kubernetes-connector-binding
+  labels:
+    app.kubernetes.io/name: q-discovery-platform
+    app.kubernetes.io/component: kubernetes-connector
+subjects:
+  - kind: ServiceAccount
+    name: q-discovery-connector-sa
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: q-discovery-kubernetes-connector-readonly
+  apiGroup: rbac.authorization.k8s.io

@@ -11,6 +11,8 @@ import { FindingsPage } from './pages/FindingsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { LinuxCollectorPage } from './pages/LinuxCollectorPage';
 import { AWSConnectorPage } from './pages/AWSConnectorPage';
+import { KubernetesConnectorPage } from './pages/KubernetesConnectorPage';
+import { AzureConnectorPage } from './pages/AzureConnectorPage';
 import { PqcReadinessPage } from './pages/PqcReadinessPage';
 
 export const App: React.FC = () => {
@@ -22,6 +24,8 @@ export const App: React.FC = () => {
       {activeTab === 'inventory-graph' && <InventoryGraphPage />}
       {activeTab === 'linux-collector' && <LinuxCollectorPage />}
       {activeTab === 'aws-connector' && <AWSConnectorPage />}
+      {activeTab === 'kubernetes-connector' && <KubernetesConnectorPage onNavigate={(tab) => setActiveTab(tab)} />}
+      {activeTab === 'azure-connector' && <AzureConnectorPage onNavigate={(tab) => setActiveTab(tab)} />}
       {activeTab === 'cloud-servers' && <CloudServersPage />}
       {activeTab === 'api-hub' && <ApiServerHubPage onNavigateScans={() => setActiveTab('scans')} />}
       {activeTab === 'targets' && <TargetsPage onNavigateScans={() => setActiveTab('scans')} />}

@@ -1,0 +1,15 @@
+{
+  "scenario": "Source Code & Dependency Scanner",
+  "target_file": "lab/services/source-app/app.py",
+  "expected_usages": [
+    { "algo": "RSA", "purpose": "DIGITAL_SIGNATURE" },
+    { "algo": "RSA", "purpose": "PUBLIC_KEY_ENCRYPTION" },
+    { "algo": "ECDSA", "purpose": "DIGITAL_SIGNATURE" },
+    { "algo": "ECDH", "purpose": "KEY_ESTABLISHMENT" },
+    { "algo": "AES-256-GCM", "purpose": "STORAGE_ENCRYPTION" },
+    { "algo": "SHA-256", "purpose": "HASH" },
+    { "algo": "HMAC", "purpose": "MAC" },
+    { "algo": "ML-KEM-768", "purpose": "KEY_ESTABLISHMENT", "quantum_status": "QUANTUM_RESISTANT" },
+    { "algo": "ML-DSA-65", "purpose": "DIGITAL_SIGNATURE", "quantum_status": "QUANTUM_RESISTANT" }
+  ]
+}

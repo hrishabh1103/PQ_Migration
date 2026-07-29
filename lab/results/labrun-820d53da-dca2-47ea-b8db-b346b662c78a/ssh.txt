@@ -1,0 +1,4 @@
+SSH-2.0-OpenSSH_9.9p1
+HostKey: rsa-sha2-512
+KEX: curve25519-sha256
+Cipher: aes256-gcm@openssh.com

@@ -1,0 +1,4 @@
+CONNECTED(00000003)
+Protocol: TLSv1.0
+Cipher: 3DES-EDE-CBC-SHA
+Key Exchange: RSA-1024
