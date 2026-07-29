@@ -72,11 +72,14 @@ An enterprise-grade cryptographic discovery, inventory, normalization, risk asse
   - Package Manifest Dependency Scanner (`DependencyScanner`)
   - Cloud Server Scanner (`CloudServerScanner`)
   - Linux Host Collector (`LinuxCollector` via `LocalTransport`)
+  - AWS Cloud Connector (`AWSConnector` via `AWSSdkClient`)
 - **Zero Private Key Collection**: Automated sanitization & PEM redaction pipeline.
 - **Scope Guard**: Target authorization and post-DNS resolution scope re-validation.
 - **Algorithm Normalization Engine**: Maps observed algorithms to standardized canonical taxonomies.
+- **Canonical Entity Correlation Engine**: Persisted `CorrelationRecord` decisions (`IDENTICAL`, `LIKELY_SAME`, `RELATED`, `UNRESOLVED`, `CONFLICTING`) with controlled non-destructive canonical resolution for strong identities.
+- **Purpose-Aware PQC Readiness Engine**: Classifies cryptographic usage by purpose, assesses asset readiness with coverage awareness, versioned policy tracking (`pqc-default / v1.0`), and calculates prioritized migration scores (0-100).
 - **CycloneDX 1.6 CBOM Generator**: Native export of Cryptographic Bill of Materials in CycloneDX 1.6 JSON format.
-- **Modern React Dashboard**: Real-time stats, interactive asset hierarchy tree, scan job status monitoring, and report exporter.
+- **Modern Enterprise React Dashboard**: Interactive knowledge graph, Linux Collector view, AWS Connector manager, PQC Readiness dashboard, real-time stats, and report exporter.
 
 ---
 

@@ -70,7 +70,7 @@ class CryptoObservation(DiscoveryObservation):
 
 class CertificateObservation(DiscoveryObservation):
     observation_type: ObservationType = ObservationType.CERTIFICATE
-    fingerprint: str # SHA-256 fingerprint
+    fingerprint: Optional[str] = None # SHA-256 fingerprint if DER bytes available
     subject: str
     issuer: str
     serial_number: Optional[str] = None

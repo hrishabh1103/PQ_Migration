@@ -348,3 +348,67 @@ class DiscoveryCoverage(Base):
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
 
     asset: Mapped["Asset"] = relationship("Asset", back_populates="coverage_records")
+
+class CorrelationRecord(Base):
+    __tablename__ = "correlation_records"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    source_entity_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    source_entity_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    target_entity_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    target_entity_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+
+    decision: Mapped[str] = mapped_column(String(32), nullable=False) # IDENTICAL, LIKELY_SAME, RELATED, UNRESOLVED, CONFLICTING
+    confidence: Mapped[str] = mapped_column(String(32), default="MEDIUM", nullable=False) # HIGH, MEDIUM, LOW
+    matching_evidence_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    conflicting_evidence_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    
+    rule_id: Mapped[str] = mapped_column(String(64), default="rule-default", nullable=False)
+    rule_version: Mapped[str] = mapped_column(String(32), default="v1.0", nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+class AssessmentRun(Base):
+    __tablename__ = "assessment_runs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    policy_id: Mapped[str] = mapped_column(String(64), default="pqc-default", nullable=False)
+    policy_version: Mapped[str] = mapped_column(String(32), default="v1.0", nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="RUNNING", nullable=False) # RUNNING, COMPLETED, FAILED
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    evaluated_entity_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    failed_entity_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+
+    assessments: Mapped[List["ReadinessAssessment"]] = relationship("ReadinessAssessment", back_populates="assessment_run")
+
+class ReadinessAssessment(Base):
+    __tablename__ = "readiness_assessments"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    assessment_run_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("assessment_runs.id"), nullable=True, index=True)
+    target_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("authorized_targets.id"), nullable=True, index=True)
+    asset_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("assets.id"), nullable=True, index=True)
+
+    policy_id: Mapped[str] = mapped_column(String(64), default="pqc-default", nullable=False)
+    policy_version: Mapped[str] = mapped_column(String(32), default="v1.0", nullable=False)
+
+    readiness_result: Mapped[str] = mapped_column(String(32), nullable=False) # READY, PARTIALLY_READY, NOT_READY, INCOMPLETE_COVERAGE, UNKNOWN
+    quantum_exposure: Mapped[str] = mapped_column(String(32), nullable=False) # QUANTUM_VULNERABLE, QUANTUM_RESISTANT, HYBRID, NOT_APPLICABLE, UNKNOWN
+    
+    migration_priority_score: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    migration_category: Mapped[str] = mapped_column(String(32), default="LOW", nullable=False) # CRITICAL, HIGH, MEDIUM, LOW, NEGLIGIBLE
+    confidence: Mapped[str] = mapped_column(String(32), default="MEDIUM", nullable=False)
+
+    known_factors_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    unknown_factors_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    factor_breakdown_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    rationale: Mapped[str] = mapped_column(Text, default="", nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    assessment_run: Mapped[Optional["AssessmentRun"]] = relationship("AssessmentRun", back_populates="assessments")
+

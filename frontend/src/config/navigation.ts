@@ -1,6 +1,6 @@
 import { 
   LayoutDashboard, Target, Play, Server, Cloud, Cpu, 
-  Database, FileText, Network, FileDown, LucideIcon 
+  Database, FileText, Network, FileDown, ShieldAlert, LucideIcon 
 } from 'lucide-react';
 
 export type NavSection = 'DISCOVERY' | 'INVENTORY' | 'MIGRATION';
@@ -45,6 +45,13 @@ export const NAVIGATION_CONFIG: NavItem[] = [
     description: 'Read-only Linux Host Cryptographic Collector'
   },
   {
+    id: 'aws-connector',
+    label: 'AWS Connector',
+    icon: Cloud,
+    section: 'DISCOVERY',
+    description: 'Read-only AWS Cloud Cryptographic Discovery Connector'
+  },
+  {
     id: 'cloud-servers',
     label: 'Cloud Servers',
     icon: Cloud,
@@ -81,6 +88,13 @@ export const NAVIGATION_CONFIG: NavItem[] = [
     description: 'Enterprise Knowledge Graph Topology'
   },
   // MIGRATION Section
+  {
+    id: 'pqc-readiness',
+    label: 'PQC Readiness',
+    icon: ShieldAlert,
+    section: 'MIGRATION',
+    description: 'Enterprise Correlation & PQC Readiness Engine'
+  },
   {
     id: 'reports',
     label: 'Reports & Readiness',

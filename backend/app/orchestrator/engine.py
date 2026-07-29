@@ -506,3 +506,179 @@ class DiscoveryOrchestrator:
         db.commit()
 
         return discovery_run
+
+    @classmethod
+    async def run_connector_sync(
+        cls,
+        db: Session,
+        target_id: str,
+        connector_plugin_id: str = "aws",
+        allowed_regions: Optional[List[str]] = None,
+        profile_name: Optional[str] = None,
+        role_arn: Optional[str] = None
+    ) -> DiscoveryRun:
+        """
+        Executes a Connector DiscoveryRun (type=SYNC) across authorized API targets.
+        Processes structured observations, applies sanitization, resolves canonical assets & CryptoObjects,
+        tracks per-region/service coverage, and persists relationships & provenance.
+        """
+        from app.scanners.plugins import PluginRegistry
+        connector = PluginRegistry.get(connector_plugin_id)
+        if not connector:
+            raise ValueError(f"Connector plugin '{connector_plugin_id}' not found in PluginRegistry")
+
+        target = db.query(AuthorizedTarget).filter(AuthorizedTarget.id == target_id).first()
+        if not target:
+            raise ValueError(f"Target '{target_id}' not found")
+
+        # 1. Authorize target scope
+        is_auth, reason = ScopeGuard.verify_target(target.target_value, target.target_type, target.is_authorized)
+        if not is_auth:
+            raise ScopeGuardError(f"Target '{target.target_value}' blocked by ScopeGuard: {reason}")
+
+        # 2. Create DiscoveryRun (type=SYNC)
+        discovery_run = DiscoveryRun(
+            target_id=target.id,
+            plugin_id=connector_plugin_id,
+            run_type="SYNC",
+            status="RUNNING",
+            started_at=utc_now(),
+            stats_json={"requested_regions": allowed_regions or ["us-east-1"]}
+        )
+        db.add(discovery_run)
+        db.commit()
+        db.refresh(discovery_run)
+
+        obs_count = 0
+        obj_map: Dict[str, str] = {}
+
+        context = ScanContext(target_id=target.id, run_id=discovery_run.id)
+
+        try:
+            async for obs in connector.collect(
+                target_value=target.target_value,
+                target_type=target.target_type,
+                context=context,
+                allowed_regions=allowed_regions,
+                profile_name=profile_name,
+                role_arn=role_arn
+            ):
+                obs_count += 1
+                ev_hash = hashlib.sha256(f"{obs.__class__.__name__}:{getattr(obs, 'provider_resource_id', obs_count)}".encode()).hexdigest()
+
+                prov = create_provenance_record(
+                    db=db,
+                    plugin_id=connector_plugin_id,
+                    evidence_hash=ev_hash,
+                    discovery_run_id=discovery_run.id,
+                    target_id=target.id,
+                    collection_method="API",
+                    metadata_json=getattr(obs, "metadata_json", {})
+                )
+
+                if isinstance(obs, AssetObservation):
+                    ast = cls.resolve_or_create_asset(
+                        db=db,
+                        target_id=target.id,
+                        hostname=obs.hostname,
+                        ip_address=obs.ip_address,
+                        asset_type=obs.asset_type,
+                        environment=target.environment,
+                        operating_system=obs.operating_system,
+                        provider_resource_id=obs.provider_resource_id,
+                        external_id=obs.external_id,
+                        identity_key=obs.identity_key,
+                        asset_category=obs.asset_category
+                    )
+                    if obs.provider_resource_id:
+                        obj_map[obs.provider_resource_id] = ast.id
+                    if obs.identity_key:
+                        obj_map[obs.identity_key] = ast.id
+
+                elif isinstance(obs, CryptoObservation):
+                    norm_id = NormalizationEngine.normalize(obs.raw_algorithm_name)
+                    c_key = f"crypto:{obs.raw_algorithm_name}"
+                    existing = db.query(CryptoObject).filter(CryptoObject.identity_key == c_key).first()
+                    if not existing:
+                        cobj = CryptoObject(
+                            object_type=obs.finding_type,
+                            canonical_name=norm_id.name if norm_id else obs.raw_algorithm_name,
+                            provider="AWS",
+                            identity_key=c_key,
+                            provenance_id=prov.id,
+                            discovery_run_id=discovery_run.id,
+                            metadata_json=obs.metadata_json
+                        )
+                        db.add(cobj)
+                        db.flush()
+                        obj_map[c_key] = cobj.id
+                    else:
+                        obj_map[c_key] = existing.id
+
+                elif isinstance(obs, CertificateObservation):
+                    cert_key = f"cert:sha256:{obs.fingerprint_sha256}"
+                    existing = db.query(CryptoObject).filter(CryptoObject.identity_key == cert_key).first()
+                    if not existing:
+                        cobj = CryptoObject(
+                            object_type="CERTIFICATE",
+                            canonical_name=f"Certificate ({obs.subject})",
+                            provider=obs.issuer,
+                            identity_key=cert_key,
+                            fingerprint=obs.fingerprint_sha256,
+                            provenance_id=prov.id,
+                            discovery_run_id=discovery_run.id,
+                            metadata_json={
+                                "subject": obs.subject,
+                                "issuer": obs.issuer,
+                                "serial_number": obs.serial_number,
+                                "not_after": obs.not_after
+                            }
+                        )
+                        db.add(cobj)
+                        db.flush()
+                        obj_map[cert_key] = cobj.id
+                        if obs.location_identifier:
+                            obj_map[obs.location_identifier] = cobj.id
+                    else:
+                        obj_map[cert_key] = existing.id
+                        if obs.location_identifier:
+                            obj_map[obs.location_identifier] = existing.id
+
+                elif isinstance(obs, RelationshipObservation):
+                    src_id = obj_map.get(obs.source_provider_resource_id)
+                    tgt_id = obj_map.get(obs.target_provider_resource_id)
+                    if src_id and tgt_id:
+                        rel = db.query(Relationship).filter(
+                            Relationship.source_entity_id == src_id,
+                            Relationship.target_entity_id == tgt_id,
+                            Relationship.relationship_type == obs.relationship_type
+                        ).first()
+                        if not rel:
+                            rel = Relationship(
+                                source_entity_type="ASSET",
+                                source_entity_id=src_id,
+                                target_entity_type="ASSET",
+                                target_entity_id=tgt_id,
+                                relationship_type=obs.relationship_type,
+                                scanner_or_connector_id=connector_plugin_id,
+                                provenance_id=prov.id,
+                                discovery_run_id=discovery_run.id,
+                                confidence=obs.confidence,
+                                metadata_json=obs.metadata_json
+                            )
+                            db.add(rel)
+
+            discovery_run.status = "COMPLETED"
+            discovery_run.completed_at = utc_now()
+            discovery_run.stats_json = {"observations_processed": obs_count, "status": "COMPLETED"}
+            db.commit()
+
+        except Exception as e:
+            logger.error(f"AWSConnector sync failed for target '{target_id}': {e}", exc_info=True)
+            discovery_run.status = "FAILED"
+            discovery_run.completed_at = utc_now()
+            discovery_run.stats_json = {"error": str(e), "observations_processed": obs_count}
+            db.commit()
+            raise
+
+        return discovery_run

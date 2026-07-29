@@ -200,3 +200,30 @@ def get_entity_graph(
         "nodes": list(nodes_map.values()),
         "edges": valid_edges
     }
+
+@router.get("/crypto/{crypto_object_id}/dependents")
+def get_crypto_dependents(
+    crypto_object_id: str,
+    depth: int = Query(2, ge=1, le=MAX_ALLOWED_DEPTH),
+    max_nodes: int = Query(50, ge=10, le=MAX_ALLOWED_NODES),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns downstream assets, services, and data flows depending on a given CryptoObject or Certificate.
+    Performs bounded graph traversal adhering to Foundation V2.1 constraints.
+    """
+    cobj = db.query(CryptoObject).filter(
+        (CryptoObject.id == crypto_object_id) | (CryptoObject.identity_key == crypto_object_id)
+    ).first()
+    if not cobj:
+        raise HTTPException(status_code=404, detail=f"CryptoObject '{crypto_object_id}' not found")
+
+    return get_entity_graph(
+        entity_type="CryptoObject",
+        entity_id=cobj.id,
+        depth=depth,
+        max_nodes=max_nodes,
+        relationship_type=None,
+        node_type=None,
+        db=db
+    )

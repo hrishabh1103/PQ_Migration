@@ -10,6 +10,8 @@ import { AssetsPage } from './pages/AssetsPage';
 import { FindingsPage } from './pages/FindingsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { LinuxCollectorPage } from './pages/LinuxCollectorPage';
+import { AWSConnectorPage } from './pages/AWSConnectorPage';
+import { PqcReadinessPage } from './pages/PqcReadinessPage';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -19,12 +21,14 @@ export const App: React.FC = () => {
       {activeTab === 'dashboard' && <DashboardPage onNavigate={(tab) => setActiveTab(tab)} />}
       {activeTab === 'inventory-graph' && <InventoryGraphPage />}
       {activeTab === 'linux-collector' && <LinuxCollectorPage />}
+      {activeTab === 'aws-connector' && <AWSConnectorPage />}
       {activeTab === 'cloud-servers' && <CloudServersPage />}
       {activeTab === 'api-hub' && <ApiServerHubPage onNavigateScans={() => setActiveTab('scans')} />}
       {activeTab === 'targets' && <TargetsPage onNavigateScans={() => setActiveTab('scans')} />}
       {activeTab === 'scans' && <ScansPage />}
       {activeTab === 'assets' && <AssetsPage />}
       {activeTab === 'findings' && <FindingsPage />}
+      {activeTab === 'pqc-readiness' && <PqcReadinessPage onNavigateGraph={() => setActiveTab('inventory-graph')} />}
       {activeTab === 'reports' && <ReportsPage />}
     </AppShell>
   );

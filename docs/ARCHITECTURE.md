@@ -73,8 +73,9 @@ The platform serves as the foundational data collector, normalization engine, an
 | **CryptoObject Identity & Deduplication** | Core | `FOUNDATION READY` | `CryptoObject` model with deterministic `identity_key` deduplication, `IntegrityError` rollback handling, and normalized cert fingerprints. |
 | **DataAsset & DataFlow Models** | Core | `FOUNDATION READY` | `DataAsset` & `DataFlow` models for tracking sensitive data flows across cryptographic channels. |
 | **DiscoveryCoverage Lifecycle** | Core | `FOUNDATION READY` | Auto-updates coverage state (`NOT_SCANNED` → `IN_PROGRESS` → `SCANNED` / `FAILED` / `PARTIALLY_SCANNED`). |
-| **Contextual Risk Engine** | Core | `FOUNDATION READY` | `ContextualRiskEngine` with neutral defaults (`UNKNOWN`), contextual confidence score (`HIGH`/`MEDIUM`/`LOW`), and explicit factor rationales. |
-| **AWS Connector (`AWSConnector`)** | `Connector` | `PLANNED` | Direct AWS API connector for EC2, KMS, ALB, and ECR discovery. |
+| **Canonical Entity Correlation Engine** | Core | `IMPLEMENTED` | Provider-independent correlation engine (`CorrelationEngine`), persisted DB records (`CorrelationRecord`), evidence strength hierarchy, and non-destructive canonical resolution for `IDENTICAL` decisions. |
+| **PQC Readiness & Migration Engine** | Core | `IMPLEMENTED` | Purpose-aware classification (`PqcClassifier`), versioned readiness policy (`ReadinessPolicy` `pqc-default / v1.0`), historical assessments (`ReadinessAssessment`), coverage-aware readiness, and priority score calculation (`MigrationPriorityEngine`). |
+| **AWS Connector (`AWSConnector`)** | `Connector` | `IMPLEMENTED` | Direct AWS API connector for STS identity, EC2, EBS, KMS key specs, ACM certificates, ELBv2 SSL policies, S3 encryption, RDS encryption, and CloudFront TLS configurations via AWSSdkClient. |
 | **Azure Connector (`AzureConnector`)** | `Connector` | `PLANNED` | Azure Key Vault, App Service, and Virtual Machine API connector. |
 | **GCP Connector (`GCPConnector`)** | `Connector` | `PLANNED` | Google Cloud Compute Engine, Cloud KMS, and GKE API connector. |
 | **Kubernetes Connector (`KubernetesConnector`)** | `Connector` | `PLANNED` | Kubernetes API reader for Ingress TLS secrets, Service Accounts, and Cert-Manager objects. |
