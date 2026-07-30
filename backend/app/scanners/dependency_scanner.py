@@ -93,9 +93,8 @@ class DependencyScanner(Scanner):
                 except Exception as e:
                     logger.warning(f"Error scanning dependency manifest '{manifest}': {e}")
         else:
-            # Yield simulated dependency finding
-            async for finding in self._generate_simulated_dep_findings(target_value):
-                yield finding
+            logger.info(f"[DependencyScanner] Path '{target_value}' is not a local manifest file/directory; no dependency findings extracted.")
+            return
 
     async def _generate_simulated_dep_findings(self, target_value: str) -> AsyncIterator[RawFinding]:
         findings = [

@@ -1,0 +1,2882 @@
+[
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "bb14630f-76b6-4139-8355-8799e0fcb79c",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "14226d26-2453-4a54-9934-84fb4b5fdf5f",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "7e70bd6e-1148-4ae8-9745-58d9d3d01f5c",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "a7ad6502-898f-4d8b-90b8-95a05e7b7879",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "403fd47a-b9dd-4b20-bf6b-8daa76b963b2",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "3cbc23d8-40fe-499c-81c0-fefb3ff65ea7",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "bd30c77a-c67a-486e-876b-63a6c37e5e9e",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "915d3e62-fe1c-440a-aa16-d5cc0f6e4054",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "1aa08b29-7fda-4145-a6ac-93efe9b713dc",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "24441cb1-79b8-4f27-8586-cf91b04f750a",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "bf8fb00d-2d62-47e2-987f-364451b50cf1",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "621e4ff3-569a-443b-b56d-702926efb377",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "7b1aef84-650f-4b87-bfe1-94ef9601afbc",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "64e9206b-d09d-4eaf-b976-c4ef678b2cb3",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "8249b635-e51b-49f8-8763-3d95e8839ae2",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "9084d6f8-9c01-4a76-9309-b39eeeee099d",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "7173b15d-70ad-45e0-a4bb-65504578ac88",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "b2e737c0-a39f-4020-874f-d22374eb7fd8",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "09ed799f-425e-47aa-8148-be3311c418ef",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "44af607c-bb65-4a00-a6d7-e9429bc5242d",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "878bdc00-dc82-4347-9103-ef0a8ff4ee43",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "af756e82-cb40-4e60-ba65-4cb7268a4d59",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "419bf971-db5e-4b27-9538-f4ecb4ba74f6",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "cc3c4237-628a-4750-a2d3-047a50562a71",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "ff02ecc1-b41f-41d4-9e2e-0b820d267b8e",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "008fb290-1d6c-4bd4-9543-1da165b3bc23",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "4e496e68-cf7e-4ee3-9e5e-09a913ca686b",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "5df41988-b281-4a35-be8e-d6f3e79f7da1",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "6e131dfc-275e-4a7e-b18f-198cbfba8b16",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "06730788-6425-4a66-8a9d-bca89481adbc",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "385696b7-902f-4fce-9342-ac035626a25b",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "de343935-2689-4382-a588-3df6f6f22ef8",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "514be5a3-ecae-4a8a-8874-aec50b3cc018",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "9689dcca-a30a-4aa2-be14-1b714d25a6ad",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "d14a9cc8-2df0-49e6-bd5f-46ab1ba42509",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "9cc5ebfa-4c83-45d3-96d3-61693976bbdc",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "8b75230b-ea86-49b5-b321-3270f6688507",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "4825b4a0-3aa8-4744-b046-455a75817785",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "6c4c010b-41da-4085-8147-c43f24a619d8",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "e6fc832b-cd6a-45f1-8884-ae5e9a3ddf76",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "c74e9e1c-6376-4b15-b2dd-371380de9ca8",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "1d8e841e-15cb-4d1c-a9fd-a30b780aaab7",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "fdfa5d5a-a429-4ab8-8455-98fa82889e25",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "6130a957-2ad5-48e9-a3d4-6e0e2c28c677",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "2d3ff2a8-bb2d-45e2-9c84-52b423d7ebe2",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "1cd7dc77-b217-4b6b-a078-2c0d13333fa2",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "d6e25595-2bc4-4225-a7b4-4f5dd28b4494",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "edcc4e17-81c3-496f-9d53-300f77a12075",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "890728ce-bcfd-42b4-a6c4-6cee93f73aae",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "d2a34c63-400b-48c1-9935-49e63cbb16a0",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "78ed04c1-d6fe-4ec6-9f28-97047b08d7a6",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "80926932-281a-47bb-a770-469e2f5ea573",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "a5299459-0901-445f-8af9-c9f5cde3a7dc",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "eff4df53-4489-4864-ace0-2c69723aafaf",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "42b61694-0460-4f95-8395-071b344e6b12",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "80a34595-89a2-4484-85cf-0223e84317b0",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "005a2101-8a06-4d79-80d3-1374edfc833e",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "a0fc8917-bc30-4355-8773-763b5082f4ce",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "52abae91-d9c7-4bbe-9417-b51591695dbf",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "69180a6c-f321-4fa5-86f5-0f4e76154ac4",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "b9b025b2-8fa0-4b66-859c-1e46447c0997",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "05835679-0dd2-485d-a1b2-51a7411dc45e",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "d44e6b90-3db1-4485-8383-03e1524635ee",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "b484def5-cff2-4204-9d0b-1203dc52b5fb",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "215dc706-8598-4502-9d55-112a94ce33fd",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "7089380f-cfd7-4a48-bcb0-00003aaa8107",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "fc005704-1fb0-4d98-ab61-427d62bcbe11",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "fda8f3e7-a916-4d2e-a5c3-257af4d1cdcc",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "d0c2c2e3-8090-4ec6-8e0a-4dc632a6be90",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "61a94777-b631-4495-b1e8-e40be86a67e2",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "74c90660-18ff-4515-9825-8b1139e6f68d",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "30b5c647-75e9-4b1c-b4f7-196b8ccfd643",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "c2c56ec1-13e7-4e24-b677-b974efa6b4ba",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "fd3b77d8-54b7-46b8-bf37-c32f61fe83c8",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "7b65eed8-30a2-41d6-93f5-757de200d1fa",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "6d3e589c-1b83-4136-9e25-9d436abd85b1",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "44dd1235-6700-488e-92a0-5b8587841d4c",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "fbd64bf8-fa5d-4e34-8c1d-ebb7cab08e74",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "fcc6246e-f72e-4f99-806d-a95ada3e152f",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "1f847cf1-ecb4-48be-8af8-50cf9e6243f0",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "4af55be0-9606-4959-8d13-a9a3ee1daf65",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "9b21d5e8-939b-4027-9456-8c82f6640699",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "336065f9-ae52-489e-a2d7-0b23c10473b4",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "b40dee30-753f-4b4a-8b3d-26456ed2d1ba",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "53a60daa-2aa4-4813-bb28-20ed170b0655",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "763948a3-9307-41ba-bdd7-da1b9c1519f6",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "53597bfd-0fce-46fa-a92f-0349ca98a601",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "85c8c3a8-eb27-479a-ae43-774c84f7e6bf",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "423d075b-9ab8-4f67-a4dd-8bb135bd3fb8",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "f4460109-4349-49a8-b56b-2f61d475b8a9",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "18139ea4-45e4-4439-8593-573b3a7a4851",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "fdd968a6-5e0c-4c99-bc40-d64ccd73cf43",
+    "display_name": "Classical TLS Target",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "8a25bf07-ed08-4812-8271-e32e893c3c1e",
+    "display_name": "ECDSA TLS Target",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "d5db8ac9-cb45-4b5d-a9ff-e446cfaefbe4",
+    "display_name": "Legacy TLS Target",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "5bc4cfc3-b1ca-492f-b688-1fe8e922c63c",
+    "display_name": "PQC TLS Target",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "24359082-5325-48e8-a6d5-817b081c6782",
+    "display_name": "Hybrid TLS Target",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "81622a8e-5cae-4b91-996f-3d9cb89c1bb1",
+    "display_name": "Neg Target",
+    "target": "neg.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "dd2fee53-2f20-41c0-9b1a-4460ccafc70f",
+    "display_name": "Mixed Target",
+    "target": "mixed.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "AuthorizedTarget",
+    "entity_id": "ad49dc28-ebb2-4e41-be6c-576ef48e3b08",
+    "display_name": "Incomplete Target",
+    "target": "incomplete.local",
+    "origin_classification": "DEMO",
+    "reason": "Simulated demo target identifier"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "466e838f-05e8-43a2-8692-62399768e356",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "140206d5-2fee-4424-81e4-04b57ad6d693",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "3bf18e50-5495-42f8-bc3f-a9abd7c963b6",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "da09c1fa-7785-4fc6-b775-7ea6e96c0aed",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "a8537850-6739-4956-9314-39d82e08d0ad",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "19e4769b-993f-45e6-b9a8-60a538d70a3a",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "700fe444-b025-4250-a809-c16c8ea6ff84",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "3fa294ef-3629-4342-a427-84f2086ad707",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "4bcaa3d1-bf99-4b8c-9444-6f6216c8a7bc",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "2845dc26-02ce-4d66-b642-b8623a95c550",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "5edac669-5a44-4a90-b48c-f3c3c14f1a9b",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "1d81cb30-2172-43b4-aac7-d73e6a44ec5d",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "3a23542c-a1e6-4718-9e72-2b0bbbf352fa",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c5d6c061-a217-4845-bd08-27b545ffef88",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "4e84d579-3b8a-4698-9b7c-6239ab0ecfb0",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "2aa9c52e-dea6-4123-a904-507ea4fe2bc8",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "d8744113-d6e4-4826-9f06-fdc5f6b335c8",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "3cf5235c-2365-426e-8b47-641c6b2eb03c",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "e0a37ba9-b293-489e-ad4c-bea9d16efdfe",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c26183fe-981e-4f50-bdd1-94ba85281849",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "e2234814-3483-4230-b4e1-d61724492171",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "7171ef73-066f-4b51-bc41-3cc46abb66e8",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "4cb6aacb-b608-474a-9e9d-8c8749990cae",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "510925f2-affe-4961-b222-1d4ca3363fdc",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "3a9c5153-bc42-4061-bd0a-6ecc504f3eb1",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "bd6d9fd3-ce89-479c-90bf-49fb5159c284",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "4f76348f-a80a-4e66-beec-cd6eec1be623",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "f47a4df5-2f4d-4dad-bc9c-b3628cf30038",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "bd4a79b5-331d-4962-be0b-1ae242d9ae2b",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "558e7ccf-edab-42c8-955c-3faa8eb32cbe",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "d5d36050-2c31-4685-92e0-3573bea0ab30",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c5cd1223-3a23-4e78-96c6-7e82f92cf331",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "e8fb59c8-7b3a-4800-a56e-3b9f1defe418",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "de280f26-4eca-4956-83ee-edba3963d14d",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "eba2a284-c906-4600-9071-23c4e0c087a1",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "2757eccb-3228-4de9-9feb-d4828695d00f",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "49b6fe33-52b3-461d-9912-83292f214a2a",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "fefb379a-ea87-4ed6-9d45-5b271a6a44ec",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "6deee1bd-530b-44d1-8602-5882ac835c58",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "d8aca414-14bd-4a6a-a9d5-52ef720bf8b1",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "2bbcb72e-8c61-4f14-b24a-61a977b5e600",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "12909e48-4ae8-4905-8204-ad8effb725d5",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "a693e02f-37b6-4770-8958-07e7a5ba97de",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "5cdc3436-b3fb-418d-9f1f-58ce99603d7c",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "3ed1b0d4-114f-4fa5-8af6-19d2dfe0d6c2",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c8c7ecd4-b2d2-46fd-9abd-7fd0de79721d",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "82d315e8-b34b-4d29-bd6c-e23a343f2b8d",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "64a33416-1c43-4d1a-aa5c-9e4d1c8cbc3d",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "ea306d6a-9150-4b8e-9d7f-f505d3b2cfe1",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "aea0d80d-2a2e-41e8-9e70-8542a8ccd0b6",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "bfd71157-f1bf-409d-b1df-3dc9bef21059",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "d2d28ea3-65bf-4037-b4e2-a86640736911",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "dc0b38ab-614c-4f96-b210-15ba5ead3422",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "efafc4ce-202f-415d-8057-ba271824f5be",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "06fec986-82d3-4cfa-b1f8-b4b87f93c6ec",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c3fb7875-a492-4774-8506-77a72940a19c",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "2f1cbd61-11c2-4973-a7b5-5a9c6a18a924",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "0ae3a030-6985-44c1-be6b-020e56063648",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "d129c546-1f9e-44d0-8122-7d5c9293dd7b",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "4d79972a-90bf-4658-ab15-80973e607e42",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c64ce0c8-6f79-4d40-a69a-f5c0fbbc83cf",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c837c61d-1455-469b-a78b-84d25e81711d",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c1a7cc45-67fc-439d-9d06-e2953d5ddc31",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "c10180a9-8cc4-4210-b4f1-e85c989f375d",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "76004256-3546-4cd8-b61d-136b9929b227",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "6d143bfa-88bb-4692-80dd-55e1e2cef44f",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "83a3a92d-71c0-4a20-a60d-712b820dc603",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "1bb37792-b701-42f4-a7a7-40fff9c9022e",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "1fa9527c-349a-436a-b8b7-01d9b4507aee",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "bc76ff4c-ab33-4aa2-875c-d8373a58e30e",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "1ad520f4-d541-4d41-b9d8-cf21e209a6b5",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "57e20df8-e8a0-4808-baff-f6781e4acdde",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "1fab6b9f-2760-407f-8df5-df8c4f4b28b2",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "d6d3d80a-802d-4ea0-8aa7-61ad4e12a6d8",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "80e1aae7-cf66-4cb3-86e4-e14f816130b9",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "b0f1c6d0-08c8-4371-a186-0d500008504e",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "0dbb9498-c9af-4a11-8b7b-59fae225f58c",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "f67eafb4-6ede-4b1b-8aee-75dae0cda3ce",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "e052d62b-ca20-42af-8a62-6de4720cfc47",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "ad25820a-0ee5-4ce5-bc71-bd685afe639b",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "16897fa7-091f-4be1-a2cd-33a70636202e",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "559e51af-38de-4002-ae56-a315551b61ac",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "8cbf0e80-84ca-4476-b734-1720f113ee81",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "f32bd4de-406e-4a61-8b14-0645c42a027d",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "8e672d5d-4dea-45b4-a026-3e4054ffed24",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "df5a2ff2-7133-482a-a450-f403b6f5c309",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "939466cf-d7b5-44a9-82d3-ff749c9c89a6",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "324147cb-0a88-4b2b-a18f-18c043d04469",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "5c17242b-48a1-4ba5-b2b5-1005f87f1b9a",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "34489f91-00f0-4e09-ad64-9f17488dc322",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "b5111def-176e-45e1-8a7a-c1174ffcc7e6",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "5fcc100e-db09-42fc-9315-13e9d8026915",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "d90afc76-2da5-45ed-9d26-aa6a4b24c61c",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "64d95b99-e3ab-43d4-a8ed-23bcc86786a8",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "f9487303-e3b3-40cc-9070-8f814626f98e",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "1cf5b998-0b4c-4956-84b5-1964f74078d2",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "54df0e0e-76dd-4858-a2da-f97a5b5c4ee0",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "cb5c1728-fd50-4bca-83d0-e09fb18e1bfc",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "551fc713-c814-4389-a812-ea8edacd0c27",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "9ee260ad-413a-4848-a084-a3414d9c8934",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "480be782-8449-452d-9232-fc36117749a1",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "e80727ad-4c66-4061-940a-3a76e00ec923",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "71e83732-483e-4c96-85e1-ecef1b97116c",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "7b866e32-fbd5-4763-b3f6-b07535257296",
+    "display_name": "lab-classical-tls.local",
+    "target": "lab-classical-tls.local",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "cd4bbf9f-24eb-48c5-b16e-6df80d97c135",
+    "display_name": "lab-ecdsa-tls.local",
+    "target": "lab-ecdsa-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "1d414302-e6f4-4db9-a866-8760576b69ec",
+    "display_name": "lab-legacy-tls.local",
+    "target": "lab-legacy-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "aabcf404-30af-4566-b3a6-67870c21f4e7",
+    "display_name": "lab-pqc-tls.local",
+    "target": "lab-pqc-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "10fb410d-513f-4271-af1b-a6e32590b05f",
+    "display_name": "lab-hybrid-tls.local",
+    "target": "lab-hybrid-tls.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "5a2ab8f7-b682-45b0-b98f-4b7ea704e520",
+    "display_name": "web-server-01",
+    "target": "web-server-01",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "b2d932e4-ea79-420a-9a83-c80914e17bcb",
+    "display_name": "web-server-02",
+    "target": "web-server-02",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "d25c8273-fa08-4bb7-a8f2-a8698758fc26",
+    "display_name": "mixed-app.local",
+    "target": "mixed-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "Asset",
+    "entity_id": "937b15f1-3050-4e39-9496-807b131ab526",
+    "display_name": "unscanned-app.local",
+    "target": "unscanned-app.local",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "c200cd6e-4ed7-41f1-af07-ce5b046fbe09",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:fef88ec6-0877-4241-90bc-9cf273d49a45",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "0726eb7d-04d4-4ac8-b15c-761429333704",
+    "display_name": "X25519",
+    "target": "kex:x25519:967455cb-b2a5-4909-af3b-70d293a37d7b",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "8ecca5b5-c5ad-417a-a8f9-182169fc20ff",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:3da5d0a4-e454-48c4-8ba5-2077f0e023fc",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "6eaafd39-36c8-4d52-8242-2ac8259a3d15",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:9efff205-2a84-47a4-aa5b-57567e3cf363",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "7ab35e9e-5a13-4009-84d6-b201085c4f98",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:4a4c97da-1de9-43ce-a5bf-0b49dd0a6039",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "95cfbb83-0323-44be-b890-51c4f10f2df2",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:5b8d2f8e-fb28-4a36-82a2-48bc13a2df4e",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "745eab7a-4879-4ce3-b57e-863fb2704986",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:aefb4e8e-2917-4e38-8da5-403ad6bc9415",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d49af7a1-e86f-47ae-bcf7-688ae7e3e6e7",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:f8a9f8fe-0d76-4ec0-93e9-9f7e874c01be",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "649c7078-458d-430c-af61-d0faccb0342d",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:ddd4cadf-c6f7-4d14-b9ea-b01f8da8d669",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "9ca1d5cf-b221-46b3-b552-5a7335b9714d",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:cefd9dbf-eb5e-4bae-b2ab-56e07cc959fe",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "f1fbb8f7-0730-4821-87cf-51688b982051",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:180a750b-c480-4284-8664-e2becd9f0d7a",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "0c097884-6d6f-4cab-8a81-88c753d786a0",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:ee8f5310-880e-4bc4-9283-efe876bb4d07",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "796c6016-96de-4bdd-8674-86fc8d7efc2a",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:09018c04-476e-4435-87d3-2a74d3474796",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "67ce365c-56a9-4056-a284-37865685aa25",
+    "display_name": "X25519",
+    "target": "kex:x25519:75e6e9f1-ed95-4be2-89ed-b314a014c8eb",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d4c57386-3f0a-4b1b-af51-e0fc3f9563df",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:dffba567-39c6-41a5-be50-44a6a7136826",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "25ba1b85-31b5-481b-8bc1-70daf6012cb1",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:fffb5a0d-5fa1-456a-9493-adbcb65e397d",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "322365b8-2399-4ebc-9b85-0eac1336bcc0",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:1ed7225b-afbd-40ce-866a-6fff4b9bd526",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "9469aec7-b207-4572-81be-dc06dd358814",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:43698428-2257-470e-ba29-1656a63889c3",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "08cd0b57-91b8-4e0b-aa71-e694c9608d1a",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:f7f6c8ff-8393-42fc-8624-96acfb9b8f0d",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "66c03be8-ff39-450b-8dae-1a0d51761ae7",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:425708f2-773e-4c14-9ab1-43f8b97195d8",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "920e1891-9500-490a-b3b7-ac1e105263ab",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:01344270-ea9e-43a8-b681-075bde01d019",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "2a9a4ac6-6c72-498a-81bf-23570ef8c783",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:19755ec9-225f-4144-9707-23aa2d4fd82a",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "5cc6674b-ebf7-4c99-8435-0488eeb0896b",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:4da4ee85-ba1a-4fc3-ab1e-f4181de225dd",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "ea567637-327e-4ba2-9855-2be069ad4afa",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:5879e12f-4e21-442e-a1b6-001862582775",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "534ef453-8853-4089-95b2-16a29e0cf3ec",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:3285ad42-2f12-4713-a163-9d3a6b81a510",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a57a5a5d-b3f8-4005-a8de-a8848e9353b3",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:38a0efec-1c08-4aea-90f8-052dacc080d5",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "8f0b9cc4-a536-41eb-820a-b5ac0f413a2b",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:b9289331-93e4-4011-8275-c101906d29f5",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "aba22aa2-e63e-4aab-9459-b1f7c826e2ca",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:f7465737-a4c6-4884-8e72-f3ae4168d71b",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d9aa4695-ce40-440c-8b73-75b2f47cbaea",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:2aa4666b-e969-4c44-889e-d7cb45682804",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "e43ca8f4-a70d-4478-a9b7-7559253aa27b",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:03ee2922-c0b4-49c7-aaff-53dac13b087e",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "eb05ffb1-d0cf-4686-abb0-cabbb39df9de",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:966d1353-748a-4fe9-b881-498dd26ebb6f",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "2084e921-4056-43d6-8b28-7b28da195f98",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:8b9bba40-3991-4bf6-906d-15e7578fad61",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "c65a4444-c585-4457-b6ae-60c70d8346f7",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:ff2175da-a996-4856-bc69-a452494d149c",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "7768c9f1-8033-44ee-be07-223944c1b7ee",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:f3cd5ab0-cc53-400b-9f00-79318eab6a32",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "dd983b31-63b0-437b-a0fa-1ded2115294d",
+    "display_name": "X25519",
+    "target": "kex:x25519:18abf3c2-9370-45c6-8db1-6600ea4e95fd",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "47eb763a-4466-4960-b35d-5408f88403b7",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:d51419d0-7039-4183-b087-2f5e890349a9",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "0c60bfab-2067-43e0-a389-695287c873b7",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:b94cd7cc-d4e1-44b7-83a7-3310cf3d60a1",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "5e4ddb23-cb50-4ae2-a7fa-1b1b6ada4c15",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:de091a71-d951-4460-b475-5d65981a5454",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "af0d45c9-86b4-4dc0-852b-8ba6c86f4d3d",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:7005f6b7-971b-4569-bc8c-70083b710ace",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "47f62959-06c3-4325-94bf-b03eae9f7d80",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:ffb28ea1-a55b-4dc1-97eb-21e80458e019",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "293e60d8-f01a-4645-89e6-7f782a1fa673",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:d70a0fdb-7a63-4d8e-b338-bee7ec4a22ad",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d5c7b127-d884-4bec-8cce-485641312c6f",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:5252be12-8806-44fb-bca4-5299f50b40f1",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "43f7d58e-d287-4636-9226-c9ef0478faa6",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:1800d9d6-d6d7-419a-8dca-05bf72a4ca25",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a2f4e6d8-8714-4d27-91ad-abbb5f3ef172",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:cff48939-7c8d-47f0-9410-7edc7523c330",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "5deae9fe-fa4c-4a9d-8f1f-8da3620797ac",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:967793d7-dbc8-42d2-b2db-4eab039aa380",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "7c9929c5-40eb-4f0b-8085-af4cf91f2d80",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:29e2e4ae-471e-4c90-b7a4-6189d628734a",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "504ba9e2-d90a-45bd-b789-58991d3a44ea",
+    "display_name": "X25519",
+    "target": "kex:x25519:1bcac45b-a2cc-413b-a4ce-385d11c07163",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "51dfd4b6-67ad-4be8-a2ee-5903403f1e22",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:d40f3619-5ccd-4a23-af23-1ea893945f2d",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "f4090a47-bc85-4866-801b-8c9713115cf1",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:1e2c0b51-4361-4aec-bf63-c9c09273eb7e",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "ca185473-b242-473e-85c8-277561997fd1",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:3ef5d913-14ed-48ed-8fbe-15f23c531ab4",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "3223830b-338d-4594-9c1b-f1616d6f448b",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:a5e71a30-2506-4da7-8eef-1f7162bdd76e",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a45c32f3-2d85-4582-99b0-15f190fb62cb",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:67858b3f-5e54-4e4e-b8f1-601e25133c84",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "6eda4fe2-2fc1-4e23-bc02-1c4cf64cd549",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:39be244e-68d3-4d38-8346-19f74ee5b105",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "c7b4c801-3830-44fc-b27c-b3f242d261c0",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:1b18dc26-68f0-40ae-b8a5-197873a12e31",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "e7657db9-f9e0-4364-85ca-fd4dc092279d",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:24091a42-8882-4f5b-9014-de92a9b80989",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "248b91ae-b0c6-4b68-a1ac-3308afbbebc1",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:dd061366-e040-460d-984b-dbe4f054453a",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "2aabf19f-1605-479f-8c3c-918beab1e749",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:32a7fc24-14d8-4457-a77e-d784b77de1ce",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "79554f03-d187-4e7b-ab3e-b15261a57ff3",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:9bd01a96-dd1d-4220-90a6-5e7f6807c5f3",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "9f99bb05-a2f3-4baa-b3d7-a8624c092b63",
+    "display_name": "X25519",
+    "target": "kex:x25519:f20af234-4efd-459e-a3d2-df5d41a7bc72",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "4593d11a-0dc6-476e-96ef-48d09006e930",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:1c4ac03d-6dad-4513-b5a6-25769e70ff83",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "1d13d14b-e713-462d-8667-8d7d5f80ffd1",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:aba83d1d-c53d-4096-bbe6-f8944f807142",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "f78b1250-b72d-45e5-ac4f-bfe3ba970e29",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:b9f14e6f-15b2-45fe-bced-69b38fc850e6",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "2a03301b-94ea-4bbb-8c65-9fb2d32c0ea2",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:51ddd324-5f7b-4bfa-a7fd-cb8b8274fbd9",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "71d7b722-8c07-4e82-ba0a-12432ec8d4f7",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:7d77a15e-a909-41a8-8d58-ef969e3d3372",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "71185446-85cc-483c-a475-23e810436c20",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:ac425524-f745-413a-8383-e17054425f51",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "7697d7f6-f157-48b0-a149-fc292d2e87ee",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:1202a5d3-a8f7-45b4-b6bf-2c5be8c23b6b",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "cfa630a4-9bab-4122-ba65-7eaee765d010",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:58bc32b8-778e-4082-ad3b-bbaaab3518d2",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "7149540e-da39-4326-a7d5-09e57bd3c0a1",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:801e8538-60b8-45e8-8713-b5413557f2ab",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "95a9c757-32ae-4a4d-99a8-09de36369ce8",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:5f11bf10-319a-4013-ba00-86e92b1ebf56",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "fdee4674-1b43-484f-a987-25402f2eab7a",
+    "display_name": "X25519",
+    "target": "kex:x25519:69bea789-206c-442a-9439-6e16391763c8",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "fc6f5337-8b05-43c4-8c2f-e6f3937a7ca3",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:08acabd6-5f49-4c30-ae1d-403b9acf9fa5",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "c9c68292-db9a-4213-959f-37dd3371a07e",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:f95b8f09-1b44-4441-b45b-f29a10ddbe9e",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a78f21a4-4103-4b94-b476-7dac566b2540",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:58a7c96e-92cc-4bf1-bcec-fb75957e080c",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "5f78c4dc-529f-49e4-9af9-8d1033150a6a",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:78ed1177-9569-4434-b96b-7a0bfe199f59",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "ae7533ff-8d41-4f98-8574-9e9d6a2728a8",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:09366f0b-d1c0-4594-931b-9e6fbc61007e",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "bb0f0ee2-74ca-43a3-9cde-3d2dd9d369f5",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:7411bb31-ec56-4ee6-904d-4af38bce724f",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "0de24de6-88d9-453d-aa34-7f6dfdb3ef15",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:079ba88c-e22b-429c-b137-a97940a16eea",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "9c3fe0ea-207a-4b61-bd55-2ea907f4f4b6",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:5acd9b2a-dc6f-4163-8d57-6d42630198c3",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "b41d108e-a11d-4eff-b10e-6daa645fbc4e",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:e17ca763-34fd-4e14-ba8a-00745c85c3ea",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a3b0b2cb-0735-472b-af33-e3891642f8a0",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:a34aa6f1-ac15-4104-91ed-5ee0d99d2d59",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a2e69378-8164-4255-a26b-569385f935a0",
+    "display_name": "X25519",
+    "target": "kex:x25519:d3490d42-c6e5-426f-a557-38ee0e72d4da",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "b4fcaa84-85b0-4dea-95f4-e3fa8f76a4b5",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:eae58bc9-0127-4d06-9eae-ca8ec748539e",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a5e6a6c2-bf34-4603-8ed1-96ba7b428018",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:050c0efb-f8d3-4ef2-ae5e-c7f03ab44a17",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "f9c59514-9996-4f9f-968b-36264197de4f",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:aba79905-0d1a-4015-9294-cd8ca193bbe8",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "2faa38f1-41d6-4e59-b9a5-354ab38792dd",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:f79005da-51a9-4c47-a735-235ff5ecee5e",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "1d0e0b3f-b38e-4bf9-babb-e9d1234b88f6",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:2642eb27-95a5-490e-a59a-634ccb1a6ac8",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "5152ba90-45b8-4706-bbbf-948e4b5a49bb",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:a2a4b8f7-2e9a-4f72-9cc2-6f39ddbbe143",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "17da4cc9-4505-4a62-a258-139c4e99e69c",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:e9c36328-c871-493c-acad-37f080a80239",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "f6e871b1-f6bd-49d9-9ee6-c9a815de29ae",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:42f3e92d-aa1f-437d-9358-ed1f727289ad",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "ff0e18be-c4e7-4573-b78a-651644a5b5e0",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:6eca066b-5b77-47b1-84c0-18c08108987a",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "207b112a-2985-4654-ae6f-1d8d750bbb50",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:4152385d-de5b-4565-b97c-ac37d6b9b84f",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "db5db089-74a9-4629-9cc0-6769c00b8159",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:9a42f38f-f2d1-49f9-aef3-7a07cff5b4fa",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "ff5885b6-af09-456c-9d9e-771074721c84",
+    "display_name": "X25519",
+    "target": "kex:x25519:6243f0ec-d261-4ea8-ba2a-85ecd7c2112f",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d1dd3500-ce14-4483-9af9-d1d7ad08f1f1",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:0071d21f-9860-413a-87eb-cda5d36c7956",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d37fed2f-be8b-4084-9f0a-795d115a1abf",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:cc212049-a7bc-4b15-8ee0-97e2ff4cc485",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "8df9fe10-00a7-445d-8c46-db67b1a76666",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:3f98009e-51a7-4fb2-b0f7-90767dd228e2",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "9d81703e-2a9d-405d-8efb-28f9d5345dbb",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:55ceecf2-e25e-437b-83a1-b60271e74f4d",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "c04a16ff-bfbf-4f61-933f-a043497e617f",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:420c131d-98fd-4afb-8f7a-ae333b7392d8",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "41bfeb3c-4816-4720-97ce-3b800b4612ae",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:b78bd37e-5572-4933-b2e6-052de3c165eb",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "14676491-7ec6-401d-a93b-75625cf164eb",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:50322c65-9624-43f3-9ebd-411f0cc07826",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "af7848b0-2c55-4583-a7f6-885627d868d5",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:2137cd72-7c15-424d-9735-9041c21dc06d",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "2bd95ceb-563d-4cef-8c50-e0f0904aa3f5",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:57698a9d-f4d5-4ec9-9a19-cb8a39069432",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "19ad702d-d57c-4cad-9fc2-b9a88d71b72c",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:8e21b851-1b2a-4ee2-8d90-23ed4624929c",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "03bd4f3a-1e83-4438-a03d-53193f235bc1",
+    "display_name": "X25519",
+    "target": "kex:x25519:ea8eeeff-780f-46c2-9691-118789e34bfb",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "7e5d16b4-ab1d-4473-8475-f6f4dedce6f8",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:27b991d4-1e9c-4690-bfc3-5483eeee3b27",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "361fe839-afdc-4157-aed7-bc91ed78c78d",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:d747105c-1994-4fbc-9d95-21e37a3b56d5",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "4c475e3b-d7ca-4dae-8b4d-1f4d74446f2b",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:281ec6fb-e253-4c97-911c-c2287d0b8d1c",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "82a07893-b3ef-431c-ac8c-ae821ec674ac",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:f4788299-54c4-4b61-8cd9-6b37b3b18b9d",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "356c0ff8-c57c-4843-b27c-fa26f879142e",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:5e9f032d-7712-4629-9424-a28d676e8504",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "0ba33788-d11e-4564-b1ef-990c6a527927",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:fb5314e6-f6df-4347-8e3c-2f75c5db0d3b",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "97440f38-7a89-41fe-9f5d-fd5d14cdbec5",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:7d766756-2eaf-4dc5-b63e-f9e9dc15f7d2",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "e743fb9b-98dc-4408-a61a-c833a8415512",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:2452d8b7-3b2e-49c7-82b7-4bee90db7767",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "3be96bd0-e8fe-408f-87c3-d3a65df24e2c",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:65215682-1f19-4ea4-9306-7ff1d2549afe",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "9e8e4418-050d-4f07-8d60-f8cd3cc6b823",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:bab46060-1c9e-4a72-b6ce-0c9973c33375",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "73029cd2-b38b-477a-ab50-266668920724",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:4d25205e-095d-4101-b677-bd15a2002cc9",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "07c36762-12bd-41bf-81fb-7e6241f7b123",
+    "display_name": "X25519",
+    "target": "kex:x25519:4d6c5be7-a2d7-4931-b74a-b1d595ef093f",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "14aab78b-a30b-48c3-bf52-6a7a09f61b00",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:06e22bbc-6d1e-4dc3-aac1-e9ba1e7f6538",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "fc38f843-6a73-412d-8174-2c2cbba0c117",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:127d65f8-db73-4f6b-b06f-fa2841184144",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "f4747e44-ebf9-410c-a916-e5d519fc3f97",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:f5a6f72e-5b06-4f43-98f4-f85c43f5dc2b",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "64303afd-2338-4d93-8979-9b74b8489cfb",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:eb074cb3-a7bf-4e89-8d59-0ea5c4e0975e",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "f6418d60-7f87-4268-bc36-1202a4585181",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:db1b64d7-fde5-4bef-a585-194df5a919b0",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "4cc45629-e459-4a60-bbfe-40df50e4907d",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:6d37737b-946b-41b4-bbf4-dcca1ade79ea",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "71c450bf-450e-4eca-9840-a83d40dedef8",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:ad0ae09d-68c8-4852-a6d3-e52088222994",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "e37116e0-305b-441c-9c53-0d23e539e376",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:11c8d34a-a390-4561-9f4d-83594d06cfe1",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "8b2f7393-fb83-4ecb-99c8-32b0f316b9b1",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:fde679e9-983a-4998-a1da-388bcea3dbf6",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "f44fec8e-c2df-43fd-8dc5-575d4415af1a",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:46c28145-96ec-466a-a6ea-00e3d91f943c",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d4e09444-befe-460c-b554-a01f1e79f50d",
+    "display_name": "X25519",
+    "target": "kex:x25519:6989cdf4-96ea-4cd9-8938-69223771f300",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "daca04b3-d8cc-4a95-b0fe-083151196911",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:e4a7fc89-7f2b-4589-912f-30a7f499eba8",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "471fc0d8-262f-4d33-94a3-ea875d583f53",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:e90c8bfd-9bf4-4c92-9705-d2c54af057aa",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "12645a98-5837-453d-97c1-e7c4b85f450b",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:86cdaebe-8e2e-41cb-85b7-ff42d0610304",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "bfa609d7-0f41-4769-b960-4f0ae1cb8e5b",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:d3ff8b92-f530-4f82-8b38-bff63b9c2e49",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "fa7dd465-fe43-4baf-943b-9afb37fa9fb2",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:78611f9e-99c0-4504-ae82-1183ff7ea94a",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a0fdd13a-5064-4019-b99a-53650fcd1fb3",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:ca1f53ee-1bbc-408f-b600-aa98ef73d203",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "b000a9f9-82fc-45fc-8fc6-118b060124be",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:7bcffc21-d0ff-42d4-9428-795da563bf93",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "c0af265b-9b77-402e-85dd-65028ed1a334",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:b06907a4-f239-4248-93b5-5c9502723f76",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "842cdbd1-0dbe-421e-a9e3-7e29604c0838",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:2a7cff53-43db-4647-8d48-6d9cff3afb26",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "2bdd450e-2480-4e64-82e6-8b1b0d80fa60",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:ed6a4418-3c47-43ab-b449-b1724c8f8767",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d54c9078-c97e-43ce-b109-9b37ff17ccd6",
+    "display_name": "RSA-2048",
+    "target": "cert:rsa:82995f33-8e3f-4a01-9de0-e1a243f48051",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "ace0e5f5-0928-4967-998c-91482d3d0a53",
+    "display_name": "X25519",
+    "target": "kex:x25519:e93103ea-b70b-46e3-abbd-1eb76b34cf14",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "78321d05-6432-4621-9851-9802f25aa785",
+    "display_name": "AES-256-GCM",
+    "target": "cipher:aes256:0fabaeea-d307-41da-a05e-4ae93e11934f",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "d7b2d659-b173-48f5-b4de-01586b8a9f57",
+    "display_name": "ECDSA-P256",
+    "target": "cert:ecdsa:31900b5b-ed4a-4e63-a261-7a92f3969ed1",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "19a39b8a-a9c0-4e79-8032-4309caeacbb4",
+    "display_name": "secp256r1",
+    "target": "kex:secp256r1:367f27c8-bafa-454a-9293-70c195ad6646",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "1a25556b-e2d9-4136-a581-a20ac1258021",
+    "display_name": "3DES-EDE-CBC-SHA",
+    "target": "cipher:3des:04bc9245-6cd2-45f1-9ddb-e6cc52a4e0d6",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "1b6cdfe4-9e3b-428d-a960-b56039f9f3d4",
+    "display_name": "ML-KEM-768",
+    "target": "kex:mlkem768:eeaf7555-d82d-4a27-9f20-3d184bb5962a",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "e716178a-7583-4bae-a734-2f41d1f260c6",
+    "display_name": "X25519_MLKEM768",
+    "target": "kex:hybrid:ff4a3737-f30c-4a7e-9285-3c6c84527e88",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "433485d3-ea6c-481b-8809-0580e271bb00",
+    "display_name": "Cert (lab-classical-tls)",
+    "target": "cert:tls:a078fdcf-54c1-4f5f-bb8f-47a8c18d816b",
+    "origin_classification": "REAL",
+    "reason": "Live scanned target or authorized lab host"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "c56b9d82-5a7f-4511-b090-f24470c4f277",
+    "display_name": "Cert (lab_cert.pem)",
+    "target": "cert:file:58650adc-53b5-4e70-b9e8-503b527c3adc",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "a65e5ead-0bb7-4780-a6d3-6ddae9339c1e",
+    "display_name": "ML-KEM-768",
+    "target": "c:kem:a1290847-fb33-4457-b2f1-89deeee4add9",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  },
+  {
+    "table": "CryptoFinding",
+    "entity_id": "92cbf467-fed2-48b6-aeed-35dcd435f753",
+    "display_name": "ECDSA-P256",
+    "target": "c:sig:6a023588-a4ea-4011-bb5f-7fc52e0a0b73",
+    "origin_classification": "UNKNOWN",
+    "reason": "Unverified provenance"
+  }
+]

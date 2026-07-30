@@ -54,9 +54,8 @@ class CertificateScanner(Scanner):
                 except Exception as e:
                     logger.warning(f"Error parsing cert file '{cert_file}': {e}")
         else:
-            # Yield simulated certificate finding for target
-            async for finding in self._simulated_cert_finding(target_value):
-                yield finding
+            logger.info(f"[CertificateScanner] Path '{target_value}' is not a local certificate file; no cert findings extracted.")
+            return
 
     async def _process_certificate(self, cert: x509.Certificate, location: str) -> AsyncIterator[RawFinding]:
         public_key = cert.public_key()

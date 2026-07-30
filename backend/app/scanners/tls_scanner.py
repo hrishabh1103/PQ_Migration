@@ -137,10 +137,9 @@ class TLSScanner(Scanner):
             )
 
         except Exception as e:
-            logger.info(f"TLS scanner fallback for target '{host}:{port}': {e}")
-            # Fallback for internal / unresolvable targets (e.g. demo.internal)
-            async for f in self._generate_simulated_tls_findings(host, port):
-                yield f
+            logger.error(f"TLS scanner connection error for target '{host}:{port}': {e}")
+            # NO EVIDENCE = NO RESULT: fail closed without generating simulated observations.
+            return
 
     def _parse_target_host_port(self, target_value: str, target_type: TargetType) -> Tuple[str, int]:
         clean_val = target_value.strip()

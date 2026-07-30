@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
-echo "=== Starting Enterprise Cryptographic Discovery Platform (Milestone 0) ==="
+echo "=== Starting Enterprise Cryptographic Discovery Platform ==="
 
-# 1. Start Backend FastAPI Server
+# 1. Kill anything on our ports
+echo "Clearing ports 8000 and 5173..."
+lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+lsof -ti:5173 | xargs kill -9 2>/dev/null || true
+sleep 1
+
+# 2. Start Backend FastAPI Server
 echo "Starting Backend API Server..."
 cd backend
 if [ ! -d "venv" ]; then
@@ -14,26 +20,31 @@ else
     source venv/bin/activate
 fi
 
-# Ensure database schema is migrated via Alembic and port 8000 is free before starting
+# Run Alembic migrations
 DATABASE_URL="sqlite:///./dev_qdiscovery.db" PYTHONPATH=. ./venv/bin/alembic upgrade head
-lsof -ti:8000 | xargs kill -9 2>/dev/null || true
 
-DATABASE_URL="sqlite:///./dev_qdiscovery.db" uvicorn app.main:app --reload --port 8000 &
+# Start uvicorn with reload
+DATABASE_URL="sqlite:///./dev_qdiscovery.db" PYTHONPATH=. uvicorn app.main:app --reload --port 8000 &
 BACKEND_PID=$!
 cd ..
 
-# 2. Start Frontend Vite Server
+# 3. Start Frontend Vite Server
 echo "Starting Frontend React Dev Server..."
 cd frontend
 if [ ! -d "node_modules" ]; then
     npm install
 fi
-npm run dev &
+npm run dev -- --port 5173 &
 FRONTEND_PID=$!
 cd ..
 
-echo "Backend running on http://localhost:8000"
-echo "Frontend running on http://localhost:5173"
+echo ""
+echo "======================================"
+echo "Backend  → http://localhost:8000"
+echo "Frontend → http://localhost:5173"
+echo "API Docs → http://localhost:8000/docs"
+echo "======================================"
+echo "Press Ctrl+C to stop both servers"
 
-trap "kill $BACKEND_PID $FRONTEND_PID" EXIT
+trap "echo 'Shutting down...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit 0" EXIT INT TERM
 wait

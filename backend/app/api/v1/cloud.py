@@ -109,7 +109,8 @@ async def run_cloud_quick_audit(
 @router.get("/scorecard")
 def get_cloud_scorecard(db: Session = Depends(get_db)):
     """
-    Returns the Cloud Server Cryptographic Posture & PQC Migration Readiness Scorecard.
+    Returns the Cloud Server Cryptographic Posture & PQC Migration Readiness Scorecard
+    calculated strictly from persisted evidence.
     """
     cloud_targets = db.query(AuthorizedTarget).filter(
         AuthorizedTarget.target_type.in_([
@@ -120,32 +121,27 @@ def get_cloud_scorecard(db: Session = Depends(get_db)):
         ])
     ).all()
 
+    from app.models.entities import CryptoFinding, ReadinessAssessment
+    findings = db.query(CryptoFinding).all()
+    assessments = db.query(ReadinessAssessment).all()
+
+    vulnerable_kms = sum(1 for f in findings if ("RSA" in f.raw_algorithm_name or "ECDSA" in f.raw_algorithm_name) and "kms" in (f.location_identifier or "").lower())
+    pqc_services = sum(1 for f in findings if "ML-KEM" in f.raw_algorithm_name or "ML-DSA" in f.raw_algorithm_name)
+    hybrid_tls = sum(1 for f in findings if "X25519" in f.raw_algorithm_name or "MLKEM" in f.raw_algorithm_name)
+
+    if assessments and len(assessments) > 0:
+        avg_priority = sum(a.migration_priority_score for a in assessments) / len(assessments)
+        score = max(0, min(100, round(100 - avg_priority, 1)))
+    else:
+        score = 0.0 if len(cloud_targets) == 0 else 50.0
+
     return {
         "summary": {
             "total_cloud_targets": len(cloud_targets),
-            "cloud_pqc_readiness_score": 82.5 if len(cloud_targets) > 0 else 75.0,
-            "quantum_vulnerable_kms_keys": 2,
-            "pqc_standardized_services": 1,
-            "hybrid_tls13_endpoints": 3
+            "cloud_pqc_readiness_score": score,
+            "quantum_vulnerable_kms_keys": vulnerable_kms,
+            "pqc_standardized_services": pqc_services,
+            "hybrid_tls13_endpoints": hybrid_tls
         },
-        "remediation_roadmap": [
-            {
-                "priority": "HIGH",
-                "resource_type": "Cloud KMS Key",
-                "recommendation": "Upgrade AWS/GCP KMS Customer Master Keys from RSA-3048 to ML-KEM-768 hybrid wrapper.",
-                "timeline": "Immediate (CNSA 2.0 Priority)"
-            },
-            {
-                "priority": "MEDIUM",
-                "resource_type": "Cloud Server SSH",
-                "recommendation": "Configure OpenSSH 9.0+ on cloud VMs to support sntrup761x25519-sha512 hybrid post-quantum KEX.",
-                "timeline": "Next Release Cycle"
-            },
-            {
-                "priority": "LOW",
-                "resource_type": "Cloud Object Storage",
-                "recommendation": "Verify S3/GCS bucket SSE-KMS uses AES-256-GCM symmetric encryption for quantum resistance.",
-                "timeline": "Compliant"
-            }
-        ]
+        "remediation_roadmap": []
     }

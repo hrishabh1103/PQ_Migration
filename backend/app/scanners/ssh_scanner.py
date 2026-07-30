@@ -87,9 +87,9 @@ class SSHScanner(Scanner):
             )
 
         except Exception as e:
-            logger.info(f"SSH scanner fallback for target '{host}:{port}': {e}")
-            async for f in self._generate_simulated_ssh_findings(host, port):
-                yield f
+            logger.error(f"SSH scanner connection error for target '{host}:{port}': {e}")
+            # NO EVIDENCE = NO RESULT: fail closed without generating simulated observations.
+            return
 
     def _is_ip(self, val: str) -> bool:
         try:

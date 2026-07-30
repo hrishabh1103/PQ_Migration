@@ -74,7 +74,7 @@ export async function fetchScanById(id: string): Promise<ScanJob> {
   return res.json();
 }
 
-export async function createScan(targetId: string, requestedScanners: string[] = ['mock-scanner']): Promise<ScanJob> {
+export async function createScan(targetId: string, requestedScanners: string[] = ['tls-scanner', 'certificate-scanner', 'ssh-scanner']): Promise<ScanJob> {
   const res = await fetch(`${API_BASE}/scans`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

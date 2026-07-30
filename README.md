@@ -3,6 +3,8 @@
 > **Post-Quantum Cryptography (PQC) Migration Readiness Platform**  
 > An enterprise-grade cryptographic discovery, inventory normalization, cross-cloud correlation, PQC risk assessment, and Cryptographic Bill of Materials (CBOM) generation platform supporting **AWS**, **Azure**, **Kubernetes**, **Linux**, **Network Endpoints (TLS/SSH)**, and **Application Source Code**.
 
+> **Runtime Truth Recovery V1 Complete** — All hardcoded/synthetic demo data has been purged. Every value displayed in the UI is now derived from real runtime evidence. Zero-state shows empty results. Real TLS scans produce real findings.
+
 ---
 
 ## 🔰 [CLICK HERE FOR THE BEGINNER'S GUIDE](BEGINNERS_GUIDE.md)
@@ -10,6 +12,7 @@
 If you are new to the platform or want a complete step-by-step tutorial on how to test every feature, read our **[BEGINNERS_GUIDE.md](BEGINNERS_GUIDE.md)**!
 
 ---
+
 
 ## 📚 Documentation & Subsystem Guides Index
 

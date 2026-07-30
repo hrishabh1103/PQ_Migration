@@ -14,10 +14,11 @@ export const FindingsPage: React.FC = () => {
   const loadFindings = async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await fetchFindings();
       setFindings(data);
     } catch (err: any) {
-      setError(err.message || 'Failed to load findings');
+      setError(`Failed to fetch findings: ${err.message || err}. Ensure backend server is active at http://localhost:8000.`);
     } finally {
       setLoading(false);
     }

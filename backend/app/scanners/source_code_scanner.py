@@ -119,9 +119,8 @@ class SourceCodeScanner(Scanner):
                 except Exception as e:
                     logger.warning(f"Error scanning code file '{file_path}': {e}")
         else:
-            # Yield simulated source code finding for target
-            async for finding in self._generate_simulated_code_findings(target_value):
-                yield finding
+            logger.info(f"[SourceCodeScanner] Path '{target_value}' is not a local filesystem directory; no source code findings extracted.")
+            return
 
     async def _generate_simulated_code_findings(self, target_value: str) -> AsyncIterator[RawFinding]:
         findings = [

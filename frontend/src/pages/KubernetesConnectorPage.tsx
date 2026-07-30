@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Server, ShieldCheck, RefreshCw, Layers, Cpu, Box, 
-  Activity, CheckCircle2, AlertTriangle, Key, Search, ExternalLink
+  Activity, CheckCircle2, AlertTriangle, Key, Search, ExternalLink, XCircle
 } from 'lucide-react';
+import { PageHeader } from '../components/common/PageHeader';
 
 interface CapabilityStatus {
   capability: string;
@@ -19,44 +20,146 @@ interface InventoryCounts {
 }
 
 export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => void }> = ({ onNavigate }) => {
-  const [clusterStatus] = useState<string>('CONNECTED');
-  const [gitVersion] = useState<string>('v1.30.2');
+  const [clusterStatus, setClusterStatus] = useState<string>('NOT_CONNECTED');
+  const [gitVersion, setGitVersion] = useState<string>('UNKNOWN');
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'coverage' | 'inventory'>('overview');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [targets, setTargets] = useState<any[]>([]);
+  const [selectedTargetId, setSelectedTargetId] = useState<string>('');
 
-  const [counts] = useState<InventoryCounts>({
-    workloads: 14,
-    pods: 42,
-    services: 18,
-    ingresses: 8,
-    certificates: 6,
-    secret_metadata: 24
+  const [counts, setCounts] = useState<InventoryCounts>({
+    workloads: 0,
+    pods: 0,
+    services: 0,
+    ingresses: 0,
+    certificates: 0,
+    secret_metadata: 0
   });
 
-  const [capabilities] = useState<CapabilityStatus[]>([
-    { capability: 'cluster_identity', status: 'SCANNED' },
-    { capability: 'nodes', status: 'SCANNED' },
-    { capability: 'namespaces', status: 'SCANNED' },
-    { capability: 'workloads', status: 'SCANNED' },
-    { capability: 'pods', status: 'SCANNED' },
-    { capability: 'services', status: 'SCANNED' },
-    { capability: 'ingress', status: 'SCANNED' },
+  const [capabilities, setCapabilities] = useState<CapabilityStatus[]>([
+    { capability: 'cluster_identity', status: 'NOT_SCANNED' },
+    { capability: 'nodes', status: 'NOT_SCANNED' },
+    { capability: 'namespaces', status: 'NOT_SCANNED' },
+    { capability: 'workloads', status: 'NOT_SCANNED' },
+    { capability: 'pods', status: 'NOT_SCANNED' },
+    { capability: 'services', status: 'NOT_SCANNED' },
+    { capability: 'ingress', status: 'NOT_SCANNED' },
     { capability: 'gateway_api', status: 'NOT_APPLICABLE' },
-    { capability: 'certificates', status: 'SCANNED' },
-    { capability: 'secret_metadata', status: 'SCANNED' },
-    { capability: 'configmaps', status: 'SCANNED' },
-    { capability: 'rbac', status: 'SCANNED' },
-    { capability: 'cert_manager', status: 'SCANNED' },
-    { capability: 'service_mesh', status: 'SCANNED' },
+    { capability: 'certificates', status: 'NOT_SCANNED' },
+    { capability: 'secret_metadata', status: 'NOT_SCANNED' },
+    { capability: 'configmaps', status: 'NOT_SCANNED' },
+    { capability: 'rbac', status: 'NOT_SCANNED' },
+    { capability: 'cert_manager', status: 'NOT_SCANNED' },
+    { capability: 'service_mesh', status: 'NOT_SCANNED' },
     { capability: 'encryption_at_rest', status: 'UNKNOWN' }
   ]);
 
-  const handleTriggerSync = () => {
+  useEffect(() => {
+    fetchTargetsAndValidate();
+  }, []);
+
+  const fetchTargetsAndValidate = async () => {
+    try {
+      const res = await fetch('/api/v1/targets');
+      if (res.ok) {
+        const list = await res.json();
+        const k8sTargets = list.filter((t: any) => t.target_type === 'KUBERNETES_CLUSTER' || t.target_type === 'KUBERNETES_NAMESPACE');
+        setTargets(k8sTargets);
+        if (k8sTargets.length > 0) {
+          const tid = k8sTargets[0].id;
+          setSelectedTargetId(tid);
+          await validateAndFetchInventory(tid);
+          return;
+        }
+      }
+      await validateAndFetchInventory('');
+    } catch (e) {
+      setClusterStatus('NOT_CONNECTED');
+      setGitVersion('UNKNOWN');
+      setStatusMessage(`Validation failed: ${e}`);
+    }
+  };
+
+  const validateAndFetchInventory = async (targetId: string) => {
+    setStatusMessage('Validating Kubernetes API server connection...');
+    try {
+      const valRes = await fetch('/api/v1/connectors/kubernetes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ in_cluster: false })
+      });
+
+      if (valRes.ok) {
+        const valData = await valRes.json();
+        if (valData.validated) {
+          setClusterStatus('CONNECTED');
+          setGitVersion(valData.git_version || 'UNKNOWN');
+          setStatusMessage(`Connected to Kubernetes cluster (${valData.git_version || 'v1.xx'})`);
+
+          if (targetId) {
+            fetchInventoryData(targetId);
+          }
+          return;
+        }
+      }
+      setClusterStatus('NOT_CONNECTED');
+      setGitVersion('UNKNOWN');
+      setStatusMessage('Kubernetes API server unreachable or invalid kubeconfig');
+    } catch (err) {
+      setClusterStatus('NOT_CONNECTED');
+      setGitVersion('UNKNOWN');
+      setStatusMessage('Kubernetes validation failed: CONNECTION_FAILED');
+    }
+  };
+
+  const fetchInventoryData = async (targetId: string) => {
+    try {
+      const [invRes, covRes] = await Promise.all([
+        fetch(`/api/v1/connectors/kubernetes/inventory/${targetId}`),
+        fetch(`/api/v1/connectors/kubernetes/coverage/${targetId}`)
+      ]);
+
+      if (invRes.ok) {
+        const invData = await invRes.json();
+        if (invData.counts) setCounts(invData.counts);
+      }
+      if (covRes.ok) {
+        const covData = await covRes.json();
+        if (covData.capabilities) setCapabilities(covData.capabilities);
+      }
+    } catch (e) {
+      console.error('Failed to fetch K8s inventory:', e);
+    }
+  };
+
+  const handleTriggerSync = async () => {
+    if (!selectedTargetId) {
+      setStatusMessage('No Kubernetes Target selected. Register a KUBERNETES_CLUSTER target first.');
+      return;
+    }
     setIsSyncing(true);
-    setTimeout(() => {
+    setStatusMessage('Executing read-only Kubernetes discovery across 15 dimensions...');
+    try {
+      const res = await fetch('/api/v1/connectors/kubernetes/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_id: selectedTargetId })
+      });
+
+      if (res.ok) {
+        setStatusMessage('Kubernetes discovery sync complete. Refreshing inventory...');
+        await validateAndFetchInventory(selectedTargetId);
+      } else {
+        const err = await res.json();
+        setStatusMessage(`Sync failed: ${err.detail || 'API error'}`);
+      }
+    } catch (e) {
+      setStatusMessage(`Sync error: ${e}`);
+    } finally {
       setIsSyncing(false);
-    }, 2000);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -66,17 +169,17 @@ export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => v
       case 'PARTIALLY_SCANNED':
         return <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> PARTIAL</span>;
       case 'FAILED':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> FAILED</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1"><XCircle className="w-3.5 h-3.5" /> FAILED</span>;
       case 'NOT_APPLICABLE':
         return <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-500/10 text-slate-400 border border-slate-500/20">N/A</span>;
       default:
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">UNKNOWN</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-500/10 text-slate-400 border border-slate-500/20">NOT SCANNED</span>;
     }
   };
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
-      {/* 1. Header & Actions */}
+      {/* Header & Actions */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900/60 border border-slate-800 p-6 rounded-2xl backdrop-blur-md">
         <div className="flex items-center space-x-4">
           <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-cyan-400">
@@ -85,8 +188,11 @@ export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => v
           <div>
             <div className="flex items-center space-x-3">
               <h1 className="text-2xl font-bold text-slate-100">Kubernetes Connector</h1>
+              <span className={`px-2.5 py-0.5 text-xs font-mono font-semibold rounded-full border ${clusterStatus === 'CONNECTED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border-rose-500/30'}`}>
+                API STATUS: {clusterStatus}
+              </span>
               <span className="px-2.5 py-0.5 text-xs font-mono font-semibold rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                v1.0.0 (Read-Only)
+                K8S VERSION: {gitVersion}
               </span>
             </div>
             <p className="text-sm text-slate-400 mt-1">
@@ -98,183 +204,72 @@ export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => v
         <div className="flex items-center space-x-3">
           <button
             onClick={handleTriggerSync}
-            disabled={isSyncing}
-            className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium text-sm rounded-xl shadow-lg shadow-cyan-500/20 flex items-center space-x-2 transition-all disabled:opacity-50"
+            disabled={isSyncing || clusterStatus !== 'CONNECTED'}
+            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-xl text-sm transition-colors flex items-center space-x-2 shadow-lg shadow-cyan-950/40 disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            <span>{isSyncing ? 'Syncing Cluster...' : 'Trigger Discovery Sync'}</span>
+            <span>{isSyncing ? 'Syncing...' : 'Trigger K8s Discovery Sync'}</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Cluster Identity & Status Banner */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-slate-900/40 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
-          <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 font-mono uppercase">API Status</div>
-            <div className="text-lg font-bold text-slate-200 mt-0.5">{clusterStatus}</div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/40 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
-          <div className="p-3 bg-blue-500/10 text-blue-400 rounded-lg">
-            <Cpu className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 font-mono uppercase">K8s Version</div>
-            <div className="text-lg font-bold text-slate-200 mt-0.5">{gitVersion}</div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/40 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
-          <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-lg">
-            <Layers className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 font-mono uppercase">Discovered Workloads</div>
-            <div className="text-lg font-bold text-slate-200 mt-0.5">{counts.workloads} Deployments</div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/40 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
-          <div className="p-3 bg-amber-500/10 text-amber-400 rounded-lg">
-            <Key className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 font-mono uppercase">Secret Metadata</div>
-            <div className="text-lg font-bold text-slate-200 mt-0.5">{counts.secret_metadata} Objects</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Navigation Tabs */}
-      <div className="flex border-b border-slate-800 space-x-6">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'overview'
-              ? 'border-cyan-400 text-cyan-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Overview & Metrics
-        </button>
-        <button
-          onClick={() => setActiveTab('coverage')}
-          className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'coverage'
-              ? 'border-cyan-400 text-cyan-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          15-Capability Coverage Matrix
-        </button>
-      </div>
-
-      {/* 4. Tab Contents */}
-      {activeTab === 'overview' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-xl space-y-3">
-              <div className="text-sm font-bold text-slate-300 flex items-center space-x-2">
-                <Box className="w-4 h-4 text-cyan-400" />
-                <span>Pods & Containers</span>
-              </div>
-              <div className="text-3xl font-extrabold text-white">{counts.pods}</div>
-              <p className="text-xs text-slate-400">Canonical identity derived via metadata.uid + Cluster ID</p>
-            </div>
-
-            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-xl space-y-3">
-              <div className="text-sm font-bold text-slate-300 flex items-center space-x-2">
-                <Activity className="w-4 h-4 text-emerald-400" />
-                <span>Services & Ingresses</span>
-              </div>
-              <div className="text-3xl font-extrabold text-white">{counts.services + counts.ingresses}</div>
-              <p className="text-xs text-slate-400">Mapped via SERVICE EXPOSES WORKLOAD and INGRESS EXPOSES SERVICE</p>
-            </div>
-
-            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-xl space-y-3">
-              <div className="text-sm font-bold text-slate-300 flex items-center space-x-2">
-                <Key className="w-4 h-4 text-amber-400" />
-                <span>Public X.509 Certificates</span>
-              </div>
-              <div className="text-3xl font-extrabold text-white">{counts.certificates}</div>
-              <p className="text-xs text-slate-400">Correlated across TLSScanner & LinuxCollector by SHA-256 fingerprint</p>
-            </div>
-          </div>
-
-          <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-xl space-y-4">
-            <h3 className="text-base font-bold text-slate-200">Zero-Secret Boundary Verification</h3>
-            <p className="text-sm text-slate-400">
-              `KubernetesConnector` operates under strict read-only least-privilege guarantees. Secret values (`Secret.data`, `Secret.stringData`), private keys (`tls.key`), bearer tokens, and passwords are never read or stored.
-            </p>
-            <div className="flex space-x-4 pt-2">
-              <button 
-                onClick={() => onNavigate && onNavigate('assets')}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center space-x-2"
-              >
-                <span>View Inventoried Assets</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
-              <button 
-                onClick={() => onNavigate && onNavigate('pqc-readiness')}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center space-x-2"
-              >
-                <span>View PQC Readiness</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
+      {statusMessage && (
+        <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-xs text-cyan-400">
+          {statusMessage}
         </div>
       )}
 
-      {activeTab === 'coverage' && (
-        <div className="bg-slate-900/40 border border-slate-800 rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-slate-800 flex justify-between items-center">
-            <h3 className="text-sm font-bold text-slate-200">15-Capability Coverage Matrix</h3>
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Filter capabilities..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-          </div>
-
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-800 bg-slate-950/50 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-                <th className="py-3 px-6">Capability Dimension</th>
-                <th className="py-3 px-6">Discovery Status</th>
-                <th className="py-3 px-6">Implementation Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60 text-sm">
-              {capabilities
-                .filter(c => c.capability.toLowerCase().includes(searchTerm.toLowerCase()))
-                .map((cap) => (
-                  <tr key={cap.capability} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3.5 px-6 font-mono text-xs font-medium text-slate-200">
-                      {cap.capability}
-                    </td>
-                    <td className="py-3.5 px-6">
-                      {getStatusBadge(cap.status)}
-                    </td>
-                    <td className="py-3.5 px-6 text-xs text-slate-400">
-                      {cap.status === 'NOT_APPLICABLE' ? 'Optional CRD / N/A' : 'IMPLEMENTED'}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+      {/* Overview Metric Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <div className="text-[10px] font-mono text-slate-400 uppercase">Workloads</div>
+          <div className="text-2xl font-bold text-slate-100 mt-1 font-mono">{counts.workloads}</div>
+          <div className="text-[10px] text-slate-400 mt-0.5">Deployments/StatefulSets</div>
         </div>
-      )}
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <div className="text-[10px] font-mono text-slate-400 uppercase">Pods & Containers</div>
+          <div className="text-2xl font-bold text-slate-100 mt-1 font-mono">{counts.pods}</div>
+          <div className="text-[10px] text-slate-400 mt-0.5">Active pod spec items</div>
+        </div>
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <div className="text-[10px] font-mono text-slate-400 uppercase">Services</div>
+          <div className="text-2xl font-bold text-slate-100 mt-1 font-mono">{counts.services}</div>
+          <div className="text-[10px] text-slate-400 mt-0.5">Network endpoints</div>
+        </div>
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <div className="text-[10px] font-mono text-slate-400 uppercase">Ingresses</div>
+          <div className="text-2xl font-bold text-slate-100 mt-1 font-mono">{counts.ingresses}</div>
+          <div className="text-[10px] text-slate-400 mt-0.5">TLS termination rules</div>
+        </div>
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <div className="text-[10px] font-mono text-slate-400 uppercase">Certificates</div>
+          <div className="text-2xl font-bold text-cyan-400 mt-1 font-mono">{counts.certificates}</div>
+          <div className="text-[10px] text-slate-400 mt-0.5">X.509 secret material</div>
+        </div>
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <div className="text-[10px] font-mono text-slate-400 uppercase">Secret Metadata</div>
+          <div className="text-2xl font-bold text-indigo-400 mt-1 font-mono">{counts.secret_metadata}</div>
+          <div className="text-[10px] text-slate-400 mt-0.5">Zero secret data leaked</div>
+        </div>
+      </div>
+
+      {/* 15 Capability Coverage Grid */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+        <h3 className="text-base font-bold text-slate-100 mb-4 flex items-center">
+          <ShieldCheck className="w-4.5 h-4.5 mr-2 text-indigo-400" /> Kubernetes 15-Capability Discovery Coverage
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {capabilities.map((item) => (
+            <div key={item.capability} className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">{item.capability}</span>
+                {getStatusBadge(item.status)}
+              </div>
+              <h4 className="text-xs font-semibold text-slate-200 capitalize">{item.capability.replace('_', ' ')}</h4>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

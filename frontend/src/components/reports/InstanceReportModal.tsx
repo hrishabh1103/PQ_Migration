@@ -124,7 +124,9 @@ export const InstanceReportModal: React.FC<InstanceReportModalProps> = ({ assetI
                     <div className="flex items-center space-x-4">
                       <div className="relative w-20 h-20 flex items-center justify-center rounded-full bg-slate-900 border-4 border-cyan-500/30 shadow-inner">
                         <div className="text-center">
-                          <span className="text-2xl font-extrabold font-mono text-cyan-300">{report.pqc_score}</span>
+                          <span className="text-2xl font-extrabold font-mono text-cyan-300">
+                            {report.pqc_score !== null ? report.pqc_score : 'N/A'}
+                          </span>
                           <span className="block text-[10px] font-mono text-slate-400">/ 100</span>
                         </div>
                       </div>
