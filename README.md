@@ -5,11 +5,15 @@
 
 ---
 
-## 📚 Documentation & Beginner Guides Index
+## 🔰 [CLICK HERE FOR THE BEGINNER'S GUIDE](BEGINNERS_GUIDE.md)
 
-We have created dedicated, beginner-friendly README guides across the repository:
+If you are new to the platform or want a complete step-by-step tutorial on how to test every feature, read our **[BEGINNERS_GUIDE.md](BEGINNERS_GUIDE.md)**!
 
-* 🔰 **[Beginner's Step-by-Step Tutorial](docs/BEGINNER_GUIDE.md)**: Zero-to-Hero guide for beginners on how to run, navigate, scan endpoints/servers, and export PQC reports.
+---
+
+## 📚 Documentation & Subsystem Guides Index
+
+* 🔰 **[Beginner's Guide & Testing Manual](BEGINNERS_GUIDE.md)**: Zero-to-Hero guide for beginners on how to run, navigate, test web endpoints, scan source code, sync cloud resources, and export PQC reports.
 * ⚙️ **[Backend Engine Architecture & REST API Guide](backend/README.md)**: Deep dive into FastAPI, SQLAlchemy, DiscoveryOrchestrator, Scanners, and pytest test suite.
 * 🎨 **[Frontend Dashboard & React UI Guide](frontend/README.md)**: Overview of React 18, TypeScript, Tailwind styling, page components, and API service integration.
 * 📖 **[Platform Architecture & PQC Standard Specification](docs/ARCHITECTURE.md)**: Complete system design, ScopeGuard security boundaries, and NIST PQC FIPS standard compliance mapping.
@@ -100,7 +104,7 @@ K8S_IN_CLUSTER=false
 4. **View PQC findings:** Go to **Crypto Findings** to inspect discovered key algorithms (`RSA-2048`, `ECDSA`, `ML-KEM-768`).
 5. **Export reports:** Go to **PQC Readiness** → Download **CycloneDX 1.6 CBOM (.json)** and **Markdown Audit Report (.md)**.
 
-For complete beginner instructions, read the **[Beginner's Step-by-Step Tutorial](docs/BEGINNER_GUIDE.md)**.
+For complete beginner instructions, read the **[Beginner's Guide & Testing Manual](BEGINNERS_GUIDE.md)**.
 
 ---
 
