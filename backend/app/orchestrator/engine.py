@@ -60,7 +60,9 @@ class DiscoveryOrchestrator:
         provider_resource_id: Optional[str] = None,
         external_id: Optional[str] = None,
         identity_key: Optional[str] = None,
-        asset_category: str = "INFRASTRUCTURE"
+        asset_category: str = "INFRASTRUCTURE",
+        provider: Optional[str] = None,
+        region: Optional[str] = None
     ) -> Asset:
         """
         Deterministic Asset Identity Resolution.
@@ -103,6 +105,8 @@ class DiscoveryOrchestrator:
                 identity_key=computed_key,
                 provider_resource_id=provider_resource_id,
                 external_id=external_id,
+                provider=provider.lower() if provider else None,
+                region=region,
                 environment=environment,
                 operating_system=operating_system,
                 status="ACTIVE",
@@ -110,6 +114,11 @@ class DiscoveryOrchestrator:
             )
             db.add(asset)
             db.flush()
+        else:
+            if provider and not asset.provider:
+                asset.provider = provider.lower()
+            if region and not asset.region:
+                asset.region = region
 
         return asset
 
@@ -607,7 +616,9 @@ class DiscoveryOrchestrator:
                         provider_resource_id=obs.provider_resource_id,
                         external_id=obs.external_id,
                         identity_key=obs.identity_key,
-                        asset_category=obs.asset_category
+                        asset_category=obs.asset_category,
+                        provider=getattr(obs, 'provider', connector_plugin_id),
+                        region=getattr(obs, 'region', None)
                     )
                     if obs.provider_resource_id:
                         obj_map[obs.provider_resource_id] = ast.id

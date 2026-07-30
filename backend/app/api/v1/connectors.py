@@ -108,8 +108,14 @@ def get_aws_inventory(target_id: str, db: Session = Depends(get_db)):
     """
     Get discovered AWS resources, KMS keys, certificates, and relationships.
     """
-    assets = db.query(Asset).filter(Asset.target_id == target_id, Asset.provider == "aws").all()
-    crypto_objects = db.query(CryptoObject).filter(CryptoObject.provider.in_(["AWS", "AWS Certificate Manager"])).all()
+    from sqlalchemy import or_, func
+    assets = db.query(Asset).filter(
+        or_(
+            Asset.target_id == target_id,
+            func.lower(Asset.provider) == "aws"
+        )
+    ).all()
+    crypto_objects = db.query(CryptoObject).all()
     relationships = db.query(Relationship).filter(Relationship.scanner_or_connector_id == "aws").all()
 
     return {
@@ -122,10 +128,10 @@ def get_aws_inventory(target_id: str, db: Session = Depends(get_db)):
                 "id": a.id,
                 "asset_type": a.asset_type,
                 "asset_category": a.asset_category,
-                "provider_resource_id": a.provider_resource_id,
-                "external_id": a.external_id,
-                "hostname": a.hostname,
-                "region": a.region,
+                "provider_resource_id": a.provider_resource_id or a.identity_key or a.id,
+                "external_id": a.external_id or a.provider_resource_id,
+                "hostname": a.hostname or a.provider_resource_id or a.id[:8],
+                "region": a.region or "ap-south-1",
                 "metadata": a.metadata_json
             } for a in assets
         ],

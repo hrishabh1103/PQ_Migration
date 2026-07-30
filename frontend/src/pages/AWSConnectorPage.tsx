@@ -38,6 +38,7 @@ export const AWSConnectorPage: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [coverage, setCoverage] = useState<CoverageItem[]>([]);
   const [resources, setResources] = useState<AWSResource[]>([]);
+  const [targetsList, setTargetsList] = useState<any[]>([]);
   const [targetId, setTargetId] = useState<string>('');
 
   useEffect(() => {
@@ -49,8 +50,10 @@ export const AWSConnectorPage: React.FC = () => {
       const tRes = await fetch('/api/v1/targets');
       if (tRes.ok) {
         const targets = await tRes.json();
-        if (targets.length > 0) {
-          const tId = targets[0].id;
+        setTargetsList(targets);
+        const awsTarget = targets.find((t: any) => t.target_type === 'CLOUD_PROVIDER') || targets[0];
+        if (awsTarget) {
+          const tId = awsTarget.id;
           setTargetId(tId);
           fetchCoverage(tId);
           fetchInventory(tId);
@@ -59,6 +62,12 @@ export const AWSConnectorPage: React.FC = () => {
     } catch (err) {
       console.error('Failed to fetch targets:', err);
     }
+  };
+
+  const handleTargetChange = (tId: string) => {
+    setTargetId(tId);
+    fetchCoverage(tId);
+    fetchInventory(tId);
   };
 
   const fetchCoverage = async (tId: string) => {
@@ -110,21 +119,44 @@ export const AWSConnectorPage: React.FC = () => {
   };
 
   const handleTriggerSync = async () => {
-    if (!targetId) return;
     setIsSyncing(true);
     setSyncStatus('Initiating AWS Connector read-only discovery sync across authorized regions...');
     try {
+      let activeTargetId = targetId;
+
+      if (!activeTargetId) {
+        // Auto-register AWS target if none exists yet
+        const regRes = await fetch('/api/v1/targets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: `AWS Cloud Account (${identity?.account_id || 'Primary'})`,
+            target_type: 'CLOUD_PROVIDER',
+            target_value: identity?.account_id || 'aws-account',
+            is_authorized: true,
+            environment: 'PRODUCTION'
+          })
+        });
+        if (regRes.ok) {
+          const newTarget = await regRes.json();
+          activeTargetId = newTarget.id;
+          setTargetId(newTarget.id);
+        }
+      }
+
       const res = await fetch('/api/v1/connectors/aws/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target_id: targetId, allowed_regions: selectedRegions })
+        body: JSON.stringify({ target_id: activeTargetId, allowed_regions: selectedRegions })
       });
 
       if (res.ok) {
         setSyncStatus('AWS Discovery Sync completed successfully. Refreshing coverage & inventory...');
         setTimeout(() => {
-          fetchCoverage(targetId);
-          fetchInventory(targetId);
+          if (activeTargetId) {
+            fetchCoverage(activeTargetId);
+            fetchInventory(activeTargetId);
+          }
           setIsSyncing(false);
         }, 1500);
       } else {
@@ -213,6 +245,23 @@ export const AWSConnectorPage: React.FC = () => {
               <Play className="w-4 h-4 mr-2 text-emerald-400" /> Region Allowlist & Discovery Sync
             </h3>
             <div className="space-y-3">
+              {targetsList.length > 0 && (
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Target Account / Provider Scope</label>
+                  <select
+                    value={targetId}
+                    onChange={(e) => handleTargetChange(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500"
+                  >
+                    {targetsList.map((t: any) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name} ({t.target_value}) [{t.target_type}]
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-mono text-slate-400 mb-1">Authorized AWS Regions</label>
                 <div className="flex flex-wrap gap-2">
