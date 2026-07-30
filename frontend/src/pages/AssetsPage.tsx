@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Asset, CryptoFinding } from '../types';
 import { fetchAssets, fetchFindings } from '../services/api';
-import { Database, Network, KeyRound, ShieldAlert, ChevronRight, RefreshCw, AlertCircle } from 'lucide-react';
+import { Database, Network, KeyRound, ShieldAlert, ChevronRight, RefreshCw, AlertCircle, FileText } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
 
 export const AssetsPage: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -10,6 +11,7 @@ export const AssetsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [reportAssetId, setReportAssetId] = useState<string | null>(null);
 
   const loadData = async () => {
     try {
@@ -115,9 +117,17 @@ export const AssetsPage: React.FC = () => {
               <div className="border-b border-slate-800 pb-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                      {selectedAsset.asset_type}
-                    </span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                        {selectedAsset.asset_type}
+                      </span>
+                      <button
+                        onClick={() => setReportAssetId(selectedAsset.id)}
+                        className="px-3 py-1 bg-cyan-600/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-sans font-medium text-xs rounded-lg transition-colors flex items-center shadow-lg shadow-cyan-950/20"
+                      >
+                        <FileText className="w-3.5 h-3.5 mr-1.5" /> View PQC Exposure Report
+                      </button>
+                    </div>
                     <h2 className="text-2xl font-extrabold text-white font-mono mt-2">
                       {selectedAsset.hostname || selectedAsset.ip_address}
                     </h2>
@@ -207,6 +217,14 @@ export const AssetsPage: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Instance PQC Report Modal */}
+      {reportAssetId && (
+        <InstanceReportModal
+          assetId={reportAssetId}
+          onClose={() => setReportAssetId(null)}
+        />
       )}
     </div>
   );

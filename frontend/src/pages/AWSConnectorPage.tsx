@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Cloud, Shield, CheckCircle, AlertTriangle, XCircle, Info, RefreshCw, Play, Key } from 'lucide-react';
+import { Cloud, Shield, CheckCircle, AlertTriangle, XCircle, Info, RefreshCw, Play, Key, FileText } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
 
 interface AWSIdentity {
   account_id: string;
@@ -40,6 +41,7 @@ export const AWSConnectorPage: React.FC = () => {
   const [resources, setResources] = useState<AWSResource[]>([]);
   const [targetsList, setTargetsList] = useState<any[]>([]);
   const [targetId, setTargetId] = useState<string>('');
+  const [selectedAssetForReport, setSelectedAssetForReport] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTargetsAndCoverage();
@@ -356,6 +358,7 @@ export const AWSConnectorPage: React.FC = () => {
                   <th className="p-3">Provider Resource ARN / ID</th>
                   <th className="p-3">Region</th>
                   <th className="p-3">Metadata</th>
+                  <th className="p-3 text-right">PQC Report</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -370,8 +373,16 @@ export const AWSConnectorPage: React.FC = () => {
                       {res.provider_resource_id}
                     </td>
                     <td className="p-3 text-slate-400">{res.region}</td>
-                    <td className="p-3 text-slate-400 truncate max-w-md" title={JSON.stringify(res.metadata)}>
+                    <td className="p-3 text-slate-400 truncate max-w-[200px]" title={JSON.stringify(res.metadata)}>
                       {JSON.stringify(res.metadata)}
+                    </td>
+                    <td className="p-3 text-right">
+                      <button
+                        onClick={() => setSelectedAssetForReport(res.id)}
+                        className="inline-flex items-center px-2.5 py-1 rounded bg-cyan-600/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 text-[11px] font-sans font-medium transition-colors"
+                      >
+                        <FileText className="w-3 h-3 mr-1" /> View PQC Exposure Report
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -380,6 +391,14 @@ export const AWSConnectorPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Instance PQC Report Modal */}
+      {selectedAssetForReport && (
+        <InstanceReportModal
+          assetId={selectedAssetForReport}
+          onClose={() => setSelectedAssetForReport(null)}
+        />
+      )}
     </div>
   );
 };
