@@ -40,18 +40,32 @@ class AWSSdkClient:
 
     def _create_session(self) -> boto3.Session:
         """
-        Create base boto3 session using standard credential provider chain.
+        Create base boto3 session using standard credential provider chain or loaded .env credentials.
         """
-        # Ensure trailing whitespace from .env files is stripped
         import os
-        key_id = os.getenv("AWS_ACCESS_KEY_ID")
-        secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-        if key_id and os.environ.get("AWS_ACCESS_KEY_ID") != key_id.strip():
-            os.environ["AWS_ACCESS_KEY_ID"] = key_id.strip()
-        if secret_key and os.environ.get("AWS_SECRET_ACCESS_KEY") != secret_key.strip():
-            os.environ["AWS_SECRET_ACCESS_KEY"] = secret_key.strip()
+        from pathlib import Path
+        try:
+            from dotenv import load_dotenv
+            # Attempt loading .env from current directory or backend directory
+            load_dotenv(override=True)
+            env_file = Path(__file__).resolve().parent.parent.parent / ".env"
+            if env_file.exists():
+                load_dotenv(env_file, override=True)
+        except Exception:
+            pass
 
-        if self.profile_name:
+        key_id = (os.getenv("AWS_ACCESS_KEY_ID") or "").strip()
+        secret_key = (os.getenv("AWS_SECRET_ACCESS_KEY") or "").strip()
+        region = (os.getenv("AWS_DEFAULT_REGION") or self.region_name).strip()
+
+        if key_id and secret_key:
+            logger.info(f"Initializing AWS Boto3 Session using environment credentials ({key_id[:6]}...) for region '{region}'")
+            session = boto3.Session(
+                aws_access_key_id=key_id,
+                aws_secret_access_key=secret_key,
+                region_name=region
+            )
+        elif self.profile_name:
             session = boto3.Session(profile_name=self.profile_name, region_name=self.region_name)
         else:
             session = boto3.Session(region_name=self.region_name)
