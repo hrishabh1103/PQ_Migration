@@ -89,7 +89,6 @@ def export_scans_archive(db: Session = Depends(get_db)):
                 "id": f.id,
                 "scan_job_id": f.scan_job_id,
                 "raw_algorithm": f.raw_algorithm_name,
-                "key_size": f.key_size,
                 "finding_type": f.finding_type,
                 "location_identifier": f.location_identifier,
                 "evidence_snippet": f.evidence_snippet,
