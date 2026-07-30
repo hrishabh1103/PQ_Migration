@@ -7,8 +7,9 @@ from app.core.config import settings
 from app.core.database import engine, Base
 from app.api.v1.api import api_router
 
-# Import scanners module so all scanner plugins auto-register with ScannerRegistry
+# Import scanners and connectors modules so all plugins auto-register with PluginRegistry
 import app.scanners  # noqa: F401
+import app.connectors  # noqa: F401
 
 logger = logging.getLogger(__name__)
 

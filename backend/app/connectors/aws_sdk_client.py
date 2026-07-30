@@ -42,6 +42,15 @@ class AWSSdkClient:
         """
         Create base boto3 session using standard credential provider chain.
         """
+        # Ensure trailing whitespace from .env files is stripped
+        import os
+        key_id = os.getenv("AWS_ACCESS_KEY_ID")
+        secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        if key_id and os.environ.get("AWS_ACCESS_KEY_ID") != key_id.strip():
+            os.environ["AWS_ACCESS_KEY_ID"] = key_id.strip()
+        if secret_key and os.environ.get("AWS_SECRET_ACCESS_KEY") != secret_key.strip():
+            os.environ["AWS_SECRET_ACCESS_KEY"] = secret_key.strip()
+
         if self.profile_name:
             session = boto3.Session(profile_name=self.profile_name, region_name=self.region_name)
         else:

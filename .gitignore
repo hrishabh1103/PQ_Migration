@@ -29,3 +29,9 @@ htmlcov/
 .DS_Store
 .vscode/
 .idea/
+
+# Environment secrets
+.env
+*.env
+backend/.env
+
