@@ -19,7 +19,7 @@ class ServiceResponse(BaseModel):
 class AssetBase(BaseModel):
     hostname: Optional[str] = None
     ip_address: Optional[str] = None
-    asset_type: AssetType
+    asset_type: str
     environment: str
     operating_system: Optional[str] = None
 

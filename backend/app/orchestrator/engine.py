@@ -633,7 +633,7 @@ class DiscoveryOrchestrator:
                     if not existing:
                         cobj = CryptoObject(
                             object_type=getattr(obs, 'object_type', 'ALGORITHM'),
-                            canonical_name=obs.canonical_name if hasattr(obs, 'canonical_name') else (norm_id.name if norm_id else obs.raw_algorithm_name),
+                            canonical_name=obs.canonical_name if hasattr(obs, 'canonical_name') else (norm_id.canonical_id if norm_id else obs.raw_algorithm_name),
                             provider=getattr(obs, 'provider', connector_plugin_id.upper()),
                             identity_key=c_key,
                             provenance_id=prov.id,
@@ -645,6 +645,27 @@ class DiscoveryOrchestrator:
                         obj_map[c_key] = cobj.id
                     else:
                         obj_map[c_key] = existing.id
+
+                    # Create CryptoFinding for Risk & Findings Engines
+                    assoc_asset = db.query(Asset).filter(Asset.target_id == target.id).first()
+                    if assoc_asset:
+                        cf = CryptoFinding(
+                            discovery_run_id=discovery_run.id,
+                            provenance_id=prov.id,
+                            asset_id=assoc_asset.id,
+                            scanner_id=connector_plugin_id,
+                            scanner_version="1.0.0",
+                            finding_type="ALGORITHM",
+                            raw_algorithm_name=raw_algo,
+                            normalized_algorithm_id=norm_id.canonical_id if norm_id else "UNKNOWN",
+                            purpose=getattr(obs, 'object_type', 'GENERAL_ENCRYPTION'),
+                            location_identifier=c_key,
+                            evidence_snippet=f"Discovered via {connector_plugin_id.upper()} Connector: {raw_algo}",
+                            evidence_hash=ev_hash,
+                            confidence="HIGH",
+                            metadata_json=getattr(obs, 'metadata', {})
+                        )
+                        db.add(cf)
 
                 elif isinstance(obs, CertificateObservation):
                     fp = getattr(obs, 'fingerprint', getattr(obs, 'fingerprint_sha256', ''))
@@ -674,6 +695,27 @@ class DiscoveryOrchestrator:
                     else:
                         obj_map[cert_key] = existing.id
 
+                    assoc_asset = db.query(Asset).filter(Asset.target_id == target.id).first()
+                    norm_cert_algo = NormalizationEngine.normalize_and_get_or_create(db, getattr(obs, 'signature_algorithm', 'RSA-2048'))
+                    if assoc_asset:
+                        cf = CryptoFinding(
+                            discovery_run_id=discovery_run.id,
+                            provenance_id=prov.id,
+                            asset_id=assoc_asset.id,
+                            scanner_id=connector_plugin_id,
+                            scanner_version="1.0.0",
+                            finding_type="CERTIFICATE",
+                            raw_algorithm_name=getattr(obs, 'signature_algorithm', 'RSA-2048'),
+                            normalized_algorithm_id=norm_cert_algo.canonical_id if norm_cert_algo else "UNKNOWN",
+                            purpose="DIGITAL_SIGNATURE",
+                            location_identifier=cert_key,
+                            evidence_snippet=f"X.509 Certificate ({obs.subject}) via {connector_plugin_id.upper()}",
+                            evidence_hash=ev_hash,
+                            confidence="HIGH",
+                            metadata_json={"subject": obs.subject, "issuer": obs.issuer}
+                        )
+                        db.add(cf)
+
                 elif isinstance(obs, RelationshipObservation):
                     src_hint = getattr(obs, 'source_id_hint', getattr(obs, 'source_provider_resource_id', None))
                     tgt_hint = getattr(obs, 'target_id_hint', getattr(obs, 'target_provider_resource_id', None))
@@ -687,6 +729,7 @@ class DiscoveryOrchestrator:
                         tgt_id = tgt_hint
 
                     if src_id and tgt_id:
+                        target_ent_type = obs.target_type if (hasattr(obs, 'target_type') and obs.target_type) else ("CRYPTO_OBJECT" if (tgt_hint and (str(tgt_hint).startswith("crypto:") or str(tgt_hint).startswith("cert:"))) else "ASSET")
                         rel = db.query(Relationship).filter(
                             Relationship.source_entity_id == src_id,
                             Relationship.target_entity_id == tgt_id,
@@ -696,7 +739,7 @@ class DiscoveryOrchestrator:
                             rel = Relationship(
                                 source_entity_type="ASSET",
                                 source_entity_id=src_id,
-                                target_entity_type="ASSET" if tgt_hint not in [k for k in obj_map if k.startswith("cert:")] else "CRYPTO_OBJECT",
+                                target_entity_type=target_ent_type,
                                 target_entity_id=tgt_id,
                                 relationship_type=obs.relationship_type,
                                 scanner_or_connector_id=connector_plugin_id,
@@ -715,6 +758,13 @@ class DiscoveryOrchestrator:
             discovery_run.completed_at = utc_now()
             discovery_run.stats_json = {"observations_processed": obs_count, "status": "COMPLETED"}
             db.commit()
+
+            # Execute PQC Readiness Evaluation across targets post-sync
+            from app.readiness.evaluator import ReadinessEvaluator
+            try:
+                ReadinessEvaluator.execute_assessment_run(db=db, target_id=target.id)
+            except Exception as eval_err:
+                logger.warning(f"Post-sync readiness evaluation failed for target '{target_id}': {eval_err}")
 
         except Exception as e:
             logger.error(f"AWSConnector sync failed for target '{target_id}': {e}", exc_info=True)

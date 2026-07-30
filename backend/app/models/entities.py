@@ -98,6 +98,8 @@ class FindingType(str, enum.Enum):
     HASH_FUNCTION = "HASH_FUNCTION"
     SIGNATURE_ALGORITHM = "SIGNATURE_ALGORITHM"
     LIBRARY_DEPENDENCY = "LIBRARY_DEPENDENCY"
+    ALGORITHM = "ALGORITHM"
+    CERTIFICATE = "CERTIFICATE"
 
 class FindingPurpose(str, enum.Enum):
     AUTHENTICATION = "AUTHENTICATION"
@@ -284,7 +286,7 @@ class CryptoFinding(Base):
     __tablename__ = "crypto_findings"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    scan_job_id: Mapped[str] = mapped_column(String(36), ForeignKey("scan_jobs.id"), nullable=False)
+    scan_job_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("scan_jobs.id"), nullable=True)
     discovery_run_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("discovery_runs.id"), nullable=True)
     provenance_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("provenance.id"), nullable=True)
 
@@ -294,7 +296,7 @@ class CryptoFinding(Base):
     
     scanner_id: Mapped[str] = mapped_column(String(64), nullable=False)
     scanner_version: Mapped[str] = mapped_column(String(32), default="1.0.0", nullable=False)
-    finding_type: Mapped[FindingType] = mapped_column(SQLEnum(FindingType), nullable=False)
+    finding_type: Mapped[str] = mapped_column(String(64), nullable=False)
     raw_algorithm_name: Mapped[str] = mapped_column(String(128), nullable=False)
     normalized_algorithm_id: Mapped[str] = mapped_column(String(64), ForeignKey("normalized_algorithms.canonical_id"), nullable=False)
     purpose: Mapped[FindingPurpose] = mapped_column(SQLEnum(FindingPurpose), default=FindingPurpose.UNKNOWN, nullable=False)

@@ -21,15 +21,15 @@ class NormalizedAlgorithmResponse(BaseModel):
 
 class CryptoFindingResponse(BaseModel):
     id: str
-    scan_job_id: str
+    scan_job_id: Optional[str] = None
     asset_id: str
     service_id: Optional[str] = None
     scanner_id: str
     scanner_version: str
-    finding_type: FindingType
+    finding_type: str
     raw_algorithm_name: str
     normalized_algorithm_id: str
-    purpose: FindingPurpose
+    purpose: str
     location_identifier: str
     evidence_snippet: str
     evidence_hash: str
