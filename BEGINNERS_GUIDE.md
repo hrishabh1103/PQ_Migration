@@ -250,12 +250,20 @@ The system automatically classifies findings into 4 vulnerability levels based o
 
 ---
 
-## 📄 7. Exporting Reports & CBOM (Cryptographic Bill of Materials)
+## 📄 7. Exporting Reports, Saving Archives & Clearing Scan History
 
+### Exporting Reports & Backup Archives
 After running discovery scans:
-1. Navigate to **PQC Readiness & Reports** tab.
-2. **Download Markdown Report:** Click **Download Audit Report (.md)** to get a comprehensive remediation report document (`PQC_Cryptographic_Remediation_Report.md`).
-3. **Export CycloneDX 1.6 CBOM:** Click **Export CycloneDX 1.6 CBOM (.json)** to generate an official CycloneDX 1.6 Cryptographic Bill of Materials JSON document (`cyclonedx_cbom_1.6.json`).
+1. Navigate to **Scans** or **Reports & Readiness** tab.
+2. **Download Full Backup Archive:** Click **Save Archive (.json)** (or request `GET /api/v1/scans/export/archive`) to download a complete JSON backup archive containing all targets, scan executions, and cryptographic findings (`pqc_discovery_archive.json`).
+3. **Download Markdown Report:** Click **Download Report (.md)** to get a comprehensive remediation report document (`PQC_Cryptographic_Remediation_Report.md`).
+4. **Export CycloneDX 1.6 CBOM:** Click **Export CBOM (.json)** to generate an official CycloneDX 1.6 Cryptographic Bill of Materials JSON document (`cyclonedx_cbom_1.6.json`).
+
+### Clearing Scan History & Deleting Jobs
+To reset your environment or start a fresh audit:
+1. **Clear All History:** On the **Scans** or **Reports** page, click the red **Clear Scan History** button. A modal prompt will appear giving you the option to download a backup archive before permanently purging scan logs and findings from the database.
+2. **Delete Single Scan:** On the **Scans** page, click the red trash icon on any individual scan job row to delete that specific scan and its findings.
+
 
 ---
 

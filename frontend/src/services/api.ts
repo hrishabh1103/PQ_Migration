@@ -124,3 +124,24 @@ export function downloadRemediationMarkdown() {
 export function downloadCycloneDXCBOM() {
   window.open(`${API_BASE}/cbom/export`, '_blank');
 }
+
+export function downloadInventoryArchive() {
+  window.open(`${API_BASE}/scans/export/archive`, '_blank');
+}
+
+export async function deleteScan(scanId: string) {
+  const res = await fetch(`${API_BASE}/scans/${scanId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error(`Failed to delete scan ${scanId}`);
+  return res.json();
+}
+
+export async function clearAllScans() {
+  const res = await fetch(`${API_BASE}/scans`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to clear scan history');
+  return res.json();
+}
+

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { fetchRemediationReport, downloadRemediationMarkdown, downloadCycloneDXCBOM } from '../services/api';
-import { FileDown, ShieldAlert, AlertTriangle, CheckCircle2, RefreshCw, Cpu, BookOpen, Layers } from 'lucide-react';
+import { fetchRemediationReport, downloadRemediationMarkdown, downloadCycloneDXCBOM, downloadInventoryArchive, clearAllScans } from '../services/api';
+import { FileDown, ShieldAlert, AlertTriangle, CheckCircle2, RefreshCw, Cpu, BookOpen, Layers, Download, Trash2 } from 'lucide-react';
 
 import { PageHeader } from '../components/common/PageHeader';
 
@@ -8,6 +8,8 @@ export const ReportsPage: React.FC = () => {
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showClearModal, setShowClearModal] = useState<boolean>(false);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const loadReport = async () => {
     try {
@@ -18,6 +20,19 @@ export const ReportsPage: React.FC = () => {
       setError(err.message || 'Failed to load report');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClearHistory = async () => {
+    try {
+      setError(null);
+      const res = await clearAllScans();
+      setShowClearModal(false);
+      setActionSuccess(res.message);
+      loadReport();
+      setTimeout(() => setActionSuccess(null), 4000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to clear scan history');
     }
   };
 
@@ -46,13 +61,22 @@ export const ReportsPage: React.FC = () => {
         icon={ShieldAlert}
         breadcrumbs={[{ label: 'Migration' }, { label: 'Reports & Readiness' }]}
         actions={
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={downloadInventoryArchive}
+              className="flex items-center space-x-2 px-3.5 py-2 rounded-xl border border-slate-700 bg-slate-900 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-mono transition"
+              title="Export complete inventory archive as JSON"
+            >
+              <Download className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Save Archive (.json)</span>
+            </button>
+
             <button
               onClick={downloadCycloneDXCBOM}
               className="flex items-center space-x-2 px-3.5 py-2 rounded-xl border border-slate-700 bg-slate-900 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-mono transition"
             >
               <Layers className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Export CycloneDX 1.6 CBOM (.json)</span>
+              <span>Export CBOM (.json)</span>
             </button>
 
             <button
@@ -60,11 +84,65 @@ export const ReportsPage: React.FC = () => {
               className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition shadow-lg shadow-cyan-500/20"
             >
               <FileDown className="w-3.5 h-3.5" />
-              <span>Download Markdown Report</span>
+              <span>Download Report (.md)</span>
+            </button>
+
+            <button
+              onClick={() => setShowClearModal(true)}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-mono transition"
+              title="Clear all findings and scan history"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+              <span>Clear History</span>
             </button>
           </div>
         }
       />
+
+      {actionSuccess && (
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm font-mono flex items-center space-x-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <span>{actionSuccess}</span>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showClearModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel p-6 rounded-2xl max-w-md w-full border border-slate-800 space-y-4">
+            <div className="flex items-center space-x-3 text-rose-400">
+              <AlertTriangle className="w-6 h-6 flex-shrink-0" />
+              <h3 className="text-lg font-bold text-white">Clear All Reports & Findings?</h3>
+            </div>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              This action will reset report findings and clear previous scan executions from the database.
+            </p>
+            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-300">
+              💡 Tip: Click <strong>"Download Backup Archive"</strong> below to save a copy before clearing.
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+              <button
+                onClick={downloadInventoryArchive}
+                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-mono transition"
+              >
+                Download Backup Archive
+              </button>
+              <button
+                onClick={() => setShowClearModal(false)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleClearHistory}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs transition"
+              >
+                Clear History
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm">

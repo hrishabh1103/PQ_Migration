@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScanJob, AuthorizedTarget } from '../types';
-import { fetchScans, fetchTargets, createScan } from '../services/api';
-import { Play, RefreshCw, CheckCircle, Clock, XCircle, AlertCircle, Cpu } from 'lucide-react';
+import { fetchScans, fetchTargets, createScan, deleteScan, clearAllScans, downloadInventoryArchive } from '../services/api';
+import { Play, RefreshCw, CheckCircle, Clock, XCircle, AlertCircle, Cpu, Trash2, Download, AlertTriangle } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
 
 const AVAILABLE_SCANNERS = [
@@ -21,6 +21,8 @@ export const ScansPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('');
   const [selectedScannerId, setSelectedScannerId] = useState<string>('all');
+  const [showClearModal, setShowClearModal] = useState<boolean>(false);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const loadData = async () => {
     try {
@@ -57,6 +59,31 @@ export const ScansPage: React.FC = () => {
     }
   };
 
+  const handleDeleteSingleScan = async (scanId: string) => {
+    try {
+      setError(null);
+      await deleteScan(scanId);
+      setActionSuccess(`Scan job ${scanId.substring(0, 8)} deleted.`);
+      loadData();
+      setTimeout(() => setActionSuccess(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete scan job');
+    }
+  };
+
+  const handleConfirmClearAll = async () => {
+    try {
+      setError(null);
+      const res = await clearAllScans();
+      setShowClearModal(false);
+      setActionSuccess(res.message);
+      loadData();
+      setTimeout(() => setActionSuccess(null), 4000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to clear scan history');
+    }
+  };
+
   const getTargetName = (targetId: string) => {
     const t = targets.find((item) => item.id === targetId);
     return t ? t.name : targetId;
@@ -66,7 +93,7 @@ export const ScansPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Scan Jobs & Executions"
-        description="Real-time execution status and history of discovery orchestrations."
+        description="Real-time execution status, archive management, and history of discovery orchestrations."
         icon={Play}
         breadcrumbs={[{ label: 'Discovery' }, { label: 'Scans' }]}
         actions={
@@ -103,14 +130,78 @@ export const ScansPage: React.FC = () => {
               <Play className="w-3.5 h-3.5 fill-white" />
               <span>Trigger Scan</span>
             </button>
+
+            <button
+              onClick={downloadInventoryArchive}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl border border-slate-700 bg-slate-900 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-mono transition"
+              title="Download full JSON archive of all targets, scans, and findings"
+            >
+              <Download className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Save Archive (.json)</span>
+            </button>
+
+            <button
+              onClick={() => setShowClearModal(true)}
+              disabled={scans.length === 0}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-mono transition disabled:opacity-40"
+              title="Clear all previous scan history and findings"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+              <span>Clear Scan History</span>
+            </button>
           </div>
         }
       />
+
+      {actionSuccess && (
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm font-mono flex items-center space-x-2">
+          <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <span>{actionSuccess}</span>
+        </div>
+      )}
 
       {error && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center space-x-3 text-sm">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span>{error}</span>
+        </div>
+      )}
+
+      {/* Confirmation Modal for Clear History */}
+      {showClearModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel p-6 rounded-2xl max-w-md w-full border border-slate-800 space-y-4">
+            <div className="flex items-center space-x-3 text-rose-400">
+              <AlertTriangle className="w-6 h-6 flex-shrink-0" />
+              <h3 className="text-lg font-bold text-white">Clear All Scan History?</h3>
+            </div>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              This action will purge all previous scan execution logs and discovered findings from the database.
+            </p>
+            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-300">
+              💡 Tip: Click <strong>"Download Backup Archive"</strong> below to save a copy before clearing.
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+              <button
+                onClick={downloadInventoryArchive}
+                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-mono transition"
+              >
+                Download Backup Archive
+              </button>
+              <button
+                onClick={() => setShowClearModal(false)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmClearAll}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs transition"
+              >
+                Clear History
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -138,7 +229,7 @@ export const ScansPage: React.FC = () => {
                   <th className="p-4">Requested Scanners</th>
                   <th className="p-4">Status</th>
                   <th className="p-4">Findings Summary</th>
-                  <th className="p-4 text-right">Timestamps</th>
+                  <th className="p-4 text-right">Actions / Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-sm">
@@ -195,7 +286,16 @@ export const ScansPage: React.FC = () => {
                         )}
                       </td>
                       <td className="p-4 text-right font-mono text-xs text-slate-400">
-                        {s.completed_at ? new Date(s.completed_at).toLocaleTimeString() : s.started_at ? new Date(s.started_at).toLocaleTimeString() : 'Queued'}
+                        <div className="flex items-center justify-end space-x-3">
+                          <span>{s.completed_at ? new Date(s.completed_at).toLocaleTimeString() : s.started_at ? new Date(s.started_at).toLocaleTimeString() : 'Queued'}</span>
+                          <button
+                            onClick={() => handleDeleteSingleScan(s.id)}
+                            className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition"
+                            title="Delete this scan job"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -208,3 +308,4 @@ export const ScansPage: React.FC = () => {
     </div>
   );
 };
+
