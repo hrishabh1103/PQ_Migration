@@ -26,3 +26,5 @@ class AssetReadinessResult(str, Enum):
     NOT_READY = "NOT_READY"
     INCOMPLETE_COVERAGE = "INCOMPLETE_COVERAGE"
     UNKNOWN = "UNKNOWN"
+    NOT_ASSESSED = "NOT_ASSESSED"  # No cryptographic evidence collected for this asset
+

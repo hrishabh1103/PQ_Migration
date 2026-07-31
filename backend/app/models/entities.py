@@ -435,12 +435,20 @@ class ReadinessAssessment(Base):
     policy_id: Mapped[str] = mapped_column(String(64), default="pqc-default", nullable=False)
     policy_version: Mapped[str] = mapped_column(String(32), default="v1.0", nullable=False)
 
-    readiness_result: Mapped[str] = mapped_column(String(32), nullable=False) # READY, PARTIALLY_READY, NOT_READY, INCOMPLETE_COVERAGE, UNKNOWN
+    readiness_result: Mapped[str] = mapped_column(String(32), nullable=False) # READY, PARTIALLY_READY, NOT_READY, NOT_ASSESSED, INCOMPLETE_COVERAGE, UNKNOWN
     quantum_exposure: Mapped[str] = mapped_column(String(32), nullable=False) # QUANTUM_VULNERABLE, QUANTUM_RESISTANT, HYBRID, NOT_APPLICABLE, UNKNOWN
-    
-    migration_priority_score: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    migration_category: Mapped[str] = mapped_column(String(32), default="LOW", nullable=False) # CRITICAL, HIGH, MEDIUM, LOW, NEGLIGIBLE
+
+    # Nullable: None means assessment was not performed (no evidence)
+    migration_priority_score: Mapped[Optional[int]] = mapped_column(Integer, default=None, nullable=True)
+    migration_category: Mapped[Optional[str]] = mapped_column(String(32), default=None, nullable=True) # CRITICAL, HIGH, MEDIUM, LOW, NEGLIGIBLE, or None
     confidence: Mapped[str] = mapped_column(String(32), default="MEDIUM", nullable=False)
+
+    # Evidence counts at time of assessment
+    evidence_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    vulnerable_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    resistant_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    hybrid_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    unknown_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     known_factors_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     unknown_factors_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)

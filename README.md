@@ -5,6 +5,9 @@
 
 > **Runtime Truth Recovery V1 Complete** — All hardcoded/synthetic demo data has been purged. Every value displayed in the UI is now derived from real runtime evidence. Zero-state shows empty results. Real TLS scans produce real findings.
 
+> **Evidence-Driven PQC Instance Report — COMPLETE** — Per-asset PQC reports are now fully evidence-driven. No asset receives a numeric score without cryptographic evidence. `cloud_account`, `cloud_region`, and API-only assets return `NOT_ASSESSED` with `score=null`. Scores are computed by a transparent, evidence-referenced rules engine (not hardcoded constants). 26/26 anti-constant acceptance tests pass.
+
+
 ---
 
 ## 🔰 [CLICK HERE FOR THE BEGINNER'S GUIDE](BEGINNERS_GUIDE.md)

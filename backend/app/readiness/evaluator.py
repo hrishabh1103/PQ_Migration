@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 
-from app.models.entities import Asset, AuthorizedTarget, CryptoObject, Relationship, DiscoveryCoverage, ReadinessAssessment, AssessmentRun, utc_now
+from app.models.entities import Asset, CryptoFinding, CryptoObject, Relationship, DiscoveryCoverage, ReadinessAssessment, AssessmentRun, utc_now
 from app.readiness.taxonomy import CryptographicPurpose, PrimitiveQuantumStatus, AssetReadinessResult
 from app.readiness.policy import ReadinessPolicy
 from app.readiness.classifier import PqcClassifier
@@ -10,11 +10,31 @@ from app.readiness.priority import MigrationPriorityEngine
 
 logger = logging.getLogger(__name__)
 
+
+# Maps CryptoFinding.finding_type to CryptographicPurpose for classifier
+_FINDING_TYPE_TO_PURPOSE = {
+    "CERTIFICATE_PUBLIC_KEY": CryptographicPurpose.CERTIFICATE_SIGNATURE,
+    "KEY_EXCHANGE": CryptographicPurpose.KEY_ESTABLISHMENT,
+    "SYMMETRIC_CIPHER": CryptographicPurpose.SYMMETRIC_ENCRYPTION,
+    "SIGNATURE_ALGORITHM": CryptographicPurpose.DIGITAL_SIGNATURE,
+    "MAC": CryptographicPurpose.MAC,
+    "HASH": CryptographicPurpose.HASH,
+    "KEY_DERIVATION": CryptographicPurpose.KEY_ESTABLISHMENT,
+    "PUBLIC_KEY_ENCRYPTION": CryptographicPurpose.PUBLIC_KEY_ENCRYPTION,
+    "CODE_SIGNING": CryptographicPurpose.CODE_SIGNING,
+    "IDENTITY_AUTHENTICATION": CryptographicPurpose.IDENTITY_AUTHENTICATION,
+    "STORAGE_ENCRYPTION": CryptographicPurpose.STORAGE_ENCRYPTION,
+    "KMS_KEY": CryptographicPurpose.KEY_ESTABLISHMENT,
+}
+
+
 class ReadinessEvaluator:
     """
-    Evaluates PQC Readiness for Assets & Targets based on versioned policy rules.
-    Enforces coverage-aware readiness: Incomplete coverage prevents READY classification.
-    Persists historical ReadinessAssessment records linked to an AssessmentRun without overwriting past runs.
+    Evidence-driven PQC Readiness Evaluator.
+
+    INVARIANT: NO EVIDENCE = NO SCORE.
+    Only produces a ReadinessAssessment with a non-null score when
+    real CryptoFinding or CryptoObject evidence exists for the asset.
     """
 
     @classmethod
@@ -26,7 +46,8 @@ class ReadinessEvaluator:
         target_id: Optional[str] = None
     ) -> AssessmentRun:
         """
-        Executes a first-class AssessmentRun, creating a new AssessmentRun DB record and evaluating all targets/assets.
+        Executes a first-class AssessmentRun, evaluating all assets.
+        Assets with no crypto evidence receive NOT_ASSESSED status with null score.
         """
         run = AssessmentRun(
             policy_id=policy_id,
@@ -69,7 +90,6 @@ class ReadinessEvaluator:
         run.failed_entity_count = failed
         db.commit()
         db.refresh(run)
-
         return run
 
     @classmethod
@@ -85,13 +105,12 @@ class ReadinessEvaluator:
         if not asset:
             raise ValueError(f"Asset '{asset_id}' not found")
 
-        # Create or link AssessmentRun if not provided
+        # Create or link AssessmentRun
         if not assessment_run_id:
             run = db.query(AssessmentRun).filter(
                 AssessmentRun.policy_id == policy_id,
                 AssessmentRun.policy_version == policy_version
             ).order_by(AssessmentRun.started_at.desc()).first()
-
             if not run:
                 run = AssessmentRun(
                     policy_id=policy_id,
@@ -105,96 +124,142 @@ class ReadinessEvaluator:
                 db.refresh(run)
             assessment_run_id = run.id
 
-        # 1. Fetch Discovery Coverage
-        coverage_records = db.query(DiscoveryCoverage).filter(DiscoveryCoverage.asset_id == asset_id).all()
-        has_scanned_coverage = any(c.status == "SCANNED" for c in coverage_records)
-        has_incomplete_coverage = any(c.status in ["NOT_SCANNED", "PARTIALLY_SCANNED", "FAILED"] for c in coverage_records) or len(coverage_records) == 0
+        # === PRIMARY EVIDENCE: CryptoFinding rows linked by asset_id ===
+        findings = db.query(CryptoFinding).filter(CryptoFinding.asset_id == asset_id).all()
 
-        # 2. Query Cryptographic Objects linked to Asset
+        # === SECONDARY EVIDENCE: CryptoObject via Relationship ===
         relationships = db.query(Relationship).filter(
             (Relationship.source_entity_id == asset_id) | (Relationship.target_entity_id == asset_id)
         ).all()
-
         crypto_object_ids = set()
         for r in relationships:
             if r.source_entity_type in ["CRYPTO_OBJECT", "CERTIFICATE"]:
                 crypto_object_ids.add(r.source_entity_id)
             if r.target_entity_type in ["CRYPTO_OBJECT", "CERTIFICATE"]:
                 crypto_object_ids.add(r.target_entity_id)
-
         crypto_objects = db.query(CryptoObject).filter(CryptoObject.id.in_(crypto_object_ids)).all() if crypto_object_ids else []
 
+        total_evidence = len(findings) + len(crypto_objects)
+
+        # ====================================================================
+        # GATE: NO EVIDENCE = NOT_ASSESSED, null score
+        # ====================================================================
+        if total_evidence == 0:
+            assessment = ReadinessAssessment(
+                assessment_run_id=assessment_run_id,
+                asset_id=asset.id,
+                target_id=asset.target_id,
+                policy_id=policy_id,
+                policy_version=policy_version,
+                readiness_result="NOT_ASSESSED",
+                quantum_exposure="UNKNOWN",
+                migration_priority_score=None,   # null — no evidence
+                migration_category=None,          # null — no evidence
+                confidence="LOW",
+                evidence_count=0,
+                vulnerable_count=0,
+                resistant_count=0,
+                hybrid_count=0,
+                unknown_count=0,
+                known_factors_json={"factors": []},
+                unknown_factors_json={"factors": ["No cryptographic evidence collected for this asset."]},
+                factor_breakdown_json={},
+                rationale="No cryptographic evidence collected. Assessment cannot be performed."
+            )
+            db.add(assessment)
+            db.commit()
+            db.refresh(assessment)
+            return assessment
+
+        # ====================================================================
+        # EVIDENCE EXISTS — classify each primitive
+        # ====================================================================
         vulnerable_count = 0
         resistant_count = 0
         hybrid_count = 0
+        unknown_count = 0
         highest_priority_score = 0
         top_priority_data: Dict[str, Any] = {}
+        overall_quantum_exposure = PrimitiveQuantumStatus.UNKNOWN
 
-        overall_quantum_exposure = PrimitiveQuantumStatus.NOT_APPLICABLE
+        # Classify CryptoFindings
+        for finding in findings:
+            purpose = _FINDING_TYPE_TO_PURPOSE.get(finding.finding_type, CryptographicPurpose.UNKNOWN)
+            # Skip symmetric/hash from vulnerability scoring — they don't affect PQC score
+            if purpose in [CryptographicPurpose.SYMMETRIC_ENCRYPTION, CryptographicPurpose.HASH, CryptographicPurpose.MAC]:
+                continue
 
-        if not crypto_objects:
-            if has_incomplete_coverage:
-                readiness_result = AssetReadinessResult.INCOMPLETE_COVERAGE
-                overall_quantum_exposure = PrimitiveQuantumStatus.UNKNOWN
-            else:
-                readiness_result = AssetReadinessResult.UNKNOWN  # NO_VULNERABILITY_FOUND != READY
-                overall_quantum_exposure = PrimitiveQuantumStatus.NOT_APPLICABLE
-        else:
-            for cobj in crypto_objects:
-                purpose = CryptographicPurpose.KEY_ESTABLISHMENT
-                if "CERT" in cobj.object_type or "SIGN" in cobj.object_type:
-                    purpose = CryptographicPurpose.DIGITAL_SIGNATURE
+            status, rec, rat = PqcClassifier.classify_primitive(finding.raw_algorithm_name, purpose)
 
-                status, rec, rat = PqcClassifier.classify_primitive(cobj.canonical_name, purpose)
+            if status == PrimitiveQuantumStatus.QUANTUM_VULNERABLE:
+                vulnerable_count += 1
+            elif status == PrimitiveQuantumStatus.HYBRID:
+                hybrid_count += 1
+            elif status == PrimitiveQuantumStatus.QUANTUM_RESISTANT:
+                resistant_count += 1
+            elif status == PrimitiveQuantumStatus.UNKNOWN:
+                unknown_count += 1
 
-                if status == PrimitiveQuantumStatus.QUANTUM_VULNERABLE:
-                    vulnerable_count += 1
-                elif status == PrimitiveQuantumStatus.HYBRID:
-                    hybrid_count += 1
-                elif status == PrimitiveQuantumStatus.QUANTUM_RESISTANT:
-                    resistant_count += 1
+            p_res = MigrationPriorityEngine.calculate_priority(
+                quantum_status=status,
+                purpose=purpose,
+                is_internet_exposed=None,
+                business_criticality=None,
+                coverage_status="SCANNED"
+            )
+            if p_res["priority_score"] >= highest_priority_score:
+                highest_priority_score = p_res["priority_score"]
+                top_priority_data = p_res
 
-                # Calculate priority for this primitive
-                p_res = MigrationPriorityEngine.calculate_priority(
-                    quantum_status=status,
-                    purpose=purpose,
-                    is_internet_exposed=False,
-                    business_criticality="MEDIUM",
-                    coverage_status="SCANNED" if has_scanned_coverage else "NOT_SCANNED"
-                )
+        # Classify CryptoObjects (secondary evidence)
+        for cobj in crypto_objects:
+            purpose = CryptographicPurpose.KEY_ESTABLISHMENT
+            if "CERT" in cobj.object_type or "SIGN" in cobj.object_type:
+                purpose = CryptographicPurpose.DIGITAL_SIGNATURE
+            status, rec, rat = PqcClassifier.classify_primitive(cobj.canonical_name, purpose)
+            if status == PrimitiveQuantumStatus.QUANTUM_VULNERABLE:
+                vulnerable_count += 1
+            elif status == PrimitiveQuantumStatus.HYBRID:
+                hybrid_count += 1
+            elif status == PrimitiveQuantumStatus.QUANTUM_RESISTANT:
+                resistant_count += 1
+            elif status == PrimitiveQuantumStatus.UNKNOWN:
+                unknown_count += 1
+            p_res = MigrationPriorityEngine.calculate_priority(
+                quantum_status=status,
+                purpose=purpose,
+                coverage_status="SCANNED"
+            )
+            if p_res["priority_score"] >= highest_priority_score:
+                highest_priority_score = p_res["priority_score"]
+                top_priority_data = p_res
 
-                if p_res["priority_score"] >= highest_priority_score:
-                    highest_priority_score = p_res["priority_score"]
-                    top_priority_data = p_res
+        # Determine overall quantum exposure
+        if vulnerable_count > 0:
+            overall_quantum_exposure = PrimitiveQuantumStatus.QUANTUM_VULNERABLE
+        elif hybrid_count > 0:
+            overall_quantum_exposure = PrimitiveQuantumStatus.HYBRID
+        elif resistant_count > 0:
+            overall_quantum_exposure = PrimitiveQuantumStatus.QUANTUM_RESISTANT
 
-            # Determine Aggregate Asset Quantum Exposure
-            if vulnerable_count > 0:
-                overall_quantum_exposure = PrimitiveQuantumStatus.QUANTUM_VULNERABLE
-            elif hybrid_count > 0:
-                overall_quantum_exposure = PrimitiveQuantumStatus.HYBRID
-            elif resistant_count > 0:
-                overall_quantum_exposure = PrimitiveQuantumStatus.QUANTUM_RESISTANT
-
-            # Determine Asset Readiness Result (Coverage-Aware)
-            if has_incomplete_coverage:
-                readiness_result = AssetReadinessResult.INCOMPLETE_COVERAGE
-            elif vulnerable_count > 0:
-                readiness_result = AssetReadinessResult.NOT_READY
-            elif hybrid_count > 0 or (resistant_count > 0 and (vulnerable_count > 0 or has_incomplete_coverage)):
-                readiness_result = AssetReadinessResult.PARTIALLY_READY
-            elif resistant_count > 0 and vulnerable_count == 0 and not has_incomplete_coverage:
-                readiness_result = AssetReadinessResult.READY
-            else:
-                readiness_result = AssetReadinessResult.UNKNOWN
-
+        # All primitives were symmetric/hash (score-irrelevant)
         if not top_priority_data:
             top_priority_data = MigrationPriorityEngine.calculate_priority(
                 quantum_status=overall_quantum_exposure,
                 purpose=CryptographicPurpose.UNKNOWN,
-                coverage_status="NOT_SCANNED" if has_incomplete_coverage else "SCANNED"
+                coverage_status="SCANNED"
             )
 
-        # 3. Create & Persist ReadinessAssessment Historical Record
+        # Determine readiness result
+        if vulnerable_count > 0:
+            readiness_result = AssetReadinessResult.NOT_READY
+        elif hybrid_count > 0:
+            readiness_result = AssetReadinessResult.PARTIALLY_READY
+        elif resistant_count > 0:
+            readiness_result = AssetReadinessResult.READY
+        else:
+            readiness_result = AssetReadinessResult.UNKNOWN
+
         assessment = ReadinessAssessment(
             assessment_run_id=assessment_run_id,
             asset_id=asset.id,
@@ -203,9 +268,14 @@ class ReadinessEvaluator:
             policy_version=policy_version,
             readiness_result=readiness_result.value if isinstance(readiness_result, AssetReadinessResult) else readiness_result,
             quantum_exposure=overall_quantum_exposure.value if isinstance(overall_quantum_exposure, PrimitiveQuantumStatus) else overall_quantum_exposure,
-            migration_priority_score=top_priority_data.get("priority_score", 0),
-            migration_category=top_priority_data.get("category", "LOW"),
+            migration_priority_score=top_priority_data.get("priority_score"),  # may be 0 for PQC-only
+            migration_category=top_priority_data.get("category"),
             confidence=top_priority_data.get("confidence", "MEDIUM"),
+            evidence_count=total_evidence,
+            vulnerable_count=vulnerable_count,
+            resistant_count=resistant_count,
+            hybrid_count=hybrid_count,
+            unknown_count=unknown_count,
             known_factors_json={"factors": top_priority_data.get("known_factors", [])},
             unknown_factors_json={"factors": top_priority_data.get("unknown_factors", [])},
             factor_breakdown_json=top_priority_data.get("factor_breakdown", {}),
@@ -214,5 +284,4 @@ class ReadinessEvaluator:
         db.add(assessment)
         db.commit()
         db.refresh(assessment)
-
         return assessment
