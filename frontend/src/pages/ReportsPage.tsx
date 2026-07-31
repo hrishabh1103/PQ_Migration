@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { fetchRemediationReport, downloadRemediationMarkdown, downloadCycloneDXCBOM, downloadInventoryArchive, clearAllScans } from '../services/api';
-import { FileDown, ShieldAlert, AlertTriangle, CheckCircle2, RefreshCw, Cpu, BookOpen, Layers, Download, Trash2 } from 'lucide-react';
+import { FileDown, AlertTriangle, CheckCircle2, RefreshCw, Cpu, BookOpen, Download, Trash2, Shield } from 'lucide-react';
 
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 export const ReportsPage: React.FC = () => {
+  const { selectedAssetId, openReport, closeReport } = useInstanceReport();
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,60 +52,61 @@ export const ReportsPage: React.FC = () => {
     );
   }
 
-  const summary = report?.summary || { total_findings: 0, quantum_vulnerable_count: 0, severity_counts: {} };
+  const summary = report?.summary || {};
   const vulns = report?.vulnerabilities || [];
 
   return (
     <div className="space-y-6">
-      {/* Reusable Page Header */}
       <PageHeader
-        title="PQC Migration Risk & Remediation Report"
-        description="Automated analysis of cryptographic flaws, NIST FIPS 203/204/205 compliance, and mitigation strategies."
-        icon={ShieldAlert}
-        breadcrumbs={[{ label: 'Migration' }, { label: 'Reports & Readiness' }]}
+        title="PQC Migration Reports & Documents"
+        description="Download audit report documents, export CycloneDX 1.6 Cryptographic Bill of Materials (CBOM), or review remediation roadmaps."
+        icon={BookOpen}
+        breadcrumbs={[{ label: 'Reports' }, { label: 'Remediation Roadmap' }]}
         actions={
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center space-x-2">
             <button
-              onClick={downloadInventoryArchive}
-              className="flex items-center space-x-2 px-3.5 py-2 rounded-xl border border-slate-700 bg-slate-900 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-mono transition"
-              title="Export complete inventory archive as JSON"
+              onClick={() => downloadRemediationMarkdown()}
+              className="px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs font-mono transition flex items-center space-x-1.5 shadow-lg shadow-cyan-500/20"
             >
-              <Download className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Save Archive (.json)</span>
-            </button>
-
-            <button
-              onClick={downloadCycloneDXCBOM}
-              className="flex items-center space-x-2 px-3.5 py-2 rounded-xl border border-slate-700 bg-slate-900 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-mono transition"
-            >
-              <Layers className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Export CBOM (.json)</span>
-            </button>
-
-            <button
-              onClick={downloadRemediationMarkdown}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition shadow-lg shadow-cyan-500/20"
-            >
-              <FileDown className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5" />
               <span>Download Report (.md)</span>
             </button>
-
+            <button
+              onClick={() => downloadCycloneDXCBOM()}
+              className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs font-mono transition flex items-center space-x-1.5 shadow-lg shadow-emerald-500/20"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              <span>Export CBOM 1.6 (.json)</span>
+            </button>
+            <button
+              onClick={() => downloadInventoryArchive()}
+              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs font-mono transition flex items-center space-x-1.5 shadow-lg shadow-indigo-600/20"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export Archive (.json)</span>
+            </button>
             <button
               onClick={() => setShowClearModal(true)}
-              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-mono transition"
-              title="Clear all findings and scan history"
+              className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition"
+              title="Clear all scan history"
             >
-              <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-              <span>Clear History</span>
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         }
       />
 
       {actionSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm font-mono flex items-center space-x-2">
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center space-x-2 text-xs font-mono">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
           <span>{actionSuccess}</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 flex items-center space-x-2 text-xs font-mono">
+          <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -141,12 +145,6 @@ export const ReportsPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm">
-          {error}
         </div>
       )}
 
@@ -205,9 +203,20 @@ export const ReportsPage: React.FC = () => {
                     <h3 className="text-lg font-bold text-white font-mono">{v.raw_algorithm}</h3>
                     <span className="text-xs font-mono text-slate-400">on <strong className="text-slate-200">{v.asset}</strong></span>
                   </div>
-                  <span className="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-md border border-cyan-500/20">
-                    {v.cnsa_timeline}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    {v.asset_id && (
+                      <button
+                        onClick={() => openReport(v.asset_id)}
+                        className="px-2.5 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 text-xs font-mono flex items-center space-x-1"
+                      >
+                        <Shield className="w-3.5 h-3.5" />
+                        <span>Inspect Report</span>
+                      </button>
+                    )}
+                    <span className="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-md border border-cyan-500/20">
+                      {v.cnsa_timeline}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
@@ -239,6 +248,9 @@ export const ReportsPage: React.FC = () => {
           })
         )}
       </div>
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };

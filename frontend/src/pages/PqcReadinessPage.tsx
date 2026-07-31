@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, AlertTriangle, CheckCircle, Info, HelpCircle, Network, ArrowRight, ShieldCheck } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, CheckCircle, Info, HelpCircle, Network, ArrowRight, FileText } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 interface SummaryData {
   policy: {
@@ -49,8 +51,11 @@ interface PqcReadinessPageProps {
 }
 
 export const PqcReadinessPage: React.FC<PqcReadinessPageProps> = ({ onNavigateGraph }) => {
+  const { selectedAssetId, openReport, closeReport } = useInstanceReport();
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [priorities, setPriorities] = useState<PriorityItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchReadinessData();
@@ -58,125 +63,118 @@ export const PqcReadinessPage: React.FC<PqcReadinessPageProps> = ({ onNavigateGr
 
   const fetchReadinessData = async () => {
     try {
-      const [sRes, pRes] = await Promise.all([
+      setLoading(true);
+      const [sumRes, prioRes] = await Promise.all([
         fetch('/api/v1/readiness/summary'),
-        fetch('/api/v1/readiness/migration-priorities')
+        fetch('/api/v1/readiness/assets')
       ]);
 
-      if (sRes.ok) {
-        const sData = await sRes.json();
-        setSummary(sData);
+      if (sumRes.ok) {
+        setSummary(await sumRes.json());
       }
-      if (pRes.ok) {
-        const pData = await pRes.json();
-        setPriorities(pData);
+      if (prioRes.ok) {
+        setPriorities(await prioRes.json());
       }
-    } catch (err) {
-      console.error('Failed to load PQC Readiness data:', err);
+    } catch (err: any) {
+      setError(`Failed to fetch PQC readiness assessments: ${err.message || err}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getCategoryBadge = (cat: string) => {
-    switch (cat) {
-      case 'CRITICAL':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">CRITICAL</span>;
-      case 'HIGH':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">HIGH</span>;
-      case 'MEDIUM':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">MEDIUM</span>;
-      default:
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-500/10 text-slate-400 border border-slate-500/20">LOW</span>;
+  const getCategoryBadge = (category: string) => {
+    switch (category?.toUpperCase()) {
+      case 'CRITICAL': return <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-rose-500/20 text-rose-300 border border-rose-500/30">CRITICAL</span>;
+      case 'HIGH':     return <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-rose-500/15 text-rose-400 border border-rose-500/30">HIGH</span>;
+      case 'MEDIUM':   return <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-500/15 text-amber-400 border border-amber-500/30">MEDIUM</span>;
+      case 'LOW':      return <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">LOW</span>;
+      default:         return <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-slate-700/40 text-slate-400 border border-slate-600/30">UNASSESSED</span>;
     }
   };
 
-  const getReadinessBadge = (state: string) => {
-    switch (state) {
-      case 'READY':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">READY</span>;
-      case 'PARTIALLY_READY':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">PARTIALLY READY</span>;
-      case 'NOT_READY':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/10 text-rose-400 border border-rose-500/20">NOT READY</span>;
-      case 'INCOMPLETE_COVERAGE':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20">INCOMPLETE COVERAGE</span>;
-      default:
-        return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-500/10 text-slate-400 border border-slate-500/20">UNKNOWN</span>;
+  const getReadinessBadge = (result: string) => {
+    switch (result?.toUpperCase()) {
+      case 'READY':              return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">READY</span>;
+      case 'PARTIALLY_READY':    return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20">PARTIALLY READY</span>;
+      case 'NOT_READY':          return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/10 text-rose-400 border border-rose-500/20">NOT READY</span>;
+      case 'INCOMPLETE_COVERAGE':return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">INCOMPLETE COVERAGE</span>;
+      default:                   return <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400">UNKNOWN</span>;
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <PageHeader
-        title="Post-Quantum Cryptographic Readiness & Migration Engine"
-        description="Provider-independent entity correlation, purpose-aware PQC classification, coverage-aware asset readiness, and versioned policy assessment."
-        icon={ShieldAlert}
-        badge={summary ? `Policy ${summary.policy.policy_id}:${summary.policy.policy_version}` : 'PQC Engine V1'}
-        breadcrumbs={[{ label: 'Migration' }, { label: 'PQC Readiness' }]}
+        title="PQC Migration Readiness Engine"
+        description="NIST FIPS 203 / 204 / 205 Policy-Driven Post-Quantum Migration Prioritization"
       />
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {loading && (
+        <div className="p-8 text-center text-slate-400 font-mono flex items-center justify-center space-x-2">
+          <FileText className="w-5 h-5 animate-pulse text-cyan-400" />
+          <span>Evaluating PQC Migration Readiness...</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-sm flex items-center">
+          <AlertTriangle className="w-4 h-4 mr-2 flex-shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* SUMMARY OVERVIEW CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono text-slate-400 uppercase">Quantum-Vulnerable</span>
-            <AlertTriangle className="w-4 h-4 text-rose-400" />
-          </div>
-          <div className="text-2xl font-bold text-rose-400">
-            {summary ? summary.quantum_exposure_breakdown.QUANTUM_VULNERABLE : 0}
-          </div>
-          <p className="text-[11px] text-slate-500 mt-1">Shor's algorithm exposed assets</p>
+          <div className="text-xs font-mono text-slate-400 mb-1">Total Inventoried Assets</div>
+          <div className="text-2xl font-bold text-slate-100">{summary?.total_assets_inventoried ?? 0}</div>
+          <div className="text-[11px] text-slate-500 mt-2 font-mono">Assessed: {summary?.total_assets_assessed ?? 0}</div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono text-slate-400 uppercase">Hybrid / PQC Usage</span>
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <div className="text-xs font-mono text-slate-400 mb-1">Quantum Exposure</div>
+          <div className="flex items-baseline space-x-2">
+            <span className="text-2xl font-bold text-rose-400">{summary?.quantum_exposure_breakdown?.QUANTUM_VULNERABLE ?? 0}</span>
+            <span className="text-xs text-slate-400 font-mono">vulnerable</span>
           </div>
-          <div className="text-2xl font-bold text-emerald-400">
-            {summary ? summary.quantum_exposure_breakdown.HYBRID + summary.quantum_exposure_breakdown.QUANTUM_RESISTANT : 0}
+          <div className="text-[11px] text-slate-500 mt-2 font-mono">
+            Resistant: {summary?.quantum_exposure_breakdown?.QUANTUM_RESISTANT ?? 0} | Hybrid: {summary?.quantum_exposure_breakdown?.HYBRID ?? 0}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">ML-KEM / ML-DSA transitioned</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono text-slate-400 uppercase">Incomplete Coverage</span>
-            <Info className="w-4 h-4 text-amber-400" />
+          <div className="text-xs font-mono text-slate-400 mb-1">PQC Readiness State</div>
+          <div className="flex items-baseline space-x-2">
+            <span className="text-2xl font-bold text-emerald-400">{summary?.asset_readiness_breakdown?.READY ?? 0}</span>
+            <span className="text-xs text-slate-400 font-mono">READY</span>
           </div>
-          <div className="text-2xl font-bold text-amber-400">
-            {summary ? summary.asset_readiness_breakdown.INCOMPLETE_COVERAGE : 0}
+          <div className="text-[11px] text-slate-500 mt-2 font-mono">
+            Not Ready: {summary?.asset_readiness_breakdown?.NOT_READY ?? 0} | Partially: {summary?.asset_readiness_breakdown?.PARTIALLY_READY ?? 0}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Assets requiring further scan scope</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono text-slate-400 uppercase">Critical Priorities</span>
-            <ShieldAlert className="w-4 h-4 text-cyan-400" />
-          </div>
-          <div className="text-2xl font-bold text-cyan-400">
-            {summary ? summary.critical_priority_items : 0}
-          </div>
-          <p className="text-[11px] text-slate-500 mt-1">Migration score ≥ 60</p>
+          <div className="text-xs font-mono text-slate-400 mb-1">Critical Priority Targets</div>
+          <div className="text-2xl font-bold text-rose-400">{summary?.critical_priority_items ?? 0}</div>
+          <div className="text-[11px] text-slate-500 mt-2 font-mono">Requires Immediate Migration</div>
         </div>
       </div>
 
-      {/* Migration Priority & Rationale List */}
+      {/* MIGRATION PRIORITY SCOREBOARD */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="text-base font-bold text-slate-100 flex items-center">
-              <ShieldAlert className="w-4.5 h-4.5 mr-2 text-cyan-400" /> Prioritized Migration Action Items ({priorities.length})
+            <h3 className="text-lg font-bold text-slate-100 flex items-center">
+              <ShieldAlert className="w-5 h-5 mr-2 text-rose-400" /> Migration Priority Scoreboard
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Purpose-aware migration priority combining quantum vulnerability, HNDL relevance, exposure, and coverage confidence.
+              Evidence-based cryptographic readiness score computed via NIST PQC policy guidelines.
             </p>
           </div>
           {onNavigateGraph && (
             <button
               onClick={onNavigateGraph}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono rounded-lg transition-colors flex items-center space-x-1.5"
+              className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-mono font-medium rounded-lg border border-slate-700 transition-colors flex items-center space-x-1.5"
             >
               <Network className="w-3.5 h-3.5" />
               <span>Explore Knowledge Graph</span>
@@ -205,6 +203,13 @@ export const PqcReadinessPage: React.FC<PqcReadinessPageProps> = ({ onNavigateGr
                       Priority Score: <span className="text-cyan-300 font-bold">{item.priority_score}/100</span> | Confidence: <span className="text-slate-300">{item.confidence}</span> | Policy: {item.policy_version}
                     </p>
                   </div>
+                  <button
+                    onClick={() => openReport(item.asset_id)}
+                    className="px-3 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 text-xs font-medium rounded-lg transition-colors flex items-center space-x-1.5"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Inspect Report</span>
+                  </button>
                 </div>
 
                 {/* WHY THIS IS PRIORITIZED */}
@@ -249,6 +254,9 @@ export const PqcReadinessPage: React.FC<PqcReadinessPageProps> = ({ onNavigateGr
           </div>
         )}
       </div>
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Server, ShieldCheck, RefreshCw, Layers, Cpu, Box, 
-  Activity, CheckCircle2, AlertTriangle, Key, Search, ExternalLink, XCircle
+  Server, ShieldCheck, RefreshCw, CheckCircle2, AlertTriangle, XCircle, Shield
 } from 'lucide-react';
-import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 interface CapabilityStatus {
   capability: string;
@@ -19,14 +19,12 @@ interface InventoryCounts {
   secret_metadata: number;
 }
 
-export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => void }> = ({ onNavigate }) => {
+export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => void }> = () => {
+  const { selectedAssetId, openReport, closeReport } = useInstanceReport();
   const [clusterStatus, setClusterStatus] = useState<string>('NOT_CONNECTED');
   const [gitVersion, setGitVersion] = useState<string>('UNKNOWN');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'coverage' | 'inventory'>('overview');
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [targets, setTargets] = useState<any[]>([]);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('');
 
   const [counts, setCounts] = useState<InventoryCounts>({
@@ -66,7 +64,6 @@ export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => v
       if (res.ok) {
         const list = await res.json();
         const k8sTargets = list.filter((t: any) => t.target_type === 'KUBERNETES_CLUSTER' || t.target_type === 'KUBERNETES_NAMESPACE');
-        setTargets(k8sTargets);
         if (k8sTargets.length > 0) {
           const tid = k8sTargets[0].id;
           setSelectedTargetId(tid);
@@ -210,6 +207,15 @@ export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => v
             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
             <span>{isSyncing ? 'Syncing...' : 'Trigger K8s Discovery Sync'}</span>
           </button>
+          {selectedTargetId && (
+            <button
+              onClick={() => openReport(selectedTargetId)}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 font-medium rounded-xl text-sm transition-colors flex items-center space-x-2"
+            >
+              <Shield className="w-4 h-4" />
+              <span>Inspect Report</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -270,6 +276,9 @@ export const KubernetesConnectorPage: React.FC<{ onNavigate?: (tab: string) => v
           ))}
         </div>
       </div>
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };

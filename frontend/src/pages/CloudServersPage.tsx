@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Cloud, Server, RefreshCw, 
-  Activity, Plus
+  Activity, Plus, Shield
 } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 interface CloudInstance {
   id?: string;
@@ -32,6 +34,7 @@ interface ScorecardData {
 }
 
 export const CloudServersPage: React.FC = () => {
+  const { selectedAssetId, openReport, closeReport } = useInstanceReport();
   const [instances, setInstances] = useState<CloudInstance[]>([]);
   const [scorecard, setScorecard] = useState<ScorecardData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -293,6 +296,7 @@ export const CloudServersPage: React.FC = () => {
                       <th className="p-2.5">Type</th>
                       <th className="p-2.5">Target Value</th>
                       <th className="p-2.5">Environment</th>
+                      <th className="p-2.5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60">
@@ -307,6 +311,17 @@ export const CloudServersPage: React.FC = () => {
                         <td className="p-2.5 text-slate-400">{inst.target_type}</td>
                         <td className="p-2.5 text-slate-300 truncate max-w-xs">{inst.target_value}</td>
                         <td className="p-2.5 text-slate-400">{inst.environment}</td>
+                        <td className="p-2.5 text-right">
+                          {inst.id && (
+                            <button
+                              onClick={() => openReport(inst.id)}
+                              className="px-2.5 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 text-xs font-mono inline-flex items-center space-x-1"
+                            >
+                              <Shield className="w-3 h-3" />
+                              <span>Report</span>
+                            </button>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -322,6 +337,9 @@ export const CloudServersPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };

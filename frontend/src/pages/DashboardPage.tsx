@@ -3,12 +3,15 @@ import { DashboardStats } from '../types';
 import { fetchDashboardStats } from '../services/api';
 import { Database, Network, KeyRound, Play, RefreshCw, Sparkles, AlertCircle, Plus } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 interface DashboardPageProps {
   onNavigate: (tab: string) => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
+  const { selectedAssetId, closeReport } = useInstanceReport();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -230,6 +233,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           </div>
         </div>
       </div>
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ScanJob, AuthorizedTarget } from '../types';
 import { fetchScans, fetchTargets, createScan, deleteScan, clearAllScans, downloadInventoryArchive } from '../services/api';
-import { Play, RefreshCw, CheckCircle, Clock, XCircle, AlertCircle, Cpu, Trash2, Download, AlertTriangle } from 'lucide-react';
+import { Play, RefreshCw, CheckCircle, Clock, XCircle, AlertCircle, Cpu, Trash2, Download, AlertTriangle, Shield } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 const AVAILABLE_SCANNERS = [
   { id: 'all', name: 'All Scanners (Complete Discovery)' },
@@ -15,6 +17,7 @@ const AVAILABLE_SCANNERS = [
 ];
 
 export const ScansPage: React.FC = () => {
+  const { selectedAssetId, openReport, closeReport } = useInstanceReport();
   const [scans, setScans] = useState<ScanJob[]>([]);
   const [targets, setTargets] = useState<AuthorizedTarget[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -288,6 +291,16 @@ export const ScansPage: React.FC = () => {
                       <td className="p-4 text-right font-mono text-xs text-slate-400">
                         <div className="flex items-center justify-end space-x-3">
                           <span>{s.completed_at ? new Date(s.completed_at).toLocaleTimeString() : s.started_at ? new Date(s.started_at).toLocaleTimeString() : 'Queued'}</span>
+                          {s.target_id && (
+                            <button
+                              onClick={() => openReport(s.target_id)}
+                              className="px-2.5 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 text-xs font-mono inline-flex items-center space-x-1"
+                              title="Inspect target instance report"
+                            >
+                              <Shield className="w-3.5 h-3.5" />
+                              <span>Report</span>
+                            </button>
+                          )}
                           <button
                             onClick={() => handleDeleteSingleScan(s.id)}
                             className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition"
@@ -305,6 +318,9 @@ export const ScansPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };

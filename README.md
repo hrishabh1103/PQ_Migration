@@ -5,7 +5,7 @@
 
 > **Runtime Truth Recovery V1 Complete** — All hardcoded/synthetic demo data has been purged. Every value displayed in the UI is now derived from real runtime evidence. Zero-state shows empty results. Real TLS scans produce real findings.
 
-> **Evidence-Driven PQC Instance Report — COMPLETE** — Per-asset PQC reports are now fully evidence-driven. No asset receives a numeric score without cryptographic evidence. `cloud_account`, `cloud_region`, and API-only assets return `NOT_ASSESSED` with `score=null`. Scores are computed by a transparent, evidence-referenced rules engine (not hardcoded constants). 26/26 anti-constant acceptance tests pass.
+> **Universal Evidence-Driven PQC Instance Report Expansion — COMPLETE** — Per-instance evidence-driven PQC assessment reports are now universally integrated across all 11 frontend pages (`LinuxCollectorPage`, `AzureConnectorPage`, `KubernetesConnectorPage`, `CloudServersPage`, `PqcReadinessPage`, `FindingsPage`, `ScansPage`, `TargetsPage`, `InventoryGraphPage`, `DashboardPage`, `ReportsPage`). All reports operate strictly on canonical backend `asset_id`s, enforce explicit assessment scopes (`INSTANCE`, `AGGREGATE`, `NOT_ELIGIBLE`), deduplicate overlapping evidence (applying rule score impact once while aggregating provenance), and gate on actual cryptographic findings (`score=null`, `status="NOT_ASSESSED"` when zero evidence exists). 13/13 backend correctness unit tests and full production frontend build (`npm run build`) pass cleanly.
 
 
 ---

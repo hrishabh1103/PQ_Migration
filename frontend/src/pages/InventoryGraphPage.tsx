@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Network, Server, Shield, Database, Activity, RefreshCw, 
-  Info, ChevronRight, Search, Layers, AlertCircle, Eye
+  Network, Shield, RefreshCw, Layers, AlertCircle, Eye
 } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 interface NodeItem {
   id: string;
@@ -29,6 +30,7 @@ interface OptionItem {
 }
 
 export const InventoryGraphPage: React.FC = () => {
+  const { selectedAssetId, openReport, closeReport } = useInstanceReport();
   const [selectedEntityType, setSelectedEntityType] = useState<string>('GLOBAL');
   const [selectedEntityId, setSelectedEntityId] = useState<string>('');
   const [entityOptions, setEntityOptions] = useState<OptionItem[]>([]);
@@ -284,6 +286,15 @@ export const InventoryGraphPage: React.FC = () => {
                   <div className="text-[10px] text-slate-400 uppercase">Entity UUID</div>
                   <div className="text-slate-300 text-[10px] break-all">{selectedNode.entity_id}</div>
                 </div>
+                {selectedNode.entity_type === 'ASSET' && (
+                  <button
+                    onClick={() => openReport(selectedNode.entity_id)}
+                    className="w-full py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 text-xs font-mono font-medium rounded-xl transition flex items-center justify-center space-x-2"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Inspect Instance Report</span>
+                  </button>
+                )}
               </div>
             ) : (
               <div className="text-slate-500 text-xs font-mono">Select a node from the canvas to inspect details.</div>
@@ -291,6 +302,9 @@ export const InventoryGraphPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };

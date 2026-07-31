@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Cloud, ShieldCheck, RefreshCw, Layers, Cpu, Key, 
-  Activity, CheckCircle2, Lock, AlertTriangle, XCircle
+  Cloud, ShieldCheck, RefreshCw, CheckCircle2, AlertTriangle, XCircle
 } from 'lucide-react';
-import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 interface CapabilityStatus {
   dimension: string;
@@ -28,13 +28,14 @@ interface InventoryCounts {
 }
 
 export const AzureConnectorPage: React.FC<{ onNavigate?: (tab: string) => void }> = () => {
+  const { selectedAssetId, closeReport } = useInstanceReport();
   const [tenantStatus, setTenantStatus] = useState<string>('NOT_CONNECTED');
   const [subscriptionId, setSubscriptionId] = useState<string>('NONE');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('');
 
-  const [counts, setCounts] = useState<InventoryCounts>({
+  const [counts] = useState<InventoryCounts>({
     tenants: 0,
     subscriptions: 0,
     resource_groups: 0,
@@ -48,7 +49,7 @@ export const AzureConnectorPage: React.FC<{ onNavigate?: (tab: string) => void }
     sql_databases: 0
   });
 
-  const [capabilities, setCapabilities] = useState<CapabilityStatus[]>([
+  const [capabilities] = useState<CapabilityStatus[]>([
     { dimension: 'AZURE_IDENTITY', capability: 'CLOUD_IDENTITY', module: 'AzureIdentityModule', status: 'NOT_SCANNED', label: 'Tenant & Subscriptions' },
     { dimension: 'AZURE_RESOURCE_GROUPS', capability: 'CLOUD_RESOURCE_GROUP', module: 'AzureResourceGroupModule', status: 'NOT_SCANNED', label: 'Resource Groups' },
     { dimension: 'AZURE_REGIONS', capability: 'CLOUD_RESOURCE', module: 'AzureRegionModule', status: 'NOT_SCANNED', label: 'Spatial Regions' },
@@ -220,6 +221,9 @@ export const AzureConnectorPage: React.FC<{ onNavigate?: (tab: string) => void }
           ))}
         </div>
       </div>
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };

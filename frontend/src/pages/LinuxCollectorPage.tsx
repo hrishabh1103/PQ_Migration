@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Server, Terminal, Shield, RefreshCw, Play, CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { InstanceReportModal } from '../components/reports/InstanceReportModal';
+import { useInstanceReport } from '../components/reports/useInstanceReport';
 
 interface CoverageItem {
   capability: string;
@@ -18,6 +20,7 @@ interface TargetItem {
 }
 
 export const LinuxCollectorPage: React.FC = () => {
+  const { selectedAssetId, openReport, closeReport } = useInstanceReport();
   const [targets, setTargets] = useState<TargetItem[]>([]);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('');
   const [newTargetValue, setNewTargetValue] = useState<string>('localhost');
@@ -216,6 +219,15 @@ export const LinuxCollectorPage: React.FC = () => {
                   </>
                 )}
               </button>
+              {selectedTargetId && (
+                <button
+                  onClick={() => openReport(selectedTargetId)}
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2"
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>Inspect Instance Report</span>
+                </button>
+              )}
             </div>
           </div>
           {statusMessage && (
@@ -258,6 +270,9 @@ export const LinuxCollectorPage: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Shared Instance Report Modal */}
+      <InstanceReportModal assetId={selectedAssetId} onClose={closeReport} />
     </div>
   );
 };
