@@ -25,6 +25,26 @@ from app.collectors.modules.base_module import ModuleResultStatus
 
 logger = logging.getLogger(__name__)
 
+_OBJECT_TYPE_TO_PURPOSE = {
+    "PROTOCOL": "PROTOCOL",
+    "ALGORITHM": "ENCRYPTION",
+    "KEY": "ENCRYPTION",
+    "CERTIFICATE": "DIGITAL_SIGNATURE",
+    "SYMMETRIC_CIPHER": "ENCRYPTION",
+    "ASYMMETRIC_CIPHER": "ENCRYPTION",
+    "KEY_EXCHANGE": "KEY_EXCHANGE",
+    "HASH": "INTEGRITY",
+    "SIGNATURE": "DIGITAL_SIGNATURE",
+    "GENERAL_ENCRYPTION": "GENERAL_ENCRYPTION",
+}
+
+def _map_object_type_to_purpose(object_type: Optional[str]) -> str:
+    """Safely map a CryptoObject object_type to a valid FindingPurpose enum value."""
+    if not object_type:
+        return "GENERAL_ENCRYPTION"
+    return _OBJECT_TYPE_TO_PURPOSE.get(str(object_type).upper(), "UNKNOWN")
+
+
 def _clean_metadata_json(meta: Any) -> dict:
     if not isinstance(meta, dict):
         return {}
@@ -658,11 +678,10 @@ class DiscoveryOrchestrator:
                             finding_type="ALGORITHM",
                             raw_algorithm_name=raw_algo,
                             normalized_algorithm_id=norm_id.canonical_id if norm_id else "UNKNOWN",
-                            purpose=getattr(obs, 'object_type', 'GENERAL_ENCRYPTION'),
+                            purpose=_map_object_type_to_purpose(getattr(obs, 'object_type', None)),
                             location_identifier=c_key,
                             evidence_snippet=f"Discovered via {connector_plugin_id.upper()} Connector: {raw_algo}",
                             evidence_hash=ev_hash,
-                            evidence_type="OBSERVATION",
                             confidence="HIGH",
                             metadata_json=getattr(obs, 'metadata', {})
                         )
@@ -712,7 +731,6 @@ class DiscoveryOrchestrator:
                             location_identifier=cert_key,
                             evidence_snippet=f"X.509 Certificate ({obs.subject}) via {connector_plugin_id.upper()}",
                             evidence_hash=ev_hash,
-                            evidence_type="OBSERVATION",
                             confidence="HIGH",
                             metadata_json={"subject": obs.subject, "issuer": obs.issuer}
                         )

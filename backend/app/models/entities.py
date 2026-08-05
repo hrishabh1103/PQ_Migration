@@ -107,6 +107,8 @@ class FindingPurpose(str, enum.Enum):
     ENCRYPTION = "ENCRYPTION"
     INTEGRITY = "INTEGRITY"
     DIGITAL_SIGNATURE = "DIGITAL_SIGNATURE"
+    PROTOCOL = "PROTOCOL"
+    GENERAL_ENCRYPTION = "GENERAL_ENCRYPTION"
     UNKNOWN = "UNKNOWN"
 
 class FindingConfidence(str, enum.Enum):

@@ -11,6 +11,8 @@
 
 > **AWS Connector Target Scope & Auto-Registration — RESOLVED** — Enhanced the AWS Connector page to automatically register and select an explicit `AWS Cloud Account` (`CLOUD_PROVIDER`) target upon page load and STS identity validation. Added an interactive `+ Register AWS Target` option to ensure AWS Cloud targets are prominently prioritized and displayed in the target scope selector.
 
+> **AWS Discovery Sync & FindingPurpose Enum Resolution — RESOLVED** — Made `crypto_findings.scan_job_id` nullable in Alembic migration `95983f6dfd92` to support `DiscoveryRun` connector syncs. Expanded `FindingPurpose` enum with `PROTOCOL` and `GENERAL_ENCRYPTION` and added a safe `_map_object_type_to_purpose` mapper in orchestrator engine, ensuring 100% clean end-to-end AWS discovery sync and readiness evaluation.
+
 
 ---
 

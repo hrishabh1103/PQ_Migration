@@ -34,8 +34,21 @@ def upgrade() -> None:
                                nullable=True,
                                existing_server_default=None)
 
+    # Make scan_job_id nullable on crypto_findings for DiscoveryRun connector syncs
+    with op.batch_alter_table('crypto_findings', schema=None) as batch_op:
+        batch_op.alter_column('scan_job_id',
+                               existing_type=sa.VARCHAR(length=36),
+                               nullable=True,
+                               existing_server_default=None)
+
 
 def downgrade() -> None:
+    with op.batch_alter_table('crypto_findings', schema=None) as batch_op:
+        batch_op.alter_column('scan_job_id',
+                               existing_type=sa.VARCHAR(length=36),
+                               nullable=False,
+                               existing_server_default=None)
+
     with op.batch_alter_table('readiness_assessments', schema=None) as batch_op:
         batch_op.alter_column('migration_category',
                                existing_type=sa.VARCHAR(length=32),
