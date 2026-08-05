@@ -662,6 +662,7 @@ class DiscoveryOrchestrator:
                             location_identifier=c_key,
                             evidence_snippet=f"Discovered via {connector_plugin_id.upper()} Connector: {raw_algo}",
                             evidence_hash=ev_hash,
+                            evidence_type="OBSERVATION",
                             confidence="HIGH",
                             metadata_json=getattr(obs, 'metadata', {})
                         )
@@ -711,6 +712,7 @@ class DiscoveryOrchestrator:
                             location_identifier=cert_key,
                             evidence_snippet=f"X.509 Certificate ({obs.subject}) via {connector_plugin_id.upper()}",
                             evidence_hash=ev_hash,
+                            evidence_type="OBSERVATION",
                             confidence="HIGH",
                             metadata_json={"subject": obs.subject, "issuer": obs.issuer}
                         )
