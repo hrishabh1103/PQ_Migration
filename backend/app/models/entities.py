@@ -303,7 +303,6 @@ class CryptoFinding(Base):
     location_identifier: Mapped[str] = mapped_column(String(512), nullable=False)
     evidence_snippet: Mapped[str] = mapped_column(Text, nullable=False)
     evidence_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
-    evidence_type: Mapped[str] = mapped_column(String(32), default="OBSERVATION", nullable=False)
     confidence: Mapped[FindingConfidence] = mapped_column(SQLEnum(FindingConfidence), default=FindingConfidence.HIGH, nullable=False)
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)

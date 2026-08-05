@@ -7,6 +7,8 @@
 
 > **Universal Evidence-Driven PQC Instance Report Expansion — COMPLETE** — Per-instance evidence-driven PQC assessment reports are now universally integrated across all 11 frontend pages (`LinuxCollectorPage`, `AzureConnectorPage`, `KubernetesConnectorPage`, `CloudServersPage`, `PqcReadinessPage`, `FindingsPage`, `ScansPage`, `TargetsPage`, `InventoryGraphPage`, `DashboardPage`, `ReportsPage`). All reports operate strictly on canonical backend `asset_id`s, enforce explicit assessment scopes (`INSTANCE`, `AGGREGATE`, `NOT_ELIGIBLE`), deduplicate overlapping evidence (applying rule score impact once while aggregating provenance), and gate on actual cryptographic findings (`score=null`, `status="NOT_ASSESSED"` when zero evidence exists). 13/13 backend correctness unit tests and full production frontend build (`npm run build`) pass cleanly.
 
+> **Database & Schema Synchronization — RESOLVED** — Database schemas and Alembic migration sequence have been fully aligned with commit state. Stale schema columns on SQLite databases left over from rolled back commits have been cleared, restoring complete operational stability across dashboard stats, scan execution, and readiness assessment evaluation.
+
 
 ---
 
