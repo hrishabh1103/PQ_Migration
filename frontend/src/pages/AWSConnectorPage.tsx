@@ -47,13 +47,33 @@ export const AWSConnectorPage: React.FC = () => {
     fetchTargetsAndCoverage();
   }, []);
 
-  const fetchTargetsAndCoverage = async () => {
+  const fetchTargetsAndCoverage = async (preferredId?: string) => {
     try {
       const tRes = await fetch('/api/v1/targets');
       if (tRes.ok) {
-        const targets = await tRes.json();
+        let targets = await tRes.json();
+        let awsTarget = targets.find((t: any) => t.id === preferredId) || targets.find((t: any) => t.target_type === 'CLOUD_PROVIDER');
+
+        if (!awsTarget) {
+          // Auto-create default AWS Cloud Provider target if none exists
+          const createRes = await fetch('/api/v1/targets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: 'AWS Cloud Account (000417292961)',
+              target_type: 'CLOUD_PROVIDER',
+              target_value: '000417292961',
+              is_authorized: true,
+              environment: 'PRODUCTION'
+            })
+          });
+          if (createRes.ok) {
+            awsTarget = await createRes.json();
+            targets = [awsTarget, ...targets];
+          }
+        }
+
         setTargetsList(targets);
-        const awsTarget = targets.find((t: any) => t.target_type === 'CLOUD_PROVIDER') || targets[0];
         if (awsTarget) {
           const tId = awsTarget.id;
           setTargetId(tId);
@@ -63,6 +83,30 @@ export const AWSConnectorPage: React.FC = () => {
       }
     } catch (err) {
       console.error('Failed to fetch targets:', err);
+    }
+  };
+
+  const handleCreateAwsTarget = async (acctId?: string) => {
+    const accNumber = acctId || identity?.account_id || '000417292961';
+    try {
+      const res = await fetch('/api/v1/targets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `AWS Cloud Account (${accNumber})`,
+          target_type: 'CLOUD_PROVIDER',
+          target_value: accNumber,
+          is_authorized: true,
+          environment: 'PRODUCTION'
+        })
+      });
+      if (res.ok) {
+        const newTarget = await res.json();
+        await fetchTargetsAndCoverage(newTarget.id);
+        setSyncStatus(`Registered new AWS Target Account: ${newTarget.name}`);
+      }
+    } catch (e) {
+      console.error('Failed to register AWS target:', e);
     }
   };
 
@@ -109,6 +153,15 @@ export const AWSConnectorPage: React.FC = () => {
         const data = await res.json();
         setIdentity(data);
         setSyncStatus(`STS Caller Identity Validated! Account ID: ${data.account_id}`);
+
+        // Ensure AWS Cloud Account target exists & is selected
+        const accId = data.account_id || '000417292961';
+        const existingAws = targetsList.find((t: any) => t.target_type === 'CLOUD_PROVIDER' && t.target_value.includes(accId));
+        if (!existingAws) {
+          await handleCreateAwsTarget(accId);
+        } else {
+          handleTargetChange(existingAws.id);
+        }
       } else {
         const err = await res.json();
         setSyncStatus(`Validation Error: ${err.detail}`);
@@ -127,14 +180,13 @@ export const AWSConnectorPage: React.FC = () => {
       let activeTargetId = targetId;
 
       if (!activeTargetId) {
-        // Auto-register AWS target if none exists yet
         const regRes = await fetch('/api/v1/targets', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name: `AWS Cloud Account (${identity?.account_id || 'Primary'})`,
+            name: `AWS Cloud Account (${identity?.account_id || '000417292961'})`,
             target_type: 'CLOUD_PROVIDER',
-            target_value: identity?.account_id || 'aws-account',
+            target_value: identity?.account_id || '000417292961',
             is_authorized: true,
             environment: 'PRODUCTION'
           })
@@ -247,22 +299,32 @@ export const AWSConnectorPage: React.FC = () => {
               <Play className="w-4 h-4 mr-2 text-emerald-400" /> Region Allowlist & Discovery Sync
             </h3>
             <div className="space-y-3">
-              {targetsList.length > 0 && (
-                <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Target Account / Provider Scope</label>
-                  <select
-                    value={targetId}
-                    onChange={(e) => handleTargetChange(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500"
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-mono text-slate-400">Target Account / Provider Scope</label>
+                  <button
+                    type="button"
+                    onClick={() => handleCreateAwsTarget()}
+                    className="text-[11px] font-mono text-cyan-400 hover:text-cyan-300 underline"
                   >
-                    {targetsList.map((t: any) => (
+                    + Register AWS Target
+                  </button>
+                </div>
+                <select
+                  value={targetId}
+                  onChange={(e) => handleTargetChange(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500"
+                >
+                  {targetsList
+                    .slice()
+                    .sort((a) => (a.target_type === 'CLOUD_PROVIDER' ? -1 : 1))
+                    .map((t: any) => (
                       <option key={t.id} value={t.id}>
-                        {t.name} ({t.target_value}) [{t.target_type}]
+                        {t.target_type === 'CLOUD_PROVIDER' ? '☁️ ' : ''}{t.name} ({t.target_value}) [{t.target_type}]
                       </option>
                     ))}
-                  </select>
-                </div>
-              )}
+                </select>
+              </div>
 
               <div>
                 <label className="block text-xs font-mono text-slate-400 mb-1">Authorized AWS Regions</label>

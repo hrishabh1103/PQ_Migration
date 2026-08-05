@@ -9,6 +9,8 @@
 
 > **Database & Schema Synchronization — RESOLVED** — Database schemas and Alembic migration sequence have been fully aligned with commit state. Stale schema columns on SQLite databases left over from rolled back commits have been cleared, restoring complete operational stability across dashboard stats, scan execution, and readiness assessment evaluation.
 
+> **AWS Connector Target Scope & Auto-Registration — RESOLVED** — Enhanced the AWS Connector page to automatically register and select an explicit `AWS Cloud Account` (`CLOUD_PROVIDER`) target upon page load and STS identity validation. Added an interactive `+ Register AWS Target` option to ensure AWS Cloud targets are prominently prioritized and displayed in the target scope selector.
+
 
 ---
 
