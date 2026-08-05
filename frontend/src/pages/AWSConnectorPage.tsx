@@ -177,7 +177,8 @@ export const AWSConnectorPage: React.FC = () => {
     setIsSyncing(true);
     setSyncStatus('Initiating AWS Connector read-only discovery sync across authorized regions...');
     try {
-      let activeTargetId = targetId;
+      let activeTarget = targetsList.find((t: any) => t.id === targetId) || targetsList.find((t: any) => t.target_type === 'CLOUD_PROVIDER');
+      let activeTargetId = activeTarget ? activeTarget.id : '';
 
       if (!activeTargetId) {
         const regRes = await fetch('/api/v1/targets', {
@@ -198,11 +199,37 @@ export const AWSConnectorPage: React.FC = () => {
         }
       }
 
-      const res = await fetch('/api/v1/connectors/aws/sync', {
+      let res = await fetch('/api/v1/connectors/aws/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ target_id: activeTargetId, allowed_regions: selectedRegions })
       });
+
+      // Self-heal if target ID was stale/not found
+      if (res.status === 404) {
+        setSyncStatus('Stale target scope detected. Registering active AWS Cloud target...');
+        const regRes = await fetch('/api/v1/targets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: `AWS Cloud Account (${identity?.account_id || '000417292961'})`,
+            target_type: 'CLOUD_PROVIDER',
+            target_value: identity?.account_id || '000417292961',
+            is_authorized: true,
+            environment: 'PRODUCTION'
+          })
+        });
+        if (regRes.ok) {
+          const newTarget = await regRes.json();
+          activeTargetId = newTarget.id;
+          await fetchTargetsAndCoverage(newTarget.id);
+          res = await fetch('/api/v1/connectors/aws/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target_id: activeTargetId, allowed_regions: selectedRegions })
+          });
+        }
+      }
 
       if (res.ok) {
         setSyncStatus('AWS Discovery Sync completed successfully. Refreshing coverage & inventory...');

@@ -13,6 +13,8 @@
 
 > **AWS Discovery Sync & FindingPurpose Enum Resolution — RESOLVED** — Made `crypto_findings.scan_job_id` nullable in Alembic migration `95983f6dfd92` to support `DiscoveryRun` connector syncs. Expanded `FindingPurpose` enum with `PROTOCOL` and `GENERAL_ENCRYPTION` and added a safe `_map_object_type_to_purpose` mapper in orchestrator engine, ensuring 100% clean end-to-end AWS discovery sync and readiness evaluation.
 
+> **Stale Target Scope Self-Healing — RESOLVED** — Implemented automatic target scope validation and self-healing fallback in `AWSConnectorPage.tsx`. If a browser session holds a cached target ID from a prior database state, the connector automatically detects stale 404 responses, registers/selects a fresh valid `AWS Cloud Account` target, and completes discovery sync seamlessly.
+
 
 ---
 
